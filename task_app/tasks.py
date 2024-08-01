@@ -8,6 +8,9 @@ from celery import Task
 def add(a: int, b: int) -> int:
     return a + b
 
+@shared_task(bind=True)
+def print(self, arg) -> None:
+    print(f"for task {self.request.id} got arg '{arg}'")
 
 @shared_task()
 def block() -> None:
