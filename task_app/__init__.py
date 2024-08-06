@@ -22,10 +22,6 @@ def create_app() -> Flask:
     app.extensions["bootstrap"] = Bootstrap5(app)
     celery_init_app(app)
 
-    @app.route("/")
-    def index() -> str:
-        return render_template("index.html")
-
     from . import views, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)
