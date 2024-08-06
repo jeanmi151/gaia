@@ -8,10 +8,9 @@ from flask import request
 
 from . import tasks
 
-bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-
-@bp.get("/result/<id>")
+@tasks_bp.get("/result/<id>")
 def result(id: str) -> dict[str, object]:
     result = AsyncResult(id)
     ready = result.ready()
@@ -22,7 +21,7 @@ def result(id: str) -> dict[str, object]:
     }
 
 
-@bp.post("/add")
+@tasks_bp.post("/add")
 def add() -> dict[str, object]:
     a = request.form.get("a", type=int)
     b = request.form.get("b", type=int)
@@ -30,13 +29,13 @@ def add() -> dict[str, object]:
     return {"result_id": result.id}
 
 
-@bp.post("/block")
+@tasks_bp.post("/block")
 def block() -> dict[str, object]:
     result = tasks.block.delay()
     return {"result_id": result.id}
 
 
-@bp.post("/process")
+@tasks_bp.post("/process")
 def process() -> dict[str, object]:
     result = tasks.process.delay(total=request.form.get("total", type=int))
     return {"result_id": result.id}

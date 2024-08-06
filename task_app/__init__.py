@@ -28,8 +28,8 @@ def create_app() -> Flask:
 
     from . import views, dashboard
 
-    dashboard.dash.register_blueprint(views.bp)
-    app.register_blueprint(dashboard.dash)
+    dashboard.dash_bp.register_blueprint(views.tasks_bp)
+    app.register_blueprint(dashboard.dash_bp)
     return app
 
 def celery_init_app(app: Flask) -> Celery:
