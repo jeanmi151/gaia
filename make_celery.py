@@ -1,4 +1,4 @@
-from task_app import create_app
+from celery import Celery
 
-flask_app = create_app()
-celery_app = flask_app.extensions["celery"]
+celery_app = Celery(__name__)
+celery_app.config_from_object('task_app.celeryconfig')
