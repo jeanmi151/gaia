@@ -18,3 +18,50 @@ fetch('/dashboard/api/geonetwork/metadatas.json')
             $table.bootstrapTable({data: xxdata});
         });
     });
+
+fetch('/dashboard/api/mapstore/maps.json')
+    .then(response => response.json())
+    .then(mydata => {
+        var $table = $('#mapstable');
+        var xxdata = [];
+        res = mydata['results'];
+        if(mydata['totalCount'] == 0) {
+            $table.remove();
+            $('#mapstitle').remove();
+            return;
+        }
+        $('#mapstitle').text(mydata['totalCount'] + ' maps');
+        res.forEach(function (value) {
+            id = value['id'];
+            value['id'] = '<a href="/dashboard/map/' + id + '">' + id + '</a>';
+            value['viewlink']='<a href="/mapstore/#/viewer/' + id + '">voir</a>';
+            xxdata.push(value);
+        });
+        $(function() {
+            $table.bootstrapTable({data: xxdata});
+        });
+    });
+
+fetch('/dashboard/api/mapstore/contexts.json')
+    .then(response => response.json())
+    .then(mydata => {
+        var $table = $('#ctxtable');
+        var xxdata = [];
+        res = mydata['results'];
+        if(mydata['totalCount'] == 0) {
+            $table.remove();
+            $('#ctxtitle').remove();
+            return;
+        }
+        $('#ctxtitle').text(mydata['totalCount'] + ' contexts');
+        res.forEach(function (value) {
+            id = value['id'];
+            value['id'] = '<a href="/dashboard/context/' + id + '">' + id + '</a>';
+            value['viewlink']='<a href="/mapstore/#/context/' + value['name'] + '">voir</a>';
+            value['editlink']='<a href="/mapstore/#/context-creator/' + id + '">editer</a>';
+            xxdata.push(value);
+        });
+        $(function() {
+            $table.bootstrapTable({data: xxdata});
+        });
+    });
