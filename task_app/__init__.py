@@ -14,7 +14,7 @@ capp.config_from_object('task_app.celeryconfig')
 capp.set_default()
 
 def create_app() -> Flask:
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/dashboard/static')
     app.config.from_mapping(
         CELERY=capp.conf
     )
