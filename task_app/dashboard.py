@@ -1,0 +1,13 @@
+#!/bin/env python3
+# -*- coding: utf-8 -*-
+# vim: ts=4 sw=4 et
+
+from flask import Blueprint
+from flask import request, render_template
+from flask import current_app as app
+
+dash = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
+
+@dash.route("/home")
+def home():
+    return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])

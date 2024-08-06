@@ -6,6 +6,7 @@ from celery import Celery
 from celery import Task
 from flask import Flask
 from flask import render_template
+from flask_bootstrap import Bootstrap5
 
 # this celery app object is used by the beat and worker threads
 capp = Celery(__name__)
@@ -18,15 +19,17 @@ def create_app() -> Flask:
         CELERY=capp.conf
     )
     app.config.from_prefixed_env()
+    app.extensions["bootstrap"] = Bootstrap5(app)
     celery_init_app(app)
 
     @app.route("/")
     def index() -> str:
         return render_template("index.html")
 
-    from . import views
+    from . import views, dashboard
 
     app.register_blueprint(views.bp)
+    app.register_blueprint(dashboard.dash)
     return app
 
 def celery_init_app(app: Flask) -> Celery:
