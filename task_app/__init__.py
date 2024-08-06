@@ -22,9 +22,10 @@ def create_app() -> Flask:
     app.extensions["bootstrap"] = Bootstrap5(app)
     celery_init_app(app)
 
-    from . import views, dashboard
+    from . import views, api, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)
+    dashboard.dash_bp.register_blueprint(api.api_bp)
     app.register_blueprint(dashboard.dash_bp)
     return app
 
