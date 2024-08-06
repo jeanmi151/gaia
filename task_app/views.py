@@ -1,3 +1,7 @@
+#!/bin/env python3
+# -*- coding: utf-8 -*-
+# vim: ts=4 sw=4 et
+
 from celery.result import AsyncResult
 from flask import Blueprint
 from flask import request

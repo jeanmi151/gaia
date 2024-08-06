@@ -1,3 +1,7 @@
+#!/bin/env python3
+# -*- coding: utf-8 -*-
+# vim: ts=4 sw=4 et
+
 import time
 
 from celery import shared_task
