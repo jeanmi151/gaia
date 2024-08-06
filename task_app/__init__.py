@@ -32,13 +32,6 @@ def create_app() -> Flask:
     app.register_blueprint(views.bp)
     return app
 
-def worker_thread():
-    argv = [
-        'worker',
-        '-P','solo', '-E',
-        '--loglevel=info']
-    capp.worker_main(argv)
-
 def beat_thread():
     capp.Beat(loglevel='info').run()
 
@@ -52,8 +45,6 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app.config_from_object(app.config["CELERY"])
     celery_app.set_default()
     app.extensions["celery"] = celery_app
-    tworker = Thread(name='worker',target=worker_thread)
     tbeat = Thread(name='beat',target=beat_thread)
     tbeat.start()
-    tworker.start()
     return celery_app
