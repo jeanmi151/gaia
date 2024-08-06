@@ -15,3 +15,11 @@ def index() -> str:
 @dash_bp.route("/home")
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+
+@dash_bp.route("/map/<int:mapid>")
+def map(mapid):
+    return render_template('map.html', mapid=mapid, bootstrap=app.extensions["bootstrap"])
+
+@dash_bp.route("/context/<int:ctxid>")
+def ctx(ctxid):
+    return render_template('ctx.html', ctxid=ctxid, bootstrap=app.extensions["bootstrap"])
