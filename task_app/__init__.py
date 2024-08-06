@@ -5,14 +5,15 @@ from flask import render_template
 
 from config import url
 
+# this celery app object is used by the beat and worker threads
+capp = Celery(__name__)
+capp.config_from_object('task_app.celeryconfig')
+capp.set_default()
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_mapping(
-        CELERY=dict(
-            broker_url=url,
-            result_backend=url,
-            task_ignore_result=True,
-        ),
+        CELERY=capp.conf
     )
     app.config.from_prefixed_env()
     celery_init_app(app)
