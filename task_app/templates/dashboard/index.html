@@ -11,7 +11,7 @@ Execute background tasks with Celery. Submits tasks and shows results using Java
 <hr>
 <h4>Add</h4>
 <p>Start a task to add two numbers, then poll for the result.
-<form id=add method=post action="{{ url_for("tasks.add") }}">
+<form id=add method=post action="{{ url_for("dashboard.tasks.add") }}">
   <label>A <input type=number name=a value=4></label><br>
   <label>B <input type=number name=b value=2></label><br>
   <input type=submit>
@@ -21,7 +21,7 @@ Execute background tasks with Celery. Submits tasks and shows results using Java
 <hr>
 <h4>Block</h4>
 <p>Start a task that takes 5 seconds. However, the response will return immediately.
-<form id=block method=post action="{{ url_for("tasks.block") }}">
+<form id=block method=post action="{{ url_for("dashboard.tasks.block") }}">
   <input type=submit>
 </form>
 <p id=block-result></p>
@@ -29,7 +29,7 @@ Execute background tasks with Celery. Submits tasks and shows results using Java
 <hr>
 <h4>Process</h4>
 <p>Start a task that counts, waiting one second each time, showing progress.
-<form id=process method=post action="{{ url_for("tasks.process") }}">
+<form id=process method=post action="{{ url_for("dashboard.tasks.process") }}">
   <label>Total <input type=number name=total value="10"></label><br>
   <input type=submit>
 </form>
@@ -48,7 +48,7 @@ Execute background tasks with Celery. Submits tasks and shows results using Java
           report(null)
 
           const poll = () => {
-            fetch(`/tasks/result/${data["result_id"]}`)
+            fetch(`/dashboard/tasks/result/${data["result_id"]}`)
               .then(response => response.json())
               .then(data => {
                 report(data)
