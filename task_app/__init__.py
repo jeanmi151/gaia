@@ -28,7 +28,7 @@ def create_app() -> Flask:
 
     from . import views, dashboard
 
-    app.register_blueprint(views.bp)
+    dashboard.dash.register_blueprint(views.bp)
     app.register_blueprint(dashboard.dash)
     return app
 
