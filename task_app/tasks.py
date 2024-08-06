@@ -5,8 +5,10 @@
 import time
 
 from celery import shared_task
+from celery.utils.log import get_task_logger
 from celery import Task
 
+mytasklogger = get_task_logger(__name__)
 
 @shared_task(ignore_result=False)
 def add(a: int, b: int) -> int:
@@ -14,7 +16,7 @@ def add(a: int, b: int) -> int:
 
 @shared_task(bind=True)
 def printmsg(self, arg) -> None:
-    print(f"for task {self.request.id} got arg '{arg}'")
+    mytasklogger.info(f"for task {self.request.id} got arg '{arg}'")
 
 @shared_task()
 def block() -> None:
