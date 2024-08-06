@@ -28,7 +28,18 @@
         <!-- Your page content -->
         {% block content %}
    <div class="container">
-            <p>Hello {{ reqhead['sec-username'] }}</p>
+            <p>Hello {{ reqhead['sec-username'] }}, see below your data:</p>
+<h2 id='mdtitle'>Metadatas</h2>
+<table id="table" class="table">
+  <thead>
+    <tr>
+      <th data-field="_id">UUID</th>
+      <th data-field="title">Title</th>
+      <th data-field="dhlink">DH</th>
+      <th data-field="editlink">Edit</th>
+    </tr>
+  </thead>
+</table>
 </div>
 {% endblock %}
     </body>
