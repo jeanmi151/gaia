@@ -8,9 +8,8 @@ from flask import request
 from flask import jsonify
 
 from . import tasks
+from task_app.checks.mapstore import check_res
 
-from task_app.checks.mapstore import MapstoreChecker
-msc = MapstoreChecker()
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @tasks_bp.get("/result/<id>")
@@ -45,10 +44,10 @@ def process() -> dict[str, object]:
 
 @tasks_bp.route("/check/map/<int:mapid>.json")
 def check_map(mapid):
-    res = msc.check_res('MAP',mapid)
-    return jsonify(res)
+    result = check_res.delay('MAP',mapid)
+    return {"result_id": result.id}
 
 @tasks_bp.route("/check/context/<int:ctxid>.json")
 def check_ctx(ctxid):
-    res = msc.check_res('CONTEXT',ctxid)
-    return jsonify(res)
+    result = check_res.delay('CONTEXT',ctxid)
+    return {"result_id": result.id}
