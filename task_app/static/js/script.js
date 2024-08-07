@@ -1,4 +1,5 @@
-fetch('/dashboard/api/geonetwork/metadatas.json')
+const fetchForHome = () => {
+  fetch('/dashboard/api/geonetwork/metadatas.json')
     .then(response => response.json())
     .then(mydata => {
         var $table = $('#table');
@@ -19,7 +20,7 @@ fetch('/dashboard/api/geonetwork/metadatas.json')
         });
     });
 
-fetch('/dashboard/api/mapstore/maps.json')
+  fetch('/dashboard/api/mapstore/maps.json')
     .then(response => response.json())
     .then(mydata => {
         var $table = $('#mapstable');
@@ -42,7 +43,7 @@ fetch('/dashboard/api/mapstore/maps.json')
         });
     });
 
-fetch('/dashboard/api/mapstore/contexts.json')
+  fetch('/dashboard/api/mapstore/contexts.json')
     .then(response => response.json())
     .then(mydata => {
         var $table = $('#ctxtable');
@@ -65,3 +66,4 @@ fetch('/dashboard/api/mapstore/contexts.json')
             $table.bootstrapTable({data: xxdata});
         });
     });
+}
