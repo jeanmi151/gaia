@@ -13,6 +13,7 @@ from owslib.wfs import WebFeatureService
 from owslib.wmts import WebMapTileService
 from owslib.util import ServiceException
 
+from celery import shared_task
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
 from task_app.georchestraconfig import GeorchestraConfig
@@ -60,6 +61,8 @@ class MapstoreChecker():
         self.cat = dict()
         for c in categories:
             self.cat[c.name] = c.id
+
+    @shared_task()
     def check_res(self, rescat, resid):
         m = self.session.query(self.Resource).filter(and_(self.Resource.category_id == self.cat[rescat], self.Resource.id == resid)).one()
         tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == self.cat[rescat] else 'le contexte', m.id, m.name))
