@@ -17,9 +17,9 @@ database_engine_options = {'echo': True}
 result_extended = True
 
 beat_schedule = {
-  'print-every-10-seconds': {
+  'print-every-600-seconds': {
     'task': 'task_app.tasks.printmsg',
-    'schedule': 10.0,
+    'schedule': 600.0,
     'args': ['hello']
   }
 }
