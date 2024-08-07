@@ -42,9 +42,10 @@ fetch('/dashboard/tasks/check/context/{{ ctxid }}.json')
                   console.error(data)
                 } else {
                   if (data["value"].problems.length > 0) {
+                    $('#pbtitle').text('Problems');
                     $('#problems').text(data["value"].problems);
                   } else {
-                    $('#pbtitle').text('No problemo! in map owned by '+data["value"].owner);
+                    $('#pbtitle').text('No problemo! in context owned by '+data["value"].owner);
                     $('#problems').remove();
                   }
                 }
