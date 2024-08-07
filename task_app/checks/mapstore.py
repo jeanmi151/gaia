@@ -62,10 +62,12 @@ class MapstoreChecker():
         for c in categories:
             self.cat[c.name] = c.id
 
+msc = MapstoreChecker()
+
 @shared_task()
-def check_res(self, rescat, resid):
-    m = self.session.query(self.Resource).filter(and_(self.Resource.category_id == self.cat[rescat], self.Resource.id == resid)).one()
-    tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == self.cat[rescat] else 'le contexte', m.id, m.name))
+def check_res(rescat, resid):
+    m = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
+    tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == msc.cat[rescat] else 'le contexte', m.id, m.name))
     # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
     ret = dict()
 
@@ -97,13 +99,13 @@ def check_res(self, rescat, resid):
         match l['type']:
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
-                if l['type'] not in self.ows_services:
-                    self.ows_services[l['type']] = dict()
-                if l['url'] not in self.ows_services[l['type']]:
-                    self.ows_services[l['type']][l['url']] = dict()
-                if l['name'] not in self.ows_services[l['type']][l['url']]:
-                    self.ows_services[l['type']][l['url']][l['name']] = set()
-                self.ows_services[l['type']][l['url']][l['name']].add((m.id))
+                if l['type'] not in msc.ows_services:
+                    msc.ows_services[l['type']] = dict()
+                if l['url'] not in msc.ows_services[l['type']]:
+                    msc.ows_services[l['type']][l['url']] = dict()
+                if l['name'] not in msc.ows_services[l['type']][l['url']]:
+                    msc.ows_services[l['type']][l['url']][l['name']] = set()
+                msc.ows_services[l['type']][l['url']][l['name']].add((m.id))
             case '3dtiles':
                 tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
             case 'cog':
@@ -115,11 +117,11 @@ def check_res(self, rescat, resid):
             case _:
                 tasklogger.debug(l)
 
-    for k,v in self.ows_services.items():
+    for k,v in msc.ows_services.items():
         for u,ls in v.items():
             # is a relative url, prepend https://domainName
             if not u.startswith('http'):
-                u = 'https://' + self.conf.get('domainName') + u
+                u = 'https://' + msc.conf.get('domainName') + u
             tasklogger.debug("fetching {} getcapabilities for {}".format(k, u))
             try:
                 if k == 'wms':
