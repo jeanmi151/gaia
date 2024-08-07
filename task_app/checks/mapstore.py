@@ -13,6 +13,8 @@ from owslib.wfs import WebFeatureService
 from owslib.wmts import WebMapTileService
 from owslib.util import ServiceException
 
+from celery.utils.log import get_task_logger
+tasklogger = get_task_logger(__name__)
 from task_app.georchestraconfig import GeorchestraConfig
 
 # solves conflicts in relationship naming ?
@@ -60,7 +62,7 @@ class MapstoreChecker():
             self.cat[c.name] = c.id
     def check_res(self, rescat, resid):
         m = self.session.query(self.Resource).filter(and_(self.Resource.category_id == self.cat[rescat], self.Resource.id == resid)).one()
-        print("{} avec id {} a pour titre {}".format('la carte' if m.category_id == self.cat[rescat] else 'le contexte', m.id, m.name))
+        tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == self.cat[rescat] else 'le contexte', m.id, m.name))
         # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
         ret = dict()
 
@@ -91,7 +93,7 @@ class MapstoreChecker():
                 ret['backgrounds'].append(l)
             match l['type']:
                 case 'wms'|'wfs'|'wmts':
-                    print('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
+                    tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                     if l['type'] not in self.ows_services:
                         self.ows_services[l['type']] = dict()
                     if l['url'] not in self.ows_services[l['type']]:
@@ -100,22 +102,22 @@ class MapstoreChecker():
                         self.ows_services[l['type']][l['url']][l['name']] = set()
                     self.ows_services[l['type']][l['url']][l['name']].add((m.id))
                 case '3dtiles':
-                    print('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
+                    tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
                 case 'cog':
-                    print(l)
+                    tasklogger.debug(l)
                 case 'empty':
                     pass
                 case 'osm':
                     pass
                 case _:
-                    print(l)
+                    tasklogger.debug(l)
 
         for k,v in self.ows_services.items():
             for u,ls in v.items():
                 # is a relative url, prepend https://domainName
                 if not u.startswith('http'):
                     u = 'https://' + self.conf.get('domainName') + u
-                print ("fetching {} getcapabilities for {}".format(k, u))
+                tasklogger.debug("fetching {} getcapabilities for {}".format(k, u))
                 try:
                     if k == 'wms':
                         s = WebMapService(u, version='1.3.0')
@@ -126,9 +128,9 @@ class MapstoreChecker():
                 except ServiceException as e:
                     # XXX hack parses the 403 page returned by the s-p ?
                     if 'interdit' in e.args[0]:
-                        print("{} needs auth ?".format(u))
+                        tasklogger.warning("{} needs auth ?".format(u))
                     else:
-                        print(e)
+                        tasklogger.error(e)
                     # skip check since we didn't get a proper getcapabilities
                     continue
                 for l,m in ls.items():
