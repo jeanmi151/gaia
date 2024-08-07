@@ -62,81 +62,81 @@ class MapstoreChecker():
         for c in categories:
             self.cat[c.name] = c.id
 
-    @shared_task()
-    def check_res(self, rescat, resid):
-        m = self.session.query(self.Resource).filter(and_(self.Resource.category_id == self.cat[rescat], self.Resource.id == resid)).one()
-        tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == self.cat[rescat] else 'le contexte', m.id, m.name))
-        # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
-        ret = dict()
+@shared_task()
+def check_res(self, rescat, resid):
+    m = self.session.query(self.Resource).filter(and_(self.Resource.category_id == self.cat[rescat], self.Resource.id == resid)).one()
+    tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == self.cat[rescat] else 'le contexte', m.id, m.name))
+    # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
+    ret = dict()
 
-        for a in m.gs_attribute:
-            if a.name in ('owner', 'context', 'details', 'thumbnail'):
-                if 'attribute' not in ret:
-                    ret['attribute'] = dict()
-                ret['attribute'][a.name] = a.attribute_text
-        for s in m.gs_security:
-            # in the ms2-geor project, an entry with username is the owner
-            if s.username is not None:
-                ret['owner'] = s.username
-            if s.groupname is not None:
-                if 'groups' not in ret:
-                    ret['groups'] = dict()
-                ret['groups'][s.groupname] = { 'canread': s.canread, 'canwrite': s.canwrite }
+    for a in m.gs_attribute:
+        if a.name in ('owner', 'context', 'details', 'thumbnail'):
+            if 'attribute' not in ret:
+                ret['attribute'] = dict()
+            ret['attribute'][a.name] = a.attribute_text
+    for s in m.gs_security:
+        # in the ms2-geor project, an entry with username is the owner
+        if s.username is not None:
+            ret['owner'] = s.username
+        if s.groupname is not None:
+            if 'groups' not in ret:
+                ret['groups'] = dict()
+            ret['groups'][s.groupname] = { 'canread': s.canread, 'canwrite': s.canwrite }
 
-        # uses automapped attribute from relationship instead of a query
-        data = json.loads(m.gs_stored_data[0].stored_data)
-        ret['backgrounds'] = list()
-        ret['problems'] = list()
-        if rescat == 'MAP':
-            ret['layers'] = data["map"]["layers"]
-        else:
-            ret['layers'] = data["mapConfig"]["map"]["layers"]
-        for l in ret['layers']:
-            if 'group' in l and l["group"] == 'background':
-                ret['backgrounds'].append(l)
-            match l['type']:
-                case 'wms'|'wfs'|'wmts':
-                    tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
-                    if l['type'] not in self.ows_services:
-                        self.ows_services[l['type']] = dict()
-                    if l['url'] not in self.ows_services[l['type']]:
-                        self.ows_services[l['type']][l['url']] = dict()
-                    if l['name'] not in self.ows_services[l['type']][l['url']]:
-                        self.ows_services[l['type']][l['url']][l['name']] = set()
-                    self.ows_services[l['type']][l['url']][l['name']].add((m.id))
-                case '3dtiles':
-                    tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
-                case 'cog':
-                    tasklogger.debug(l)
-                case 'empty':
-                    pass
-                case 'osm':
-                    pass
-                case _:
-                    tasklogger.debug(l)
+    # uses automapped attribute from relationship instead of a query
+    data = json.loads(m.gs_stored_data[0].stored_data)
+    ret['backgrounds'] = list()
+    ret['problems'] = list()
+    if rescat == 'MAP':
+        ret['layers'] = data["map"]["layers"]
+    else:
+        ret['layers'] = data["mapConfig"]["map"]["layers"]
+    for l in ret['layers']:
+        if 'group' in l and l["group"] == 'background':
+            ret['backgrounds'].append(l)
+        match l['type']:
+            case 'wms'|'wfs'|'wmts':
+                tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
+                if l['type'] not in self.ows_services:
+                    self.ows_services[l['type']] = dict()
+                if l['url'] not in self.ows_services[l['type']]:
+                    self.ows_services[l['type']][l['url']] = dict()
+                if l['name'] not in self.ows_services[l['type']][l['url']]:
+                    self.ows_services[l['type']][l['url']][l['name']] = set()
+                self.ows_services[l['type']][l['url']][l['name']].add((m.id))
+            case '3dtiles':
+                tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
+            case 'cog':
+                tasklogger.debug(l)
+            case 'empty':
+                pass
+            case 'osm':
+                pass
+            case _:
+                tasklogger.debug(l)
 
-        for k,v in self.ows_services.items():
-            for u,ls in v.items():
-                # is a relative url, prepend https://domainName
-                if not u.startswith('http'):
-                    u = 'https://' + self.conf.get('domainName') + u
-                tasklogger.debug("fetching {} getcapabilities for {}".format(k, u))
-                try:
-                    if k == 'wms':
-                        s = WebMapService(u, version='1.3.0')
-                    if k == 'wfs':
-                        s = WebFeatureService(u, version='1.1.0')
-                    if k == 'wmts':
-                        s = WebMapTileService(u)
-                except ServiceException as e:
-                    # XXX hack parses the 403 page returned by the s-p ?
-                    if 'interdit' in e.args[0]:
-                        tasklogger.warning("{} needs auth ?".format(u))
-                    else:
-                        tasklogger.error(e)
-                    # skip check since we didn't get a proper getcapabilities
-                    continue
-                for l,m in ls.items():
-                    if l not in s.contents:
-                        ret['problems'].append('layer {} referenced by map {} doesnt exist in {} service at {}'.format(l, m, k, u))
-        return ret
+    for k,v in self.ows_services.items():
+        for u,ls in v.items():
+            # is a relative url, prepend https://domainName
+            if not u.startswith('http'):
+                u = 'https://' + self.conf.get('domainName') + u
+            tasklogger.debug("fetching {} getcapabilities for {}".format(k, u))
+            try:
+                if k == 'wms':
+                    s = WebMapService(u, version='1.3.0')
+                if k == 'wfs':
+                    s = WebFeatureService(u, version='1.1.0')
+                if k == 'wmts':
+                    s = WebMapTileService(u)
+            except ServiceException as e:
+                # XXX hack parses the 403 page returned by the s-p ?
+                if 'interdit' in e.args[0]:
+                    tasklogger.warning("{} needs auth ?".format(u))
+                else:
+                    tasklogger.error(e)
+                # skip check since we didn't get a proper getcapabilities
+                continue
+            for l,m in ls.items():
+                if l not in s.contents:
+                    ret['problems'].append('layer {} referenced by map {} doesnt exist in {} service at {}'.format(l, m, k, u))
+    return ret
