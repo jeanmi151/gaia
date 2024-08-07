@@ -3,7 +3,7 @@
 # vim: ts=4 sw=4 et
 
 from flask import Blueprint
-from flask import request, jsonify
+from flask import request, jsonify, abort
 import requests
 import json
 
