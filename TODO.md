@@ -1,5 +1,4 @@
 # todo/ideas
-- parse localConfig.json to find the geonetwork/geoserver urls from local/localgs entries instead of hardcoding geocat/wxs (craig specifics)
 - a page by ogc service (eg localgs by default):
   - listing/linking to layers
   - for localgs, listing workspaces entrypoints
