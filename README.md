@@ -13,7 +13,10 @@ one of the goal is to provide an api returning JSON so that it can be reused in
 other components/webpages (such as the [ids
 homepage](https://github.com/georchestra/htdocs/))
 
-it is a work in progress, being developed when spare time is available.
+it is a work in progress, being developed when spare time is available. for now
+developped in my own github account, but if enough features are developed and
+interest is shown, it'll move to the
+[geOrchestra](https://github.com/georchestra/) organization.
 
 ## dependencies
 
