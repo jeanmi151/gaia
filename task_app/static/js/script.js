@@ -67,3 +67,36 @@ const fetchForHome = () => {
         });
     });
 }
+
+const CheckRes = (type, resid) => {
+  fetch('/dashboard/tasks/check/' + type + '/' + resid + '.json')
+    .then(response => response.json())
+    .then(mydata => {
+        $('#pbtitle').text("En cours d'analyse");
+        const poll = () => {
+          fetch(`/dashboard/tasks/result/${mydata["result_id"]}`)
+            .then(response => response.json())
+            .then(data => {
+//                console.log(data)
+                if (data === null) {
+                  $('#pbtitle').text('got null, shouldnt happen ?');
+                } else if(!data["ready"]) {
+                  $('#pbtitle').text('Waiting');
+                  setTimeout(poll, 500)
+                } else if (!data["successful"]) {
+                  $('#problems').text('Something crashed, check browser console');
+                  console.error(data)
+                } else {
+                  if (data["value"].problems.length > 0) {
+                    $('#pbtitle').text('Problems');
+                    $('#problems').text(data["value"].problems);
+                  } else {
+                    $('#pbtitle').text('No problemo! in ' + type + ' owned by '+data["value"].owner);
+                    $('#problems').remove();
+                  }
+                }
+            })
+        }
+        poll();
+    })
+}
