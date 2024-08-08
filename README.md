@@ -37,6 +37,10 @@ add this line to `/etc/georchestra/security-proxy/target-mappings.properties`:
 dashboard=http://<hostname>:<port>/dashboard/
 ```
 
+and visit https://<idsurl>/dashboard/home, which should list for now:
+- your metadatas
+- the maps & contexts you can access
+
 ## service
 
 needs two services running (TODO)
@@ -44,7 +48,7 @@ needs two services running (TODO)
 - the celery worker, for long-running checks
 
 for now during development those are started by [`run.sh`](run.sh), proper
-integration via gunicorn/systemd will is the goal
+integration via gunicorn/systemd is the goal
 
 ## configuration
 
