@@ -52,9 +52,9 @@ def check_ctx(ctxid):
     result = check_res.delay('CONTEXT',ctxid)
     return {"result_id": result.id}
 
-@tasks_bp.route("/check/mapstore", methods=['GET', 'POST'])
+@tasks_bp.route("/check/mapstore", methods=['POST'])
 def check_mapstore():
-    as_subtasks = request.args.get("subtasks", default=0, type=int)
+    as_subtasks = request.form.get("subtasks", default=0, type=int)
     if as_subtasks != 0:
         result = check_all_mapstore_res.delay_subtasks()
     else:
