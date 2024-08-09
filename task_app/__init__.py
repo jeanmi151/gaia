@@ -21,6 +21,8 @@ def create_app() -> Flask:
     # cant work since its at /bootstrap and cant be below /dashboard ?
     # app.config.update(BOOTSTRAP_SERVE_LOCAL=True)
     app.config.from_prefixed_env()
+    # needs FLASK_DEBUG in the env, or flask --debug
+    # app.config.update(EXPLAIN_TEMPLATE_LOADING=True)
     app.extensions["bootstrap"] = Bootstrap5(app)
     celery_init_app(app)
 
