@@ -56,7 +56,7 @@ def check_ctx(ctxid):
 def check_mapstore():
     as_subtasks = request.form.get("subtasks", default=0, type=int)
     if as_subtasks != 0:
-        result = check_all_mapstore_res.delay_subtasks()
+        result = check_all_mapstore_res_subtasks.delay()
     else:
         result = check_all_mapstore_res.delay()
     return {"result_id": result.id}
