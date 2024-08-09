@@ -64,10 +64,11 @@ class MapstoreChecker():
 
 msc = MapstoreChecker()
 
+
 @shared_task()
 def check_res(rescat, resid):
     m = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
-    tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if m.category_id == msc.cat[rescat] else 'le contexte', m.id, m.name))
+    tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
     # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
     ret = dict()
 
