@@ -18,6 +18,8 @@ def result(id: str) -> dict[str, object]:
     ready = result.ready()
     return {
         "ready": ready,
+        "task": result.name,
+        "args": result.args,
         "successful": result.successful() if ready else None,
         "value": result.get() if ready else result.result,
     }
