@@ -10,10 +10,10 @@
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
 
-        {% endblock %}
+        {% endblock styles %}
 
         <title>Dashboard</title>
-        {% endblock %}
+        {% endblock head %}
     </head>
     <body>
 {% include 'header.tmpl' %}
@@ -27,7 +27,7 @@
 CheckRes('map', {{ mapid }});
 
 </script>
-        {% endblock %}
+        {% endblock scripts %}
         <!-- Your page content -->
         {% block content %}
 <div class="container">
@@ -35,7 +35,7 @@ CheckRes('map', {{ mapid }});
 <h2 id='pbtitle'>Problems</h2>
 <div id="problems"></div>
 </div>
-	{% endblock %}
+	{% endblock content %}
     </body>
 </html>
 </body>
