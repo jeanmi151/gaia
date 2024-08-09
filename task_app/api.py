@@ -40,7 +40,7 @@ def metadatas():
     username = request.headers.get('Sec-Username','anonymous')
     if username == 'anonymous':
         return abort(403)
-    gnurl = conf.get(conf.get('urls','localgn'), 'secproxytargets')
+    gnurl = conf.get(conf.get('localgn', 'urls'), 'secproxytargets')
     preauth = requests.get(gnurl + "srv/api/me", headers={'Accept': 'application/json'})
     if preauth.status_code == 204:
       if 'XSRF-TOKEN' in preauth.cookies:
