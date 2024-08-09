@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% block head %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        {% block styles %}
+            <!-- Bootstrap CSS -->
+            {{ bootstrap.load_css() }}
+        {% endblock %}
+
+        <title>Dashboard</title>
+        {% endblock %}
+    </head>
+    <body>
+{% include 'header.tmpl' %}
+
+        {% block scripts %}
+            <!-- Optional JavaScript -->
+            {{ bootstrap.load_js() }}
+        {% endblock %}
+        <!-- Your page content -->
+        {% block content %}
+   <div class="container">
+<hr>
+<h4>Check mapstore</h4>
+<p>check all mapstore resources.
+<form id=checkms method=post action="{{ url_for("dashboard.tasks.check_mapstore") }}">
+<input type=radio name=subtasks value=1><label>as subtasks</label><br>
+<input type=radio name=subtasks value=0><label>as a single task with progress</label><br>
+  <input type=submit>
+</form>
+<p>Result: <span id=checkms-result></span></p>
+  </div>
+       {% endblock %}
+
+<script>
+  const taskForm = (formName, doPoll, report) => {
+    document.forms[formName].addEventListener("submit", (event) => {
+      event.preventDefault()
+      fetch(event.target.action, {
+        method: "POST",
+        body: new FormData(event.target)
+      })
+        .then(response => response.json())
+        .then(data => {
+          report(null)
+
+          const poll = () => {
+            fetch(`/dashboard/tasks/result/${data["result_id"]}`)
+              .then(response => response.json())
+              .then(data => {
+                report(data)
+
+                if (!data["ready"]) {
+                  setTimeout(poll, 500)
+                } else if (!data["successful"]) {
+                  console.error(formName, data)
+                }
+              })
+          }
+
+          if (doPoll) {
+            poll()
+          }
+        })
+    })
+  }
+
+  taskForm("checkms", true, data => {
+    const el = document.getElementById("checkms-result")
+
+    if (data === null) {
+      el.innerText = "submitted"
+    } else if (!data["ready"]) {
+      el.innerText = `${data["value"]["current"]} / ${data["value"]["total"]}`
+    } else if (!data["successful"]) {
+      el.innerText = "error, check console"
+    } else {
+      el.innerText = data["value"]
+    }
+    console.log(data)
+  })
+
+</script>
+</body>
+</html>
