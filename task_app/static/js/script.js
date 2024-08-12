@@ -94,6 +94,8 @@ const CheckRes = (type, resid) => {
                     $('#pbtitle').text('No problemo! in ' + type + ' owned by '+data["value"].owner);
                     $('#problems').remove();
                   }
+                  const d = new Date(data["finished"] * 1000);
+                  $('#details').text($('#details').text() + ', valid at '+ d);
                 }
             })
         }
