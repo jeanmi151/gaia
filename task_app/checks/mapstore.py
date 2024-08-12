@@ -18,6 +18,7 @@ from celery import Task
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
 from task_app.georchestraconfig import GeorchestraConfig
+from task_app.owscapcache import OwsCapCache
 
 # solves conflicts in relationship naming ?
 def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
@@ -34,8 +35,8 @@ def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
 
 class MapstoreChecker():
     def __init__(self):
-        self.ows_services=dict()
         self.conf = GeorchestraConfig()
+        self.owscache = OwsCapCache(self.conf)
         url = URL.create(
             drivername="postgresql",
             username=self.conf.get('pgsqlUser'),
@@ -101,13 +102,13 @@ def check_res(rescat, resid):
         match l['type']:
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
-                if l['type'] not in msc.ows_services:
-                    msc.ows_services[l['type']] = dict()
-                if l['url'] not in msc.ows_services[l['type']]:
-                    msc.ows_services[l['type']][l['url']] = dict()
-                if l['name'] not in msc.ows_services[l['type']][l['url']]:
-                    msc.ows_services[l['type']][l['url']][l['name']] = set()
-                msc.ows_services[l['type']][l['url']][l['name']].add((m.id))
+                s = msc.owscache.get(l['type'], l['url'])
+                if s is None:
+                    ret['problems'].append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
+                else:
+                    tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s['timestamp']))
+                    if l['name'] not in s['service'].contents:
+                        ret['problems'].append('layer {} referenced by {} {} doesnt exist in {} service at {}'.format(l['name'], 'la carte' if rescat == 'MAP' else 'le contexte', resid, l['type'], l['url']))
             case '3dtiles':
                 tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
             case 'cog':
@@ -118,31 +119,6 @@ def check_res(rescat, resid):
                 pass
             case _:
                 tasklogger.debug(l)
-
-    for k,v in msc.ows_services.items():
-        for u,ls in v.items():
-            # is a relative url, prepend https://domainName
-            if not u.startswith('http'):
-                u = 'https://' + msc.conf.get('domainName') + u
-            tasklogger.debug("fetching {} getcapabilities for {}".format(k, u))
-            try:
-                if k == 'wms':
-                    s = WebMapService(u, version='1.3.0')
-                if k == 'wfs':
-                    s = WebFeatureService(u, version='1.1.0')
-                if k == 'wmts':
-                    s = WebMapTileService(u)
-            except ServiceException as e:
-                # XXX hack parses the 403 page returned by the s-p ?
-                if 'interdit' in e.args[0]:
-                    tasklogger.warning("{} needs auth ?".format(u))
-                else:
-                    tasklogger.error(e)
-                # skip check since we didn't get a proper getcapabilities
-                continue
-            for l,m in ls.items():
-                if l not in s.contents:
-                    ret['problems'].append('layer {} referenced by map {} doesnt exist in {} service at {}'.format(l, m, k, u))
     return ret
 
 # this task enqueues subtasks
