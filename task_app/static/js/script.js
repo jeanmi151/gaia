@@ -80,8 +80,13 @@ const CheckRes = (type, resid) => {
     .then(response => response.json())
     .then(mydata => {
         $('#pbtitle').text("En cours d'analyse");
-        const poll = () => {
-          fetch(`/dashboard/tasks/result/${mydata["result_id"]}`)
+        PollTaskRes(mydata["result_id"]);
+    });
+}
+
+const PollTaskRes = (taskid) => {
+    const poll = () => {
+        fetch('/dashboard/tasks/result/' + taskid)
             .then(response => response.json())
             .then(data => {
 //                console.log(data)
@@ -107,5 +112,4 @@ const CheckRes = (type, resid) => {
             })
         }
         poll();
-    })
 }
