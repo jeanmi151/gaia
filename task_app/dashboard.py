@@ -6,7 +6,12 @@ from flask import Blueprint
 from flask import request, render_template
 from flask import current_app as app
 
+from task_app.result_backend.redisbackend import RedisClient
+from config import url
+
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
+
+rcli = RedisClient(url)
 
 @dash_bp.route("/")
 def index() -> str:
