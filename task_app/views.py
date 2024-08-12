@@ -16,9 +16,12 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def result(id: str) -> dict[str, object]:
     result = AsyncResult(id)
     ready = result.ready()
+    # date_done is a datetime
+    finished = result.date_done
     return {
         "ready": ready,
         "task": result.name,
+        "finished": (finished.strftime('%s') if finished is not None else False),
         "args": result.args,
         "successful": result.successful() if ready else None,
         "value": result.get() if ready else result.result,
