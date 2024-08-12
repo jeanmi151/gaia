@@ -110,6 +110,6 @@ const PollTaskRes = (taskid) => {
                   $('#details').text($('#details').text() + ', valid at '+ d);
                 }
             })
-        }
-        poll();
+    }
+    poll();
 }
