@@ -68,6 +68,13 @@ const fetchForHome = () => {
     });
 }
 
+const ArrayToHtmlList = (array) => {
+  const list = $('<ul>').append(
+    array.map(p => $("<li>").text(p))
+  );
+  return list;
+}
+
 const CheckRes = (type, resid) => {
   fetch('/dashboard/tasks/check/' + type + '/' + resid + '.json')
     .then(response => response.json())
@@ -89,7 +96,7 @@ const CheckRes = (type, resid) => {
                 } else {
                   if (data["value"].problems.length > 0) {
                     $('#pbtitle').text('Problems');
-                    $('#problems').text(data["value"].problems);
+                    $('#problems').html(ArrayToHtmlList(data["value"].problems));
                   } else {
                     $('#pbtitle').text('No problemo! in ' + type + ' owned by '+data["value"].owner);
                     $('#problems').remove();
