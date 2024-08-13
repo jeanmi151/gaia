@@ -1,4 +1,6 @@
 from config import url
+from celery.schedules import crontab
+
 broker_url = url
 result_backend = url
 worker_concurrency = 1
@@ -17,6 +19,10 @@ database_engine_options = {'echo': True}
 result_extended = True
 
 beat_schedule = {
+  'check-every-night': {
+    'task': 'task_app.checks.mapstore.check_all_mapstore_res',
+    'schedule': crontab(minute=0, hour=0),
+  },
   'print-every-600-seconds': {
     'task': 'task_app.tasks.printmsg',
     'schedule': 600.0,
