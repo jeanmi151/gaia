@@ -32,7 +32,7 @@ if (prev) {
 }
 
 $(document).ready(function(){
-  DisplayPrev({{ previous_jobs | tojson() }});
+  DisplayPrev(prev);
 });
 </script>
         {% endblock scripts %}
