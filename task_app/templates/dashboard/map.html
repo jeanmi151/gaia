@@ -24,7 +24,12 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 <script>
-CheckRes('map', {{ mapid }});
+let prev = {{ previous_jobs | tojson() }};
+if (prev) {
+  PollTaskRes(prev[0]);
+} else {
+  CheckRes('map', {{ mapid }});
+}
 
 </script>
         {% endblock scripts %}
