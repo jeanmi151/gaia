@@ -43,6 +43,9 @@ $(document).ready(function(){
         {% block content %}
 <div class="container">
 <p id='details'>Details pour la carte {{ mapid }}</p>
+<form id='check' action="javascript:CheckRes('map', {{ mapid }});">
+<input type=submit value="check now">
+</form>
 <h2 id='pbtitle'>Problems</h2>
 <div id="problems"></div>
 <h2 id='previous'>Previous</h2>
