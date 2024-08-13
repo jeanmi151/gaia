@@ -68,6 +68,10 @@ const fetchForHome = () => {
     });
 }
 
+const DisplayPrev = (taskids) => {
+    $('#previouslist').html(ArrayToHtmlList(taskids));
+}
+
 const ArrayToHtmlList = (array) => {
   const list = $('<ul>').append(
     array.map(p => $("<li>").text(p))
