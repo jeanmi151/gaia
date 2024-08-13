@@ -18,7 +18,7 @@ class RedisClient:
                 self.task_by_taskname[name] = dict()
             if tuple(args) not in self.task_by_taskname[name]:
                 self.task_by_taskname[name][tuple(args)] = list()
-            self.task_by_taskname[name][tuple(args)].append(k.decode())
+            self.task_by_taskname[name][tuple(args)].append(k.decode()[17:])
 
     def get(self, key):
 #        print(f"get({key}) called")
