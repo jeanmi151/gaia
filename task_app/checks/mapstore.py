@@ -90,15 +90,12 @@ def check_res(rescat, resid):
 
     # uses automapped attribute from relationship instead of a query
     data = json.loads(m.gs_stored_data[0].stored_data)
-    ret['backgrounds'] = list()
     ret['problems'] = list()
     if rescat == 'MAP':
-        ret['layers'] = data["map"]["layers"]
+        layers = data["map"]["layers"]
     else:
-        ret['layers'] = data["mapConfig"]["map"]["layers"]
-    for l in ret['layers']:
-        if 'group' in l and l["group"] == 'background':
-            ret['backgrounds'].append(l)
+        layers = data["mapConfig"]["map"]["layers"]
+    for l in layers:
         match l['type']:
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
