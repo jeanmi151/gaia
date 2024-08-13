@@ -5,7 +5,7 @@ broker_url = url
 result_backend = url
 worker_concurrency = 1
 #autoscale = 8,1
-imports = ('task_app.tasks','task_app.checks.mapstore')
+imports = ('task_app.checks.mapstore')
 #worker_pool = solo
 worker_log_format = "[%(asctime)s: %(levelname)s/%(processName)s/%(threadName)s] WORKER %(message)s"
 worker_task_log_format = "[%(asctime)s: %(levelname)s/%(processName)s/%(threadName)s] TASK %(task_name)s[%(task_id)s]: %(message)s"
@@ -24,9 +24,4 @@ beat_schedule = {
     'task': 'task_app.checks.mapstore.check_all_mapstore_res',
     'schedule': crontab(minute=0, hour=0),
   },
-  'print-every-600-seconds': {
-    'task': 'task_app.tasks.printmsg',
-    'schedule': 600.0,
-    'args': ['hello']
-  }
 }

@@ -14,10 +14,6 @@ dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_fol
 rcli = RedisClient(url)
 
 @dash_bp.route("/")
-def index() -> str:
-    return render_template("index.html")
-
-@dash_bp.route("/home")
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
