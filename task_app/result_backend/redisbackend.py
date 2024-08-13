@@ -18,7 +18,7 @@ class RedisClient:
                 self.task_by_taskname[name] = dict()
             if tuple(args) not in self.task_by_taskname[name]:
                 self.task_by_taskname[name][tuple(args)] = list()
-            self.task_by_taskname[name][tuple(args)].append(k.decode()[17:])
+            self.task_by_taskname[name][tuple(args)].append({ 'id': k.decode()[17:], 'finished': task["date_done"]})
 
     def get(self, key):
 #        print(f"get({key}) called")
@@ -51,6 +51,7 @@ if __name__ == '__main__':
     tasks = rc.get_taskids_by_taskname_and_args("task_app.checks.mapstore.check_res", ["MAP", 1])
     print(tasks)
     for f in tasks:
-        print(len(rc.get(f)))
-        j = json.loads(rc.get(f))
+        print(len(rc.get(f['id'])))
+        print(f['finished'])
+        j = json.loads(rc.get(f['id']))
         print(j["result"]["problems"])
