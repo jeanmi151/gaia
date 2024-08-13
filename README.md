@@ -9,7 +9,7 @@ this project aims at providing a user-centric dashboard for [geOrchestra](https:
   - list their md/data
   - list their org md
 
-one of the goal is to provide an api returning JSON so that it can be reused in
+one of the goals is to provide an api returning JSON so that it can be reused in
 other components/webpages (such as the [ids
 homepage](https://github.com/georchestra/htdocs/))
 
