@@ -68,8 +68,16 @@ const fetchForHome = () => {
     });
 }
 
-const DisplayPrev = (taskids) => {
-    $('#previouslist').html(ArrayToHtmlList(taskids));
+const DisplayPrev = (type, resid, taskids) => {
+    const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
+    const arr = sorted.map(t => {
+        const link = $("<a>");
+        link.attr("href","javascript:PollTaskRes('" + type +"',"+ resid + ",'" + t['id'] + "');");
+        link.attr("title","Show result for task " + t['id']);
+        link.text("check at " + t['finished']);
+        return link[0];
+    });
+    $('#previouslist').html(ArrayToHtmlList(arr));
 }
 
 const ArrayToHtmlList = (array) => {
