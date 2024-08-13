@@ -84,11 +84,11 @@ const CheckRes = (type, resid) => {
     .then(response => response.json())
     .then(mydata => {
         $('#pbtitle').text("En cours d'analyse");
-        PollTaskRes(mydata["result_id"]);
+        PollTaskRes(type, resid, mydata["result_id"]);
     });
 }
 
-const PollTaskRes = (taskid) => {
+const PollTaskRes = (type, resid, taskid) => {
     const poll = () => {
         fetch('/dashboard/tasks/result/' + taskid)
             .then(response => response.json())
@@ -111,7 +111,7 @@ const PollTaskRes = (taskid) => {
                     $('#problems').remove();
                   }
                   const d = new Date(data["finished"] * 1000);
-                  $('#details').text($('#details').text() + ', valid at '+ d);
+                  $('#details').text('details for ' + type + ' ' + resid + ', valid at '+ d);
                 }
             })
     }
