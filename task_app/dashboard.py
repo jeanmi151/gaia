@@ -23,7 +23,8 @@ def home():
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
-    return render_template('map.html', mapid=mapid, bootstrap=app.extensions["bootstrap"])
+    all_jobs_for_mapid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid])
+    return render_template('map.html', mapid=mapid, previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
