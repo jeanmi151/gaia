@@ -26,7 +26,10 @@
 <script>
 let prev = {{ previous_jobs | tojson() }};
 if (prev) {
-  PollTaskRes(prev[0]);
+  const last = prev.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('map', {{ mapid }}, last['id']);
 } else {
   CheckRes('map', {{ mapid }});
 }
