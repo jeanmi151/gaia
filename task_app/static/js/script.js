@@ -74,7 +74,7 @@ const DisplayPrev = (taskids) => {
 
 const ArrayToHtmlList = (array) => {
   const list = $('<ul>').append(
-    array.map(p => $("<li>").text(p))
+    array.map(p => $("<li>").html(p))
   );
   return list;
 }
