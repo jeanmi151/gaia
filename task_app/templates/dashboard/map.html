@@ -31,6 +31,9 @@ if (prev) {
   CheckRes('map', {{ mapid }});
 }
 
+$(document).ready(function(){
+  DisplayPrev({{ previous_jobs | tojson() }});
+});
 </script>
         {% endblock scripts %}
         <!-- Your page content -->
