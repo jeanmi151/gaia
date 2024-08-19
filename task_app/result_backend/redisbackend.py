@@ -34,7 +34,16 @@ class RedisClient:
     def get_taskids_by_taskname_and_args(self, taskname, args):
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
-                return self.task_by_taskname[taskname][tuple(args)]
+                taskids = self.task_by_taskname[taskname][tuple(args)]
+                for i in range(len(taskids)):
+                    task = taskids[i]
+                    # refresh finished ts from backend if not set
+                    if task["finished"] is None:
+                        v = self.get(task["id"])
+                        taskb = json.loads(v)
+                        if taskb["date_done"] is not None:
+                            taskids[i] = { "id": task["id"], "finished": taskb["date_done"] }
+                return taskids
         return None
 
     def add_taskid_for_taskname_and_args(self, taskname, args, taskid):
