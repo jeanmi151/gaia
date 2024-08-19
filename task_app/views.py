@@ -7,6 +7,7 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
+from task_app.dashboard import rcli
 from task_app.checks.mapstore import check_res, check_all_mapstore_res, check_all_mapstore_res_subtasks
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -29,11 +30,15 @@ def result(id: str) -> dict[str, object]:
 @tasks_bp.route("/check/map/<int:mapid>.json")
 def check_map(mapid):
     result = check_res.delay('MAP',mapid)
+    if result.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid], result.id)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/context/<int:ctxid>.json")
 def check_ctx(ctxid):
     result = check_res.delay('CONTEXT',ctxid)
+    if result.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid], result.id)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/mapstore", methods=['POST'])
