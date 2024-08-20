@@ -31,6 +31,22 @@ class RedisClient:
                 nk = "celery-task-meta-".encode() + key
             return self.r.get(nk)
 
+    def forget(self, taskid):
+        v = self.get(taskid)
+        if v is None:
+            return None
+        task = json.loads(v)
+        taskname = task["name"]
+        args = task["args"]
+        if taskname in self.task_by_taskname:
+            if tuple(args) in self.task_by_taskname[taskname]:
+                taskids = self.task_by_taskname[taskname][tuple(args)]
+                for i in range(len(taskids)):
+                    task = taskids[i]
+                    if task["id"] == taskid:
+                        taskids.remove(task)
+                        return taskid
+
     def get_taskids_by_taskname_and_args(self, taskname, args):
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
