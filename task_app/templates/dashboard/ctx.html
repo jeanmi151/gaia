@@ -9,6 +9,7 @@
         {% block styles %}
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         {% endblock styles %}
 
         <title>Dashboard</title>
@@ -23,16 +24,32 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 <script>
-CheckRes('context', {{ ctxid }});
+let prev = {{ previous_jobs | tojson() }};
+if (prev) {
+  const last = prev.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('context', {{ ctxid }}, last['id']);
+} else {
+  CheckRes('context', {{ ctxid }});
+}
 
+$(document).ready(function(){
+  DisplayPrev('context', {{ ctxid }}, prev, {{ showdelete|int }});
+});
 </script>
         {% endblock scripts %}
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p>	Details pour le contexte {{ ctxid }}</p>
+<p id='details'>Details pour le contexte {{ ctxid }}</p>
+<form id='check' action="javascript:CheckRes('context', {{ ctxid }});">
+<input type=submit value="check now">
+</form>
 <h2 id='pbtitle'>Problems</h2>
 <div id="problems"></div>
+<h2 id='previous'>Previous</h2>
+<p id='previouslist'></p>
 </div>
 	{% endblock content %}
     </body>

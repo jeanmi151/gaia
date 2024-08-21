@@ -26,4 +26,5 @@ def map(mapid):
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
-    return render_template('ctx.html', ctxid=ctxid, bootstrap=app.extensions["bootstrap"])
+    all_jobs_for_ctxid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid])
+    return render_template('ctx.html', ctxid=ctxid, previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
