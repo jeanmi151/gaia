@@ -72,6 +72,7 @@ const DisplayPrev = (type, resid, taskids) => {
     const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
     const arr = sorted.map(t => {
         const link = $("<a>");
+        link.attr("id", 'display-taskres-' + t['id'])
         link.attr("href","javascript:PollTaskRes('" + type +"',"+ resid + ",'" + t['id'] + "');");
         link.attr("title","Show result for task " + t['id']);
         link.text("check at " + t['finished']);
