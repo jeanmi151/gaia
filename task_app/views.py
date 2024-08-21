@@ -9,6 +9,7 @@ from flask import jsonify
 
 from task_app.dashboard import rcli
 from task_app.checks.mapstore import check_res, check_all_mapstore_res, check_all_mapstore_res_subtasks
+from task_app.decorators import check_role
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -26,6 +27,14 @@ def result(id: str) -> dict[str, object]:
         "successful": result.successful() if ready else None,
         "value": result.get() if ready else result.result,
     }
+
+@tasks_bp.get("/forget/<id>")
+@check_role(role='SUPERUSER')
+def forget(id: str):
+    result = AsyncResult(id)
+    rcli.forget(id)
+    result.forget()
+    return jsonify("ok")
 
 @tasks_bp.route("/check/map/<int:mapid>.json")
 def check_map(mapid):
