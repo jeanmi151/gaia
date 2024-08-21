@@ -88,6 +88,15 @@ const ArrayToHtmlList = (array) => {
   return list;
 }
 
+const DeleteTask = (taskid) => {
+  fetch('/dashboard/tasks/forget/' + taskid)
+    .then(response => {
+      if (response.status != 403) {
+        $('#display-taskres-' + taskid).parent().remove();
+      }
+    });
+}
+
 const CheckRes = (type, resid) => {
   fetch('/dashboard/tasks/check/' + type + '/' + resid + '.json')
     .then(response => response.json())
