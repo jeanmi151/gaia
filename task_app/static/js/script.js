@@ -68,7 +68,7 @@ const fetchForHome = () => {
     });
 }
 
-const DisplayPrev = (type, resid, taskids) => {
+const DisplayPrev = (type, resid, taskids, showdelete = false) => {
     const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
     const arr = sorted.map(t => {
         const link = $("<a>");
@@ -76,6 +76,13 @@ const DisplayPrev = (type, resid, taskids) => {
         link.attr("href","javascript:PollTaskRes('" + type +"',"+ resid + ",'" + t['id'] + "');");
         link.attr("title","Show result for task " + t['id']);
         link.text("check at " + t['finished']);
+        if (showdelete) {
+          const link2 = $("<a>");
+          link2.attr("href","javascript:DeleteTask('" + t['id'] + "');");
+          link2.attr("title","Forget result for task " + t['id']);
+          link2.html('<i class="bi bi-trash"></i>');
+          return [ link[0], "&nbsp;", link2[0] ];
+        }
         return link[0];
     });
     $('#previouslist').html(ArrayToHtmlList(arr));
