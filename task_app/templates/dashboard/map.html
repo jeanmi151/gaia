@@ -35,7 +35,7 @@ if (prev) {
 }
 
 $(document).ready(function(){
-  DisplayPrev('map', {{ mapid }}, prev);
+  DisplayPrev('map', {{ mapid }}, prev, {{ showdelete|int }});
 });
 </script>
         {% endblock scripts %}
