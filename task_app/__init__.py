@@ -13,8 +13,20 @@ capp = Celery(__name__)
 capp.config_from_object('task_app.celeryconfig')
 capp.set_default()
 
+from datetime import datetime, date, time
+def format_datetime(value, format="%d %b %Y %I:%M %p"):
+    """Format a date time to (Default): d Mon YYYY HH:MM P"""
+    if value is None:
+        return ""
+    if  isinstance(value, float):
+        return datetime.fromtimestamp(value).strftime(format)
+    if  isinstance(value, str):
+        return datetime.fromtimestamp(int(value)).strftime(format)
+    return value.strftime(format)
+
 def create_app() -> Flask:
     app = Flask(__name__, static_url_path='/dashboard/static')
+    app.jinja_env.filters['datetimeformat'] = format_datetime
     app.config.from_mapping(
         CELERY=capp.conf
     )
