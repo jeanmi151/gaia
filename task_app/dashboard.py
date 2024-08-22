@@ -8,12 +8,29 @@ from flask import current_app as app
 
 from task_app.result_backend.redisbackend import RedisClient
 from task_app.decorators import is_superuser
+from task_app.georchestraconfig import GeorchestraConfig
+from task_app.owscapcache import OwsCapCache
 
 from config import url
 
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
 
+conf = GeorchestraConfig()
+owscache = OwsCapCache(conf)
 rcli = RedisClient(url)
+
+def unmunge(url):
+    """
+    takes a munged url in the form ~geoserver(|~ws)~ows or http(s):~~fqdn~geoserver(|~ws)~ows
+    returns: a proper url with slashes, eventually stripped of the local ids domainName (eg /geoserver/ws/ows)
+    """
+    url = url.replace('~','/')
+    if not url.startswith('/') and not url.startswith('http'):
+        url = '/' + url
+    localdomain = "https://" + conf.get("domainName")
+    if url.startswith(localdomain):
+        url = url.removeprefix(localdomain)
+    return url
 
 @dash_bp.route("/")
 def home():
