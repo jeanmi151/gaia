@@ -5,6 +5,7 @@
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 from owslib.wmts import WebMapTileService
+from owslib.csw import CatalogueServiceWeb
 from owslib.util import ServiceException
 from time import time
 
@@ -26,7 +27,7 @@ class OwsCapCache:
 
     def fetch(self, service_type, url):
         s = None
-        if service_type not in ("wms", "wmts", "wfs"):
+        if service_type not in ("wms", "wmts", "wfs", "csw"):
             return None
         tasklogger.debug("fetching {} getcapabilities for {}".format(service_type, url))
         try:
@@ -34,6 +35,8 @@ class OwsCapCache:
                 s = WebMapService(url, version="1.3.0")
             elif service_type == "wfs":
                 s = WebFeatureService(url, version="1.1.0")
+            elif service_type == "csw":
+                s = CatalogueServiceWeb(url)
             elif service_type == "wmts":
                 s = WebMapTileService(url)
         except ServiceException as e:
