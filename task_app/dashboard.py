@@ -36,6 +36,14 @@ def unmunge(url):
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
+@dash_bp.route("/ows/<string:stype>/<string:url>")
+def ows(stype, url):
+    if stype not in ('wms', 'wmts', 'wfs'):
+        return abort(412)
+    url = unmunge(url)
+    service = owscache.get(stype, url)
+    return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), bootstrap=app.extensions["bootstrap"])
+
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
     all_jobs_for_mapid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid])
