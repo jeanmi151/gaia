@@ -44,7 +44,7 @@ class OwsCapCache:
                 s = WebMapTileService(url)
         except (ServiceException, HTTPError, SSLError, MaxRetryError, XMLSyntaxError) as e:
             # XXX hack parses the 403 page returned by the s-p ?
-            if "interdit" in e.args[0]:
+            if type(e.args) == list() and "interdit" in e.args[0]:
                 tasklogger.warning("{} needs auth ?".format(url))
             else:
                 tasklogger.error(e)
