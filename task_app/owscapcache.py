@@ -7,6 +7,9 @@ from owslib.wfs import WebFeatureService
 from owslib.wmts import WebMapTileService
 from owslib.csw import CatalogueServiceWeb
 from owslib.util import ServiceException
+from requests.exceptions import HTTPError, SSLError
+from urllib3.exceptions import MaxRetryError
+from lxml.etree import XMLSyntaxError
 from time import time
 
 from celery.utils.log import get_task_logger
@@ -39,7 +42,7 @@ class OwsCapCache:
                 s = CatalogueServiceWeb(url)
             elif service_type == "wmts":
                 s = WebMapTileService(url)
-        except ServiceException as e:
+        except (ServiceException, HTTPError, SSLError, MaxRetryError, XMLSyntaxError) as e:
             # XXX hack parses the 403 page returned by the s-p ?
             if "interdit" in e.args[0]:
                 tasklogger.warning("{} needs auth ?".format(url))
