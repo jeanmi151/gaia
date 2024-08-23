@@ -96,17 +96,26 @@ def check_res(rescat, resid):
         layers = data["map"]["layers"]
     else:
         layers = data["mapConfig"]["map"]["layers"]
+    ret['problems'] += check_layers(layers)
+    ## for contexts, check for valid services in the list of catalogs
+    if rescat == 'CONTEXT':
+        catalogs = data["mapConfig"]["catalogServices"]["services"]
+        ret['problems'] += check_catalogs(catalogs)
+    return ret
+
+def check_layers(layers):
+    ret = list()
     for l in layers:
         match l['type']:
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                 s = msc.owscache.get(l['type'], l['url'])
                 if s is None:
-                    ret['problems'].append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
+                    ret.append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
                 else:
                     tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s['timestamp']))
                     if l['name'] not in s['service'].contents:
-                        ret['problems'].append('layer {} referenced by {} {} doesnt exist in {} service at {}'.format(l['name'], 'la carte' if rescat == 'MAP' else 'le contexte', resid, l['type'], l['url']))
+                        ret.append('layer {} referenced by {} {} doesnt exist in {} service at {}'.format(l['name'], 'la carte' if rescat == 'MAP' else 'le contexte', resid, l['type'], l['url']))
             case '3dtiles':
                 tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
             case 'cog':
@@ -117,28 +126,29 @@ def check_res(rescat, resid):
                 pass
             case _:
                 tasklogger.debug(l)
-    ## for contexts, check for valid services in the list of catalogs
-    if rescat == 'CONTEXT':
-        catalogs = data["mapConfig"]["catalogServices"]["services"]
-        for k,c in catalogs.items():
-            tasklogger.debug(f"checking catalog entry {k} type {c['type']} at {c['url']}")
-            msg = f"{c['type']} catalog entry with key {k}, title {c['title']} and url {c['url']} "
-            match c['type']:
-                case 'wms'|'wfs'|'wmts'|'csw':
-                    s = msc.owscache.get(c['type'], c['url'])
-                    if s is None:
-                        ret['problems'].append(msg + "doesn't seem to be an OGC service")
-                case '3dtiles' | 'cog':
-                    try:
-                        response = requests.head(c['url'], allow_redirects=True)
-                        if response.status_code != 200:
-                            ret['problems'].append(msg + f"doesn't seem to exist ({response.status_code}")
-                    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as e:
-                        ret['problems'].append(msg + f"Failure - Unable to establish connection: {e}.")
-                    except Exception as e:
-                        ret['problems'].append(msg + f"Failure - Unknown error occurred: {e}.")
-                case _:
-                    pass
+    return ret
+
+def check_catalogs(catalogs):
+    ret = list()
+    for k,c in catalogs.items():
+        tasklogger.debug(f"checking catalog entry {k} type {c['type']} at {c['url']}")
+        msg = f"{c['type']} catalog entry with key {k}, title {c['title']} and url {c['url']} "
+        match c['type']:
+            case 'wms'|'wfs'|'wmts'|'csw':
+                s = msc.owscache.get(c['type'], c['url'])
+                if s is None:
+                    ret.append(msg + "doesn't seem to be an OGC service")
+            case '3dtiles' | 'cog':
+                try:
+                    response = requests.head(c['url'], allow_redirects=True)
+                    if response.status_code != 200:
+                        ret.append(msg + f"doesn't seem to exist ({response.status_code}")
+                except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as e:
+                    ret.append(msg + f"Failure - Unable to establish connection: {e}.")
+                except Exception as e:
+                    ret.append(msg + f"Failure - Unknown error occurred: {e}.")
+            case _:
+                pass
     return ret
 
 # this task enqueues subtasks
