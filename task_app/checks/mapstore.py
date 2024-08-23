@@ -7,6 +7,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 import json
+import requests
 
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
@@ -116,6 +117,28 @@ def check_res(rescat, resid):
                 pass
             case _:
                 tasklogger.debug(l)
+    ## for contexts, check for valid services in the list of catalogs
+    if rescat == 'CONTEXT':
+        catalogs = data["mapConfig"]["catalogServices"]["services"]
+        for k,c in catalogs.items():
+            tasklogger.debug(f"checking catalog entry {k} type {c['type']} at {c['url']}")
+            msg = f"{c['type']} catalog entry with key {k}, title {c['title']} and url {c['url']} "
+            match c['type']:
+                case 'wms'|'wfs'|'wmts'|'csw':
+                    s = msc.owscache.get(c['type'], c['url'])
+                    if s is None:
+                        ret['problems'].append(msg + "doesn't seem to be an OGC service")
+                case '3dtiles' | 'cog':
+                    try:
+                        response = requests.head(c['url'], allow_redirects=True)
+                        if response.status_code != 200:
+                            ret['problems'].append(msg + f"doesn't seem to exist ({response.status_code}")
+                    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as e:
+                        ret['problems'].append(msg + f"Failure - Unable to establish connection: {e}.")
+                    except Exception as e:
+                        ret['problems'].append(msg + f"Failure - Unknown error occurred: {e}.")
+                case _:
+                    pass
     return ret
 
 # this task enqueues subtasks
