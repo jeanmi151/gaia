@@ -10,8 +10,10 @@ from task_app.result_backend.redisbackend import RedisClient
 from task_app.decorators import is_superuser
 from task_app.georchestraconfig import GeorchestraConfig
 from task_app.owscapcache import OwsCapCache
+from task_app.api import get
 
 from config import url
+import json
 
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
 
@@ -54,8 +56,17 @@ def owslayer(stype, url, lname):
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
+    r = get(request, f'rest/geostore/data/{mapid}', False)
+    msmap = None
+    layers = dict()
+    if r.status_code == 200:
+        msmap = json.loads(r.content)
+        for l in msmap['map']['layers']:
+            if 'group' not in l or ('group' in l and l['group'] != 'background'):
+                if l['type'] in ('wms', 'wfs', 'wmts'):
+                    layers[l['id']] = l
     all_jobs_for_mapid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid])
-    return render_template('map.html', mapid=mapid, previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('map.html', mapid=mapid, layers=layers, previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
