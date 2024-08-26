@@ -34,6 +34,21 @@ def unmunge(url):
         url = url.removeprefix(localdomain)
     return url
 
+def get_rescontent_from_resid(restype, resid):
+    r = get(request, f'rest/geostore/data/{resid}', False)
+    layers = dict()
+    if r.status_code == 200:
+        msmap = json.loads(r.content)
+        if restype == 'MAP':
+           llist = msmap['map']['layers']
+        else:
+           llist = msmap['mapConfig']['map']['layers']
+        for l in llist:
+            if 'group' not in l or ('group' in l and l['group'] != 'background'):
+                if l['type'] in ('wms', 'wfs', 'wmts'):
+                    layers[l['id']] = l
+    return layers
+
 @dash_bp.route("/")
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
@@ -56,19 +71,10 @@ def owslayer(stype, url, lname):
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
-    r = get(request, f'rest/geostore/data/{mapid}', False)
-    msmap = None
-    layers = dict()
-    if r.status_code == 200:
-        msmap = json.loads(r.content)
-        for l in msmap['map']['layers']:
-            if 'group' not in l or ('group' in l and l['group'] != 'background'):
-                if l['type'] in ('wms', 'wfs', 'wmts'):
-                    layers[l['id']] = l
     all_jobs_for_mapid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid])
-    return render_template('map.html', mapid=mapid, layers=layers, previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('map.html', mapid=mapid, layers=get_rescontent_from_resid("MAP", mapid), previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
     all_jobs_for_ctxid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid])
-    return render_template('ctx.html', ctxid=ctxid, previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ctx.html', ctxid=ctxid, layers=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
