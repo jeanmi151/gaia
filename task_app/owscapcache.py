@@ -42,13 +42,15 @@ class OwsCapCache:
                 s = CatalogueServiceWeb(url)
             elif service_type == "wmts":
                 s = WebMapTileService(url)
-        except (ServiceException, HTTPError, SSLError, ReadTimeout, MaxRetryError, XMLSyntaxError) as e:
+        except ServiceException as e:
             # XXX hack parses the 403 page returned by the s-p ?
             if type(e.args) == tuple and "interdit" in e.args[0]:
                 tasklogger.warning("{} needs auth ?".format(url))
-            else:
-                tasklogger.error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
-                tasklogger.error(e)
+            return None
+#        except (HTTPError, SSLError, ReadTimeout, MaxRetryError, XMLSyntaxError, KeyError) as e:
+        except Exception as e:
+            tasklogger.error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
+            tasklogger.error(e)
             return None
         entry = dict()
         entry["timestamp"] = time()
