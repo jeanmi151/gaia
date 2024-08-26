@@ -46,6 +46,9 @@ class OwsCapCache:
             # XXX hack parses the 403 page returned by the s-p ?
             if type(e.args) == tuple and "interdit" in e.args[0]:
                 tasklogger.warning("{} needs auth ?".format(url))
+            else:
+                tasklogger.error(f"failed loading {service_type} from {url}")
+                tasklogger.error(e)
             return None
 #        except (HTTPError, SSLError, ReadTimeout, MaxRetryError, XMLSyntaxError, KeyError) as e:
         except Exception as e:
