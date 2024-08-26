@@ -117,10 +117,11 @@ def check_res(rescat, resid):
     else:
         layers = data["mapConfig"]["map"]["layers"]
     ret['problems'] += check_layers(layers, rescat, resid)
-    ## for contexts, check for valid services in the list of catalogs
-    if rescat == 'CONTEXT':
+    if rescat == 'MAP':
+        catalogs = data["catalogServices"]["services"]
+    else:
         catalogs = data["mapConfig"]["catalogServices"]["services"]
-        ret['problems'] += check_catalogs(catalogs)
+    ret['problems'] += check_catalogs(catalogs)
     return ret
 
 def check_layers(layers, rescat, resid):
