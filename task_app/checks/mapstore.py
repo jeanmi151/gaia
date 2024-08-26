@@ -69,6 +69,26 @@ msc = MapstoreChecker()
 
 
 @shared_task()
+def check_configs():
+    """ check mapstore configs:
+    - catalog entries provided in localConfig.json are valid
+    - layers & backgrounds in new/config.json exist in services
+    """
+    ret = dict()
+    with open("/etc/georchestra/mapstore/configs/localConfig.json") as file:
+        localconfig = json.load(file)
+        catalogs = localconfig["initialState"]["defaultState"]["catalog"]["default"]["services"]
+        ret["localconfig"] = check_catalogs(catalogs)
+
+    for filetype in ["new", "config"]:
+        with open(f"/etc/georchestra/mapstore/configs/{filetype}.json") as file:
+            s = file.read()
+            mapconfig = json.loads(s)
+            layers = mapconfig["map"]["layers"]
+            ret[filetype] = check_layers(layers, 'MAP', filetype)
+    return ret
+
+@shared_task()
 def check_res(rescat, resid):
     m = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
     tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
