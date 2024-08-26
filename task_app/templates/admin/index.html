@@ -39,11 +39,12 @@
 <script>
   const taskForm = (formName, doPoll, report) => {
     document.forms[formName].addEventListener("submit", (event) => {
+      let fetchargs = { method: document.forms[formName].method };
+      if (fetchargs.method == 'post') {
+        fetchargs.body = new FormData(event.target);
+      };
       event.preventDefault()
-      fetch(event.target.action, {
-        method: "POST",
-        body: new FormData(event.target)
-      })
+      fetch(event.target.action, fetchargs)
         .then(response => response.json())
         .then(data => {
           report(null)
