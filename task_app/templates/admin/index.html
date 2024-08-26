@@ -20,6 +20,8 @@
         {% block scripts %}
             <!-- Optional JavaScript -->
             {{ bootstrap.load_js() }}
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+            <script src="{{ url_for('static', filename='js/script.js') }}"></script>
         {% endblock %}
         <!-- Your page content -->
         {% block content %}
@@ -42,7 +44,7 @@
        {% endblock %}
 
 <script>
-  const taskForm = (formName, doPoll, report) => {
+  const taskForm = (formName, resName, report) => {
     document.forms[formName].addEventListener("submit", (event) => {
       let fetchargs = { method: document.forms[formName].method };
       if (fetchargs.method == 'post') {
@@ -52,57 +54,52 @@
       fetch(event.target.action, fetchargs)
         .then(response => response.json())
         .then(data => {
-          report(null)
-
+          $('#'+resName).text("submitted");
           const poll = () => {
             fetch(`/dashboard/tasks/result/${data["result_id"]}`)
               .then(response => response.json())
               .then(data => {
-                report(data)
-
                 if (!data["ready"]) {
-                  setTimeout(poll, 500)
+                  setTimeout(poll, 500);
+                  if (typeof data["value"]["current"] !== 'undefined' && typeof data["value"]["total"] !== 'undefined') {
+                    $('#'+resName).text(`${data["value"]["current"]} / ${data["value"]["total"]}`)
+                  } else {
+                    $('#'+resName).text('working')
+                  }
                 } else if (!data["successful"]) {
+                  $('#'+resName).text("error, check console")
                   console.error(formName, data)
+                } else {
+                  $('#'+resName).html(report(data["value"]));
                 }
+                console.log(data);
               })
           }
 
-          if (doPoll) {
-            poll()
-          }
+          poll()
         })
     })
   }
 
-  taskForm("checkms", true, data => {
-    const el = document.getElementById("checkms-result")
-
-    if (data === null) {
-      el.innerText = "submitted"
-    } else if (!data["ready"]) {
-      el.innerText = `${data["value"]["current"]} / ${data["value"]["total"]}`
-    } else if (!data["successful"]) {
-      el.innerText = "error, check console"
-    } else {
-      el.innerText = data["value"]
-    }
-    console.log(data)
+  taskForm("checkms", "checkms-result", data = (res) => {
+      return res;
   })
 
-  taskForm("checkconf", true, data => {
-    const el = document.getElementById("checkconf-result")
-
-    if (data === null) {
-      el.innerText = "submitted"
-    } else if (!data["ready"]) {
-      el.innerText = `${data["value"]["current"]} / ${data["value"]["total"]}`
-    } else if (!data["successful"]) {
-      el.innerText = "error, check console"
-    } else {
-      el.innerText = data["value"]
+  taskForm("checkconf", "checkconf-result", data = (res) => {
+     ret = [];
+     for (i of ['new','config', 'localconfig']) {
+       if ( res[i].length > 0) {
+         const title = $("<h3>");
+         title.text(res[i].length + " errors for " + i);
+         title.attr("id", "errtitle-" + i);
+         ret.push(title[0]);
+         const errs = $("<div>");
+         errs.attr("id", "errs-" + i);
+         errs.html(ArrayToHtmlList(res[i]));
+         ret.push(errs[0]);
+       }
     }
-    console.log(data)
+    return ret;
   })
 </script>
 </body>
