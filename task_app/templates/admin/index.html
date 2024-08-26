@@ -33,6 +33,11 @@
   <input type=submit>
 </form>
 <p>Result: <span id=checkms-result></span></p>
+<p>check mapstore global configs.
+<form id='checkconf' method="GET" action="{{ url_for("dashboard.tasks.check_mapstore_configs") }}">
+<input type=submit value="check now">
+</form>
+<p>Result: <span id=checkconf-result></span></p>
   </div>
        {% endblock %}
 
@@ -85,6 +90,20 @@
     console.log(data)
   })
 
+  taskForm("checkconf", true, data => {
+    const el = document.getElementById("checkconf-result")
+
+    if (data === null) {
+      el.innerText = "submitted"
+    } else if (!data["ready"]) {
+      el.innerText = `${data["value"]["current"]} / ${data["value"]["total"]}`
+    } else if (!data["successful"]) {
+      el.innerText = "error, check console"
+    } else {
+      el.innerText = data["value"]
+    }
+    console.log(data)
+  })
 </script>
 </body>
 </html>
