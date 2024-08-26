@@ -48,6 +48,23 @@ $(document).ready(function(){
 </form>
 <h2 id='pbtitle'>Problems</h2>
 <div id="problems"></div>
+<h2 id='usetitle'>Contents</h2>
+{% if layers.items() | length > 0 %}
+<div id="uses">
+la carte utilise les ressources suivantes:
+<ul>
+{% for k,l in layers.items() %}
+<li id='{{ k }}'>
+'{{ l.title }}': couche {{ l.type }}
+<a href='{{ url_for('dashboard.owslayer', stype=l.type, url=l.url.replace('/', '~'), lname=l.name) }}'>{{ l.name }}</a>
+dans
+<a href='{{ url_for('dashboard.ows', stype=l.type, url=l.url.replace('/', '~')) }}'>{{ l.url }}</a></li>
+{% endfor %}
+</ul>
+</div>
+{% else %}
+<p>une erreur est survenue lors de la récupération des informations de la carte</p>
+{% endif %}
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
