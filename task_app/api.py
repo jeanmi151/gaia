@@ -11,8 +11,10 @@ from task_app.georchestraconfig import GeorchestraConfig
 conf = GeorchestraConfig()
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
-def get(request, url):
-    headers = {'Accept': 'application/json', 'sec-proxy': 'true' }
+def get(request, url, accept_json = True):
+    headers = { 'sec-proxy': 'true' }
+    if accept_json:
+        headers['Accept'] = 'application/json'
     if 'sec-username' in request.headers:
         headers['sec-username'] = request.headers.get('Sec-Username')
     if 'sec-roles' in request.headers:
