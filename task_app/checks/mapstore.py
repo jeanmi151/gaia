@@ -172,6 +172,49 @@ def check_catalogs(catalogs):
                 pass
     return ret
 
+def get_resources_using_ows(owstype, url, layer=None):
+    """ returns a set of ms resources (tuples with resource type & id)
+    using a given ows layer from a given ows service type at a given url
+    this awful function builds a reverse full map at each call, because i
+    havent found a way to query json inside stored_data from sqlalchemy
+    (and mapstore hibernate doesnt use proper psql json types on purpose?)
+    if layer is not set, then it will return the set of resources using
+    the given service
+    """
+    if '~' in url:
+        url = url.replace('~','/')
+    layermap = dict()
+    servicemap = dict()
+    resources = msc.session.query(msc.Resource).filter(or_(msc.Resource.category_id == msc.cat['MAP'], msc.Resource.category_id == msc.cat['CONTEXT'])).all()
+    for r in resources:
+        layers = None
+        data = json.loads(r.gs_stored_data[0].stored_data)
+        if r.category_id == msc.cat['MAP']:
+            layers = data["map"]["layers"]
+            rcat = 'MAP'
+        else:
+            layers = data["mapConfig"]["map"]["layers"]
+            rcat = 'CONTEXT'
+        for l in layers:
+            if 'group' in l and l["group"] == 'background':
+                continue
+            match l['type']:
+                case 'wms'|'wfs'|'wmts':
+                    lkey = (l['type'], l['url'], l['name'])
+                    skey = (l['type'], l['url'])
+                    val = (rcat, r.id)
+                    if lkey not in layermap:
+                        layermap[lkey] = set()
+                    if skey not in servicemap:
+                        servicemap[skey] = set()
+                    layermap[lkey].add(val)
+                    servicemap[skey].add(val)
+                case _:
+                    pass
+    if layer is None:
+        return servicemap.get((owstype, url), None)
+    return layermap.get((owstype, url, layer), None)
+
 # this task enqueues subtasks
 # XXX test as a celery group
 @shared_task()
