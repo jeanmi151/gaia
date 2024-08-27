@@ -50,7 +50,7 @@ class MapstoreChecker():
 
 # these three lines perform the "database reflection" to analyze tables and relationships
         m = MetaData(schema=self.conf.get('pgsqlGeoStoreSchema','mapstoregeostore'))
-        Base = automap_base(bind=engine, metadata=m)
+        Base = automap_base(metadata=m)
         Base.prepare(autoload_with=engine,name_for_collection_relationship=name_for_collection_relationship)
 
         # there are many tables in the database but me only directly use those
