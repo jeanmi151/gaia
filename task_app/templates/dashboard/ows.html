@@ -27,7 +27,7 @@
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p id='details'>Details pour le service {{ type }}  {{ s.service.url }}</p>
+<p id='details'>Details pour le service {{ type }} {{ s.service.url }}</p>
 <p>titre: {{ s.service.identification.title }}<p>
 <p>résumé: {{ s.service.identification.abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
