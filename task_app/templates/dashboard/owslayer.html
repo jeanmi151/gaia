@@ -31,6 +31,20 @@
 <p>titre: {{ s.service.contents[lname].title }}<p>
 <p>résumé: {{ s.service.contents[lname].abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+{% if consumers is not none %}
+<p>
+utilisée par:
+<ul>
+{% for f in consumers %}
+{% if f[0] == 'MAP' %}
+<li><a href='{{ url_for('dashboard.map', mapid=f[1])}}'>carte {{ f[1] }}</a></li>
+{% elif f[0] == 'CONTEXT' %}
+<li><a href='{{ url_for('dashboard.ctx', ctxid=f[1])}}'>contexte {{ f[1] }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
+</p>
+{% endif %}
 </div>
 	{% endblock content %}
     </body>

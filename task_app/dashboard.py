@@ -10,6 +10,7 @@ from task_app.result_backend.redisbackend import RedisClient
 from task_app.decorators import is_superuser
 from task_app.georchestraconfig import GeorchestraConfig
 from task_app.owscapcache import OwsCapCache
+from task_app.checks.mapstore import get_resources_using_ows
 from task_app.api import get
 
 from config import url
@@ -67,7 +68,8 @@ def owslayer(stype, url, lname):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, bootstrap=app.extensions["bootstrap"])
+    used_by = get_resources_using_ows(stype, url, lname)
+    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
