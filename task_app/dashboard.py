@@ -60,7 +60,8 @@ def ows(stype, url):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), bootstrap=app.extensions["bootstrap"])
+    used_by = get_resources_using_ows(stype, url)
+    return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), consumers=used_by, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/ows/<string:stype>/<string:url>/<string:lname>")
 def owslayer(stype, url, lname):
