@@ -202,7 +202,7 @@ def get_resources_using_ows(owstype, url, layer=None):
                 case 'wms'|'wfs'|'wmts':
                     lkey = (l['type'], l['url'], l['name'])
                     skey = (l['type'], l['url'])
-                    val = (rcat, r.id)
+                    val = (rcat, r.id, r.name)
                     if lkey not in layermap:
                         layermap[lkey] = set()
                     if skey not in servicemap:
