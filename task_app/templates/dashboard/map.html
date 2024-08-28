@@ -43,6 +43,7 @@ $(document).ready(function(){
         {% block content %}
 <div class="container">
 <p id='details'>Details pour la carte {{ mapid }}</p>
+<a href='/mapstore/#/viewer/{{ mapid }}'>voir la carte</a>
 <form id='check' action="javascript:CheckRes('map', {{ mapid }});">
 <input type=submit value="check now">
 </form>
