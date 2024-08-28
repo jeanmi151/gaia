@@ -31,6 +31,23 @@
 <p>titre: {{ s.service.contents[lname].title }}<p>
 <p>résumé: {{ s.service.contents[lname].abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+{% if not url.startswith('http')  %}
+{%   set base=url.split('~')[1] %}
+{%   set ws=url.split('~')[2] %}
+{%   if ':' in lname %}
+{%     set ws=lname.split(':')[0] %}
+{%     set slname=lname.split(':')[1] %}
+{%     set previewbase=base %}
+{%   else %}
+{%     set slname=lname %}
+{%     set previewbase=base + '/' + ws %}
+{%   endif %}
+this is probably a layer in the localgs, <a href='/{{ previewbase }}/wms?{{ previewqparams }}'>preview it in geoserver</a> or:
+<ul>
+<li><a href='/{{ base }}/{{ ws }}/{{ slname }}/ows?service=WMS&version=1.3.0&request=GetCapabilities'>grab the layer getcapabilities link</a></li>
+<li><a href='/{{ base }}/{{ ws }}/ows?service=WMS&version=1.3.0&request=GetCapabilities'>grab the workspace getcapabilities link</a></li>
+</ul>
+{% endif %}
 {% if consumers is not none %}
 <p>
 utilisée par:
