@@ -10,7 +10,7 @@ from task_app.result_backend.redisbackend import RedisClient
 from task_app.decorators import is_superuser
 from task_app.georchestraconfig import GeorchestraConfig
 from task_app.owscapcache import OwsCapCache
-from task_app.checks.mapstore import get_resources_using_ows
+from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
 from task_app.api import get
 
 from config import url
@@ -80,4 +80,4 @@ def map(mapid):
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
     all_jobs_for_ctxid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid])
-    return render_template('ctx.html', ctxid=ctxid, layers=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), layers=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
