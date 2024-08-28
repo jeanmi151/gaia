@@ -75,8 +75,13 @@ def owslayer(stype, url, lname):
         return abort(404)
     if lname not in service['service'].contents:
         return abort(404)
+    params = ""
+    if not url.startswith('http'):
+        bbox = service['service'].contents[lname].boundingBox
+        params = "service=WMS&version=1.1.1&request=GetMap&styles=&format=application/openlayers&"
+        params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
     used_by = get_resources_using_ows(stype, url, lname)
-    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, bootstrap=app.extensions["bootstrap"])
+    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
