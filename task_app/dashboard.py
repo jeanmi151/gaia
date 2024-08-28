@@ -54,6 +54,10 @@ def get_rescontent_from_resid(restype, resid):
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
+@dash_bp.route("/csw/<string:uuid>")
+def cswentry(uuid):
+    return "requested local md with uuid " + uuid
+
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
     if stype not in ('wms', 'wmts', 'wfs'):
