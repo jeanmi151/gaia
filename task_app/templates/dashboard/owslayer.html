@@ -30,6 +30,23 @@
 <p id='details'>Details pour la couche {{ type }} '{{ lname }}' dans <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>{{ s.service.url }}</a></p>
 <p>titre: {{ s.service.contents[lname].title }}<p>
 <p>résumé: {{ s.service.contents[lname].abstract }}</p>
+{% if s.service.contents[lname].metadataUrls | length > 0 %}
+<p>métadonnées:
+<ul>
+{%   for m in s.service.contents[lname].metadataUrls %}
+{%     if m.format == 'text/html' %}
+<li><a href='{{ m.url }}'>voir les métadonnées au format HTML (type {{ m.type }})</li>
+{%     elif m.format == 'text/xml' %}
+<li><a href='{{ m.url }}'>voir les métadonnées au format XML (type {{ m.type }})</li>
+{%     endif %}
+{%   endfor %}
+{%   if localmduuids is not none %}
+{%     for m in localmduuids %}
+<li><a href='{{ url_for('dashboard.cswentry', uuid=m) }}'>voir les détails pour la métadonnée</a></li>
+{%     endfor %}
+{%   endif %}
+</ul>
+{% endif %}
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 <p><a href="javascript:SendToMapstore('{{ type }}', '{{ s.service.url }}', '{{ lname }}')">view it in mapstore</a></p>
 {% if not url.startswith('http')  %}
