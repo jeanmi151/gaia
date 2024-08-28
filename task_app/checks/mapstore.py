@@ -172,6 +172,12 @@ def check_catalogs(catalogs):
                 pass
     return ret
 
+def get_name_from_ctxid(ctxid):
+    r = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat['CONTEXT'], msc.Resource.id == ctxid)).one()
+    if r:
+        return r.name
+    return None
+
 def get_resources_using_ows(owstype, url, layer=None):
     """ returns a set of ms resources (tuples with resource type & id)
     using a given ows layer from a given ows service type at a given url
