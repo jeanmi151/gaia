@@ -47,6 +47,7 @@ this is probably a layer in the localgs, <a href='/{{ previewbase }}/wms?{{ prev
 <ul>
 <li><a href='/{{ base }}/{{ ws }}/{{ slname }}/ows?service=WMS&version=1.3.0&request=GetCapabilities'>grab the layer getcapabilities link</a></li>
 <li><a href='/{{ base }}/{{ ws }}/ows?service=WMS&version=1.3.0&request=GetCapabilities'>grab the workspace getcapabilities link</a></li>
+<li><a href='/{{ base }}/web/wicket/bookmarkable/org.geoserver.web.data.resource.ResourceConfigurationPage?name={{ slname }}&wsName={{ ws }}'>configure in geoserver</a></li>
 </ul>
 {% endif %}
 {% if consumers is not none %}
