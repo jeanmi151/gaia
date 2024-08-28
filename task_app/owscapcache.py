@@ -33,6 +33,7 @@ class OwsCapCache:
         if service_type not in ("wms", "wmts", "wfs", "csw"):
             return None
         tasklogger.debug("fetching {} getcapabilities for {}".format(service_type, url))
+        entry = dict()
         try:
             if service_type == "wms":
                 s = WebMapService(url, version="1.3.0")
@@ -42,6 +43,7 @@ class OwsCapCache:
                 s = CatalogueServiceWeb(url)
             elif service_type == "wmts":
                 s = WebMapTileService(url)
+            entry["service"] = s
         except ServiceException as e:
             # XXX hack parses the 403 page returned by the s-p ?
             if type(e.args) == tuple and "interdit" in e.args[0]:
@@ -49,15 +51,17 @@ class OwsCapCache:
             else:
                 tasklogger.error(f"failed loading {service_type} from {url}")
                 tasklogger.error(e)
-            return None
+            entry["exception"] = e
+            # cache the failure
+            entry["service"] = None
 #        except (HTTPError, SSLError, ReadTimeout, MaxRetryError, XMLSyntaxError, KeyError) as e:
         except Exception as e:
             tasklogger.error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
             tasklogger.error(e)
-            return None
-        entry = dict()
+            entry["service"] = None
+            # cache the failure
+            entry["exception"] = e
         entry["timestamp"] = time()
-        entry["service"] = s
         self.services[service_type][url] = entry
         return entry
 
@@ -75,6 +79,9 @@ class OwsCapCache:
                 > time()
                 and not force_fetch
             ):
+                if self.services[service_type][url]["service"] == None:
+                    tasklogger.warning(f"already got a {type(self.services[service_type][url]['exception'])} for {service_type} {url} in cache, returning None")
+                    return None
                 tasklogger.debug(
                     "returning {} getcapabilities from cache for {}".format(
                         service_type, url
