@@ -79,13 +79,31 @@ def owslayer(stype, url, lname):
         return abort(404)
     if lname not in service['service'].contents:
         return abort(404)
+    localmduuids = set()
+    localdomain = "https://" + conf.get("domainName")
+    for m in service['service'].contents[lname].metadataUrls:
+        mdurl = m['url']
+        mdformat = m['format']
+        if mdurl.startswith(localdomain):
+            if mdformat == 'text/xml' and "formatters/xml" in mdurl:
+            # XXX find the uuid in https://geobretagne.fr/geonetwork/srv/api/records/60c7177f-e4e0-48aa-922b-802f2c921efc/formatters/xml
+                localmduuids.add(mdurl.split('/')[7])
+            if mdformat == 'text/html' and "datahub/dataset" in mdurl:
+            # XXX find the uuid in https://geobretagne.fr/datahub/dataset/60c7177f-e4e0-48aa-922b-802f2c921efc
+                localmduuids.add(mdurl.split('/')[5])
+            if mdformat == 'text/html' and "api/records" in mdurl:
+            # XXX find the uuid in https://ids.craig.fr/geocat/srv/api/records/9c785908-004d-4ed9-95a6-bd2915da1f08
+                localmduuids.add(mdurl.split('/')[7])
+            if mdformat == 'text/html' and "catalog.search" in mdurl:
+            # XXX find the uuid in https://ids.craig.fr/geocat/srv/fre/catalog.search#/metadata/e37c057b-5884-429b-8bec-5db0baef0ee1
+                localmduuids.add(mdurl.split('/')[8])
     params = ""
     if not url.startswith('http'):
         bbox = service['service'].contents[lname].boundingBox
         params = "service=WMS&version=1.1.1&request=GetMap&styles=&format=application/openlayers&"
         params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
     used_by = get_resources_using_ows(stype, url, lname)
-    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, bootstrap=app.extensions["bootstrap"])
+    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, localmduuids=localmduuids, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
