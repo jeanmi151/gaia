@@ -60,11 +60,31 @@
 {%     set slname=lname %}
 {%     set previewbase=base + '/' + ws %}
 {%   endif %}
-this is probably a layer in the localgs, <a href='/{{ previewbase }}/wms?{{ previewqparams }}'>preview it in geoserver</a> or:
+this is probably a layer in the localgs,
+{%   if type == 'wms' %}
+<a href='/{{ previewbase }}/wms?{{ previewqparams }}'>preview WMS layer in geoserver</a>
+{%   elif type == 'wmts' %}
+<a href='/{{ base }}/gwc/demo/{{ ws }}:{{ slname }}?gridSet=EPSG:4326&format=image/png'>preview cache in geoserver demo</a>
+{%   elif type == 'wfs' %}
+<a href='/{{ previewbase }}/ows?version=1.0.0&request=GetFeature&typeName={{ ws }}%3A{{ slname }}&maxFeatures=50'>download GML sample</a>
+{%   endif %}
+or:
 <ul>
-<li><a href='/{{ base }}/{{ ws }}/{{ slname }}/ows?service=WMS&version=1.3.0&request=GetCapabilities'>grab the layer getcapabilities link</a></li>
-<li><a href='/{{ base }}/{{ ws }}/ows?service=WMS&version=1.3.0&request=GetCapabilities'>grab the workspace getcapabilities link</a></li>
-<li><a href='/{{ base }}/web/wicket/bookmarkable/org.geoserver.web.data.resource.ResourceConfigurationPage?name={{ slname }}&wsName={{ ws }}'>configure in geoserver</a></li>
+{%   if type == 'wms' %}
+{%     set gcparm = 'service=WMS&version=1.3.0' %}
+{%     set servhandler = 'ows' %}
+{%   elif type == 'wmts' %}
+{%     set gcparm = 'service=WMTS&version=1.1.1' %}
+{%     set servhandler = 'gwc/service/wmts' %}
+{%   elif type == 'wfs' %}
+{%     set gcparm = 'service=WFS&acceptversions=2.0.0' %}
+{%     set servhandler = 'ows' %}
+{%   endif %}
+{%   if type == 'wms' %} <!-- per-layer getcapabilities only works for wms ? -->
+<li><a href='/{{ base }}/{{ ws }}/{{ slname }}/{{ servhandler }}?{{ gcparm }}&request=GetCapabilities'>grab the {{ type }} layer getcapabilities link</a></li>
+{%   endif %}
+<li><a href='/{{ base }}/{{ ws }}/{{ servhandler }}?{{ gcparm }}&request=GetCapabilities'>grab the workspace {{ type }} getcapabilities link</a></li>
+<li><a href='/{{ base }}/web/wicket/bookmarkable/org.geoserver.web.data.resource.ResourceConfigurationPage?name={{ slname }}&wsName={{ ws }}'>configure layer in geoserver</a></li>
 </ul>
 {% endif %}
 {% if consumers is not none %}
