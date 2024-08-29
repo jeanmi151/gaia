@@ -86,14 +86,25 @@ def csw():
 @dash_bp.route("/csw/<string:uuid>")
 def cswentry(uuid):
     # XXX for now only support the local GN
-    service = owscache.get('csw', '/' + conf.get('localgn', 'urls') + '/srv/fre/csw')
+    localgn = conf.get('localgn', 'urls')
+    service = owscache.get('csw', '/' + localgn + '/srv/fre/csw')
     if service is None:
         return abort(404)
     csw = service["service"]
     csw.getrecordbyid([uuid])
     if len(csw.records) != 1:
         return abort(404)
-    return render_template('cswentry.html', s=service, r=csw.records[uuid], reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+    owslinks = list()
+    r = csw.records[uuid]
+    for u in r.uris:
+        if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
+            stype = u['protocol'].split(':')[1].lower()
+            url = u['url'].rstrip('?')
+            localdomain = "https://" + conf.get("domainName")
+            if url.startswith(localdomain):
+                url = url.removeprefix(localdomain)
+            owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
+    return render_template('cswentry.html', localgn=localgn, s=service, r=r, owslinks=owslinks, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):

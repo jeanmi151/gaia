@@ -31,6 +31,16 @@
 <p>titre: {{ r.title }}<p>
 <p>résumé: {{ r.abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+<p><a href='/datahub/dataset/{{ r.identifier }}'>voir dans datahub</a></p>
+<p><a href='/{{ localgn }}/srv/fre/catalog.search#/metadata/{{ r.identifier }}'>voir dans geonetwork</a></p>
+{% if owslinks | length  > 0 %}
+<h2>references</h2>
+<ul>
+{%   for o in owslinks %}
+<li><a href='{{ url_for('dashboard.owslayer', stype=o.type, url=o.url.replace('/','~'), lname=o.layername) }}'>couche {{ o.type }} {{ o.layername }} dans {{ o.url }}</a> ({{ o.descr }})</li>
+{%   endfor %}
+</ul>
+{% endif %}
 </div>
 	{% endblock content %}
     </body>
