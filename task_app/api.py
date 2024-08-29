@@ -36,6 +36,20 @@ def contexts():
         return str(maps.status_code)
     return maps.json()
 
+def gninternalid(uuid):
+    gnurl = conf.get(conf.get('localgn', 'urls'), 'secproxytargets')
+    query = { "size": 1,
+              "_source": {"includes": ["id"]},
+              "query": { "bool": { "must": [ { "query_string" : { "query": "uuid: " + uuid } }, { "terms": { "isTemplate": [ "y", "n" ] } }]}}
+    }
+    md = requests.post(gnurl + "srv/api/search/records/_search",
+        json = query,
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'})
+    if md.status_code != 200:
+      return md.text
+    rep = md.json()
+    return rep['hits']['hits'][0]['_source']['id']
+
 @api_bp.route("/geonetwork/metadatas.json")
 def metadatas():
     # bail out early if user is not auth
