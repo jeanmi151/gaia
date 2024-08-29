@@ -40,7 +40,7 @@ class OwsCapCache:
             elif service_type == "wfs":
                 s = WebFeatureService(url, version="1.1.0")
             elif service_type == "csw":
-                s = CatalogueServiceWeb(url)
+                s = CatalogueServiceWeb(url, timeout=60)
             elif service_type == "wmts":
                 s = WebMapTileService(url)
             entry["service"] = s
