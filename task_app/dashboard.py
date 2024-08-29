@@ -56,7 +56,15 @@ def home():
 
 @dash_bp.route("/csw/<string:uuid>")
 def cswentry(uuid):
-    return "requested local md with uuid " + uuid
+    # XXX for now only support the local GN
+    service = owscache.get('csw', '/' + conf.get('localgn', 'urls') + '/srv/fre/csw')
+    if service is None:
+        return abort(404)
+    csw = service["service"]
+    csw.getrecordbyid([uuid])
+    if len(csw.records) != 1:
+        return abort(404)
+    return render_template('cswentry.html', s=service, r=csw.records[uuid], reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
