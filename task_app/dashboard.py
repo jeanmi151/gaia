@@ -13,6 +13,9 @@ from task_app.owscapcache import OwsCapCache
 from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
 from task_app.api import get
 
+#from owslib import namespaces
+from owslib.fes import PropertyIsEqualTo, Not, Or, And
+
 from config import url
 import json
 
@@ -53,6 +56,35 @@ def get_rescontent_from_resid(restype, resid):
 @dash_bp.route("/")
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+
+@dash_bp.route("/csw")
+def csw():
+    # XXX for now only support the local GN
+    service = owscache.get('csw', '/' + conf.get('localgn', 'urls') + '/srv/fre/csw')
+    if service is None:
+        return abort(404)
+    is_dataset = PropertyIsEqualTo("Type", "dataset")
+    is_service = PropertyIsEqualTo("Type", "service")
+    non_harvested = PropertyIsEqualTo("isHarvested", "false")
+    # collect the list of records XXX should be done in the API to populate the page client-side
+    startpos = 0
+    mds = {}
+    csw = service["service"]
+    ns = namespaces.Namespaces()
+    while True:
+        csw.getrecords2(
+#            outputschema=ns.get_namespace('gmd'), gmd doesnt have title ?
+            constraints=[And([non_harvested] + [is_dataset])],
+            startposition=startpos,
+            maxrecords=100
+        )
+        for uuid in csw.records:
+            mds[uuid] = csw.records[uuid]
+        print(f"start = {startpos}, res={csw.results}, returned {len(csw.records)} allmds={len(mds)}")
+        startpos = csw.results['nextrecord'] # len(mds) + 1
+        if startpos > csw.results['matches']:
+            break
+    return render_template('csw.html', s=service, r=mds, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/csw/<string:uuid>")
 def cswentry(uuid):
