@@ -114,6 +114,10 @@ def owslayer(stype, url, lname):
     service = owscache.get(stype, url)
     if service is None:
         return abort(404)
+    # if a wfs from geoserver, prepend ws to lname
+    if stype == 'wfs' and ':' not in lname and service['service'].updateSequence:
+        ws = url.split('/')[-2]
+        lname = f"{ws}:{lname}"
     if lname not in service['service'].contents:
         return abort(404)
     localmduuids = set()
