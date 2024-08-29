@@ -11,7 +11,7 @@ from task_app.decorators import is_superuser
 from task_app.georchestraconfig import GeorchestraConfig
 from task_app.owscapcache import OwsCapCache
 from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
-from task_app.api import get
+from task_app.api import get, gninternalid
 
 from owslib.fes import PropertyIsEqualTo, Not, Or, And
 
@@ -96,6 +96,7 @@ def cswentry(uuid):
         return abort(404)
     owslinks = list()
     r = csw.records[uuid]
+    gnid = gninternalid(uuid)
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
@@ -104,7 +105,7 @@ def cswentry(uuid):
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
-    return render_template('cswentry.html', localgn=localgn, s=service, r=r, owslinks=owslinks, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+    return render_template('cswentry.html', localgn=localgn, s=service, r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
