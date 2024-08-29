@@ -3,7 +3,7 @@
 # vim: ts=4 sw=4 et
 
 from flask import Blueprint
-from flask import request, render_template
+from flask import request, render_template, abort
 from flask import current_app as app
 
 from task_app.result_backend.redisbackend import RedisClient
