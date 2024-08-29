@@ -135,7 +135,7 @@ def owslayer(stype, url, lname):
             # XXX find the uuid in https://ids.craig.fr/geocat/srv/fre/catalog.search#/metadata/e37c057b-5884-429b-8bec-5db0baef0ee1
                 localmduuids.add(mdurl.split('/')[8])
     params = ""
-    if not url.startswith('http'):
+    if not url.startswith('http') and stype == 'wms':
         bbox = service['service'].contents[lname].boundingBox
         params = "service=WMS&version=1.1.1&request=GetMap&styles=&format=application/openlayers&"
         params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
