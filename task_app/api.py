@@ -48,6 +48,8 @@ def gninternalid(uuid):
     if md.status_code != 200:
       return md.text
     rep = md.json()
+    if len(rep['hits']['hits']) != 1:
+        return None
     return rep['hits']['hits'][0]['_source']['id']
 
 @api_bp.route("/geonetwork/metadatas.json")
