@@ -101,6 +101,11 @@ utilisée par:
 </ul>
 </p>
 {% endif %}
+<form id='check' action="javascript:CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}');">
+<input type=submit value="check now">
+</form>
+<h2 id='pbtitle'>Problems</h2>
+<div id="problems"></div>
 </div>
 	{% endblock content %}
     </body>
