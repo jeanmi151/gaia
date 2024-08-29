@@ -7,8 +7,9 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from task_app.dashboard import rcli
+from task_app.dashboard import rcli, unmunge, owscache
 from task_app.checks.mapstore import check_res, check_all_mapstore_res, check_all_mapstore_res_subtasks, check_configs
+import task_app.checks.ows
 from task_app.decorators import check_role
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -64,4 +65,23 @@ def check_mapstore():
         result = check_all_mapstore_res_subtasks.delay()
     else:
         result = check_all_mapstore_res.delay()
+    return {"result_id": result.id}
+
+@tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
+def check_owslayer(stype, url, lname):
+    if stype not in ('wms', 'wmts', 'wfs'):
+        return abort(412)
+    url = unmunge(url)
+    service = owscache.get(stype, url)
+    if service is None:
+        return abort(404)
+    # if a wfs from geoserver, prepend ws to lname
+    if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
+        ws = url.split('/')[-2]
+        lname = f"{ws}:{lname}"
+    if lname not in service['service'].contents:
+        return abort(404)
+    result = task_app.checks.ows.owslayer.delay(stype, url, lname)
+    if result.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.check_owslayer', [stype, url, lname], result.id)
     return {"result_id": result.id}
