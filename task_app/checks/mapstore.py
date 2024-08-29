@@ -131,7 +131,7 @@ def check_layers(layers, rescat, resid):
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                 s = msc.owscache.get(l['type'], l['url'])
-                if s is None:
+                if s['service'] is None:
                     ret.append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
                 else:
                     tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s['timestamp']))
@@ -157,7 +157,7 @@ def check_catalogs(catalogs):
         match c['type']:
             case 'wms'|'wfs'|'wmts'|'csw':
                 s = msc.owscache.get(c['type'], c['url'])
-                if s is None:
+                if s['service'] is None:
                     ret.append(msg + "doesn't seem to be an OGC service")
             case '3dtiles' | 'cog':
                 try:
