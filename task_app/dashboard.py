@@ -13,7 +13,6 @@ from task_app.owscapcache import OwsCapCache
 from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
 from task_app.api import get
 
-#from owslib import namespaces
 from owslib.fes import PropertyIsEqualTo, Not, Or, And
 
 from config import url
@@ -70,10 +69,8 @@ def csw():
     startpos = 0
     mds = {}
     csw = service["service"]
-    ns = namespaces.Namespaces()
     while True:
         csw.getrecords2(
-#            outputschema=ns.get_namespace('gmd'), gmd doesnt have title ?
             constraints=[And([non_harvested] + [is_dataset])],
             startposition=startpos,
             maxrecords=100
