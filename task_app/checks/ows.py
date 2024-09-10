@@ -11,6 +11,7 @@ tasklogger = get_task_logger(__name__)
 
 from task_app.checks.mapstore import msc
 from task_app.dashboard import unmunge
+from task_app.utils import find_localmduuid
 
 import xml.etree.ElementTree as ET
 from owslib.util import ServiceException
@@ -76,30 +77,17 @@ def owslayer(stype, url, layername):
     ret['problems'] = list()
     url = unmunge(url)
     service = msc.owscache.get(stype, url)
-    localmduuids = set()
-    localdomain = "https://" + msc.conf.get("domainName")
-    # XXX for wfs, no metadataUrls are found by owslib, be it with 1.1.0 or 2.0.0 ?
-    for m in service['service'].contents[layername].metadataUrls:
-        mdurl = m['url']
-        # check first that the url exists
-        r = requests.head(mdurl)
-        if r.status_code != 200:
-            ret['problems'].append(f"metadataurl at {mdurl} doesn't seem to exist (returned code {r.status_code})")
-        tasklogger.debug(f"{mdurl} -> {r.status_code}")
-        mdformat = m['format']
-        if mdurl.startswith(localdomain):
-            if mdformat == 'text/xml' and "formatters/xml" in mdurl:
-            # XXX find the uuid in https://geobretagne.fr/geonetwork/srv/api/records/60c7177f-e4e0-48aa-922b-802f2c921efc/formatters/xml
-                localmduuids.add(mdurl.split('/')[7])
-            if mdformat == 'text/html' and "datahub/dataset" in mdurl:
-            # XXX find the uuid in https://geobretagne.fr/datahub/dataset/60c7177f-e4e0-48aa-922b-802f2c921efc
-                localmduuids.add(mdurl.split('/')[5])
-            if mdformat == 'text/html' and "api/records" in mdurl:
-            # XXX find the uuid in https://ids.craig.fr/geocat/srv/api/records/9c785908-004d-4ed9-95a6-bd2915da1f08
-                localmduuids.add(mdurl.split('/')[7])
-            if mdformat == 'text/html' and "catalog.search" in mdurl:
-            # XXX find the uuid in https://ids.craig.fr/geocat/srv/fre/catalog.search#/metadata/e37c057b-5884-429b-8bec-5db0baef0ee1
-                localmduuids.add(mdurl.split('/')[8])
+    l = service['service'].contents[layername]
+    if hasattr(l, 'metadataUrls'):
+        for m in service['service'].contents[layername].metadataUrls:
+            mdurl = m['url']
+            # check first that the url exists
+            r = requests.head(mdurl)
+            if r.status_code != 200:
+                ret['problems'].append(f"metadataurl at {mdurl} doesn't seem to exist (returned code {r.status_code})")
+            tasklogger.debug(f"{mdurl} -> {r.status_code}")
+
+    localmduuids = find_localmduuid(service['service'], layername)
     # in a second time, make sure local md uuids are reachable via csw
     if len(localmduuids) > 0:
         localgn = msc.conf.get('localgn', 'urls')
@@ -114,7 +102,6 @@ def owslayer(stype, url, layername):
                 tasklogger.debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
 
     operation = ""
-    l = service['service'].contents[layername]
     try:
         if stype == "wms":
             operation = "GetMap"
