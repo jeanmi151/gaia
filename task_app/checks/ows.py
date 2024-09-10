@@ -103,8 +103,8 @@ def owslayer(stype, url, layername):
     # in a second time, make sure local md uuids are reachable via csw
     if len(localmduuids) > 0:
         localgn = msc.conf.get('localgn', 'urls')
-        service = msc.owscache.get('csw', '/' + localgn + '/srv/fre/csw')
-        csw = service['service']
+        cswservice = msc.owscache.get('csw', '/' + localgn + '/srv/fre/csw')
+        csw = cswservice['service']
         csw.getrecordbyid(list(localmduuids))
         tasklogger.debug(csw.records)
         for uuid in localmduuids:
