@@ -85,3 +85,16 @@ def check_owslayer(stype, url, lname):
     if result.id:
         rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owslayer', [stype, url, lname], result.id)
     return {"result_id": result.id}
+
+@tasks_bp.route("/check/owsservice/<string:stype>/<string:url>.json")
+def check_owsservice(stype, url):
+    if stype not in ('wms', 'wmts', 'wfs'):
+        return abort(412)
+    url = unmunge(url)
+    service = owscache.get(stype, url)
+    if service is None:
+        return abort(404)
+    result = task_app.checks.ows.owsservice.delay(stype, url)
+    if result.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owsservice', [stype, url], result.id)
+    return {"result_id": result.id}
