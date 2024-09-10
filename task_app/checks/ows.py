@@ -65,7 +65,7 @@ def owslayer(stype, url, layername):
     """
     Given an ows layer check that:
     - it refers to existing metadata ids
-    - TODO: a getmap/getfeature query succeeds
+    - a getmap/getfeature/gettile query succeeds
     :param stype: the service type (wms/wfs/wmts)
     :param url: the service url
     :param layername: the layer name in the service object
@@ -113,4 +113,57 @@ def owslayer(stype, url, layername):
             else:
                 tasklogger.debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
 
+    operation = ""
+    l = service['service'].contents[layername]
+    try:
+        if stype == "wms":
+            operation = "GetMap"
+            if operation not in [op.name for op in service["service"].operations]:
+                ret['problems'].append(f"{operation} unavailable")
+                return ret
+            r = service["service"].getmap(layers=[layername],
+                srs='EPSG:4326',
+                format='image/png',
+                size=(10,10),
+                bbox=reduced_bbox(l.boundingBoxWGS84))
+            headers = r.info()
+            defformat = service["service"].getOperationByName('GetMap').formatOptions[0]
+            if headers['content-type'] != defformat:
+                ret['problems'].append(f"{operation} succeded but returned format {headers['content-type']} didn't match expected {defformat}")
+            # content-length only available for HEAD requests ?
+            if 'content-length' in headers and not int(headers['content-length']) > 0:
+                ret['problems'].append(f"{operation} succeded but the result size was {headers['content-length']}")
+
+        elif stype == "wfs":
+            operation = "GetFeature"
+            feat = service["service"].getfeature(typename=[layername],
+                srsname=l.crsOptions[0],
+#                bbox=reduced_bbox(l.boundingBoxWGS84),
+                maxfeatures=1)
+            xml = feat.read()
+            try:
+                root = ET.fromstring(xml.decode())
+                first_tag = root.tag.lower()
+                if not first_tag.endswith("featurecollection"):
+                    ret['problems'].append(f"{operation} succeeded but the first XML tag of the response was {first_tag}")
+            except lxml.etree.XMLSyntaxError as e:
+                ret['problems'].append(f"{operation} succeeded but didnt return XML ? {xml.decode()}")
+
+        elif stype == "wmts":
+            operation = "GetTile"
+            (tms, tm, r, c) = find_tilematrix_center(service['service'], layername)
+            tile = service["service"].gettile(layer=layername, tilematrixset = tms, tilematrix = tm, row = r, column = c)
+            headers = tile.info()
+            if headers['content-type'] != l.formats[0]:
+                ret['problems'].append(f"{operation} succeded but returned format {headers['content-type']} didn't match expected {l.formats[0]}")
+            if 'content-length' in headers and not int(headers['content-length']) > 0:
+                ret['problems'].append(f"{operation} succeded but the result size was {headers['content-length']}")
+
+    except ServiceException as e:
+        if type(e.args) == tuple and "interdit" in e.args[0]:
+            ret['problems'].append(f"got a 403 for {operation} on {layername} in {stype} at {url}")
+        else:
+            ret['problems'].append(f"failed {operation} on {layername} in {stype} at {url}: {e}")
+    else:
+       tasklogger.debug(f"{operation} on {layername} in {stype} at {url} succeeded")
     return ret
