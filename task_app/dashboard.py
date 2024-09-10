@@ -138,7 +138,7 @@ def owslayer(stype, url, lname):
         params = "service=WMS&version=1.1.1&request=GetMap&styles=&format=application/openlayers&"
         params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
     used_by = get_resources_using_ows(stype, url, lname)
-    all_jobs_for_owslayer = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.check_owslayer',[stype, url, lname])
+    all_jobs_for_owslayer = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.owslayer',[stype, url, lname])
     return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, localmduuids=localmduuids, previous_jobs=all_jobs_for_owslayer, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/map/<int:mapid>")
