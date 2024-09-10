@@ -83,5 +83,5 @@ def check_owslayer(stype, url, lname):
         return abort(404)
     result = task_app.checks.ows.owslayer.delay(stype, url, lname)
     if result.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.check_owslayer', [stype, url, lname], result.id)
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owslayer', [stype, url, lname], result.id)
     return {"result_id": result.id}
