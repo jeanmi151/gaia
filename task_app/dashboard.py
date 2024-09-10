@@ -8,10 +8,10 @@ from flask import current_app as app
 
 from task_app.result_backend.redisbackend import RedisClient
 from task_app.decorators import is_superuser
-from task_app.georchestraconfig import GeorchestraConfig
 from task_app.owscapcache import OwsCapCache
 from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
 from task_app.api import get, gninternalid
+from task_app.utils import find_localmduuid, conf
 
 from owslib.fes import PropertyIsEqualTo, Not, Or, And
 
@@ -20,7 +20,6 @@ import json
 
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
 
-conf = GeorchestraConfig()
 owscache = OwsCapCache(conf)
 rcli = RedisClient(url)
 
@@ -132,24 +131,7 @@ def owslayer(stype, url, lname):
         lname = f"{ws}:{lname}"
     if lname not in service['service'].contents:
         return abort(404)
-    localmduuids = set()
-    localdomain = "https://" + conf.get("domainName")
-    for m in service['service'].contents[lname].metadataUrls:
-        mdurl = m['url']
-        mdformat = m['format']
-        if mdurl.startswith(localdomain):
-            if mdformat == 'text/xml' and "formatters/xml" in mdurl:
-            # XXX find the uuid in https://geobretagne.fr/geonetwork/srv/api/records/60c7177f-e4e0-48aa-922b-802f2c921efc/formatters/xml
-                localmduuids.add(mdurl.split('/')[7])
-            if mdformat == 'text/html' and "datahub/dataset" in mdurl:
-            # XXX find the uuid in https://geobretagne.fr/datahub/dataset/60c7177f-e4e0-48aa-922b-802f2c921efc
-                localmduuids.add(mdurl.split('/')[5])
-            if mdformat == 'text/html' and "api/records" in mdurl:
-            # XXX find the uuid in https://ids.craig.fr/geocat/srv/api/records/9c785908-004d-4ed9-95a6-bd2915da1f08
-                localmduuids.add(mdurl.split('/')[7])
-            if mdformat == 'text/html' and "catalog.search" in mdurl:
-            # XXX find the uuid in https://ids.craig.fr/geocat/srv/fre/catalog.search#/metadata/e37c057b-5884-429b-8bec-5db0baef0ee1
-                localmduuids.add(mdurl.split('/')[8])
+    localmduuids = find_localmduuid(service['service'], lname)
     params = ""
     if not url.startswith('http') and stype == 'wms':
         bbox = service['service'].contents[lname].boundingBox
