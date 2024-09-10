@@ -23,6 +23,21 @@
             {{ bootstrap.load_js() }}
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+let prev = {{ previous_jobs | tojson() }};
+if (prev) {
+  const last = prev.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id']);
+} else {
+  CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id']);
+}
+
+$(document).ready(function(){
+  DisplayPrev('ows/{{ type }}/{{ url }}', '{{ lname }}', prev, {{ showdelete|int }});
+});
+</script>
         {% endblock scripts %}
         <!-- Your page content -->
         {% block content %}
@@ -106,6 +121,8 @@ utilisée par:
 </form>
 <h2 id='pbtitle'>Problems</h2>
 <div id="problems"></div>
+<h2 id='previous'>Previous</h2>
+<p id='previouslist'></p>
 </div>
 	{% endblock content %}
     </body>
