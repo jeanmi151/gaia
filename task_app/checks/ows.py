@@ -16,6 +16,13 @@ import xml.etree.ElementTree as ET
 from owslib.util import ServiceException
 
 def find_tilematrix_center(wmts, lname):
+    """
+    for a given wmts layer, find the 'center' tile at the last tilematrix level
+    and return a tuple with:
+    - the last tilematrix level to query
+    - the tilematrix name
+    - the row/column index at the center of the matrix
+    """
     # find first tilematrixset
     # tilematrixset is a service attribute
     tsetk = list(wmts.tilematrixsets.keys())[0]
