@@ -12,6 +12,47 @@ tasklogger = get_task_logger(__name__)
 from task_app.checks.mapstore import msc
 from task_app.dashboard import unmunge
 
+import xml.etree.ElementTree as ET
+from owslib.util import ServiceException
+
+def find_tilematrix_center(wmts, lname):
+    # find first tilematrixset
+    # tilematrixset is a service attribute
+    tsetk = list(wmts.tilematrixsets.keys())[0]
+    tset = wmts.tilematrixsets[tsetk]
+    # find last tilematrix level
+    tmk = list(tset.tilematrix.keys())[-1]
+    lasttilematrix = tset.tilematrix[tmk]
+#    print(f"first tilematrixset named {tsetk}: {tset}")
+#    print(f"last tilematrix lvl named {tmk}: {lasttilematrix} (type {type(lasttilematrix)}")
+#    print(f"width={lasttilematrix.matrixwidth}, height={lasttilematrix.matrixheight}")
+    # tilematrixsetlink is a layer attribute
+    l = wmts.contents[lname]
+    tms = list(l.tilematrixsetlinks.keys())[0]
+#    print(f"first tilesetmatrixlink for layer {lname} named {tms}")
+    tsetl = l.tilematrixsetlinks[tms]
+    #geoserver/gwc sets tilematrixsetlinks, mapproxy doesnt
+    if len(tsetl.tilematrixlimits) > 0:
+        tmk = list(tsetl.tilematrixlimits.keys())[-1]
+        tml = tsetl.tilematrixlimits[tmk]
+        r = tml.mintilerow + int((tml.maxtilerow - tml.mintilerow) / 2)
+        c = tml.mintilecol + int((tml.maxtilecol - tml.mintilecol) / 2)
+    else:
+        r = int(int(lasttilematrix.matrixwidth) / 2)
+        c = int(int(lasttilematrix.matrixheight) / 2)
+    return (tms, tmk, r, c)
+
+def reduced_bbox(bbox):
+    """
+    for a layer bounding box, return a very small bbox at the center of it
+    used for getmap/getfeature tests to ensure it doesn't hammer the remote
+    """
+    xmin, ymin, xmax, ymax = bbox
+    return [xmin+0.49*(xmax-xmin),
+         ymin+0.49*(ymax-ymin),
+         xmax-0.49*(xmax-xmin),
+         ymax-0.49*(ymax-ymin)]
+
 @shared_task()
 def owslayer(stype, url, layername):
     """
