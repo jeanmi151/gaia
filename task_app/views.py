@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4 sw=4 et
 
-from celery.result import AsyncResult
+from celery.result import AsyncResult, GroupResult
+from celery import group
 from flask import Blueprint
 from flask import request
 from flask import jsonify
@@ -94,7 +95,14 @@ def check_owsservice(stype, url):
     service = owscache.get(stype, url)
     if service is None:
         return abort(404)
-    result = task_app.checks.ows.owsservice.delay(stype, url)
-    if result.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owsservice', [stype, url], result.id)
-    return {"result_id": result.id}
+    taskslist = list()
+    for lname in service['service'].contents:
+        taskslist.append(task_app.checks.ows.owslayer.s(stype, url, lname))
+    grouptask = group(taskslist)
+    groupresult = grouptask.apply_async()
+    groupresult.save()
+    for t in groupresult.children:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owslayer', [stype, url, lname], t.id)
+    if groupresult.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owsservice', [stype, url], groupresult.id)
+    return {"result_id": groupresult.id}
