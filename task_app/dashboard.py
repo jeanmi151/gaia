@@ -59,7 +59,7 @@ def home():
 def csw():
     # XXX for now only support the local GN
     service = owscache.get('csw', '/' + conf.get('localgn', 'urls') + '/srv/fre/csw')
-    if s['service'] is None:
+    if service['service'] is None:
         return abort(404)
     is_dataset = PropertyIsEqualTo("Type", "dataset")
     is_service = PropertyIsEqualTo("Type", "service")
@@ -87,7 +87,7 @@ def cswentry(uuid):
     # XXX for now only support the local GN
     localgn = conf.get('localgn', 'urls')
     service = owscache.get('csw', '/' + localgn + '/srv/fre/csw')
-    if s['service'] is None:
+    if service['service'] is None:
         return abort(404)
     csw = service["service"]
     csw.getrecordbyid([uuid])
@@ -112,7 +112,7 @@ def ows(stype, url):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if s['service'] is None:
+    if service['service'] is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
     all_jobs_for_ows = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.owsservice',[stype, url])
@@ -124,7 +124,7 @@ def owslayer(stype, url, lname):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service is None:
+    if service['service'] is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
     if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
