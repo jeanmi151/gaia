@@ -35,6 +35,7 @@ class OwsCapCache:
         tasklogger.debug("fetching {} getcapabilities for {}".format(service_type, url))
         entry = dict()
         try:
+            # XX consider passing parse_remote_metadata ?
             if service_type == "wms":
                 s = WebMapService(url, version="1.3.0")
             elif service_type == "wfs":
