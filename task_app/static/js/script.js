@@ -69,6 +69,7 @@ const fetchForHome = () => {
 }
 
 const DisplayPrev = (type, resid, taskids, showdelete = false) => {
+    if (taskids === null) { return ; }
     const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
     const arr = sorted.map(t => {
         const link = $("<a>");
