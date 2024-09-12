@@ -17,17 +17,27 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @tasks_bp.get("/result/<id>")
 def result(id: str) -> dict[str, object]:
-    result = AsyncResult(id)
+    result = GroupResult.restore(id)
+    finished = None
+    value = None
+    if result is None:
+        result = AsyncResult(id)
+        # date_done is a datetime
+        finished = result.date_done
+        value = result.get() if result.ready() else result.result
+    else:
+        if result.ready():
+            value = list()
+            for r in result.results:
+                value.append({'args': r.args, 'problems': r.get()['problems']})
     ready = result.ready()
-    # date_done is a datetime
-    finished = result.date_done
     return {
         "ready": ready,
-        "task": result.name,
+        "task": result.name if hasattr(result,'name') else "grouptask",
         "finished": (finished.strftime('%s') if finished is not None else False),
-        "args": result.args,
+        "args": result.args if hasattr(result,'args') else "grouptask",
         "successful": result.successful() if ready else None,
-        "value": result.get() if ready else result.result,
+        "value": value,
     }
 
 @tasks_bp.get("/forget/<id>")
