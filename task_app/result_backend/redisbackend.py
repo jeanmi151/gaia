@@ -20,6 +20,46 @@ class RedisClient:
             args = task["args"]
             self.add_taskid_for_taskname_and_args(name, args, k.decode()[17:], task["date_done"])
 
+        # analyse tasksets
+        for k in self.r.scan_iter("celery-taskset-meta-*"):
+            n += 1
+            v = self.get(k.decode())
+            try:
+                task = json.loads(v)
+            except json.JSONDecodeError as e:
+                print(f"discarding {k}, not json ? {e}")
+            # just makes sure we're on the same task
+            assert(task['result'][0][0] == k.decode()[20:])
+            name = None
+            args = None
+            date_done = None
+            for f in task['result'][1]:
+                tid = f[0][0]
+                tj = self.get(tid)
+                if tj is None:
+                    continue
+                try:
+                    task = json.loads(tj)
+                except json.JSONDecodeError as e:
+                    print(f"discarding {tid}, not json ? {e}")
+                    continue
+                if name is None:
+                    name = task["name"]
+                else:
+                    if task["name"] != name:
+                        print(f"{name} mismatched task name for {tid}")
+                if args is None:
+                    args = task["args"][:-1]
+                # find the last finishing job
+                if date_done is None:
+                    date_done = task["date_done"]
+                elif task["date_done"] > date_done:
+                    date_done = task["date_done"]
+                # print(f"{tid} {task['name']} {task['args'][:-1]} {task['date_done']} {date_done}")
+            if name.endswith('owslayer'):
+                name = 'task_app.checks.ows.owsservice'
+            self.add_taskid_for_taskname_and_args(name, args, k.decode()[20:], date_done)
+
     def get(self, key):
 #        print(f"get({key}) called")
         if key[:17] == "celery-task-meta-" or key[:20] == "celery-taskset-meta-":
