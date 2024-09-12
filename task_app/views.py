@@ -20,12 +20,14 @@ def result(id: str) -> dict[str, object]:
     result = GroupResult.restore(id)
     finished = None
     value = None
+    completed = None
     if result is None:
         result = AsyncResult(id)
         # date_done is a datetime
         finished = result.date_done
         value = result.get() if result.ready() else result.result
     else:
+        completed = f"{result.completed_count()} / {len(result.children)}"
         if result.ready():
             value = list()
             for r in result.results:
@@ -33,6 +35,7 @@ def result(id: str) -> dict[str, object]:
     ready = result.ready()
     return {
         "ready": ready,
+        "completed": completed,
         "task": result.name if hasattr(result,'name') else "grouptask",
         "finished": (finished.strftime('%s') if finished is not None else False),
         "args": result.args if hasattr(result,'args') else "grouptask",
