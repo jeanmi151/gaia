@@ -126,9 +126,13 @@ class RedisClient:
                     if task["finished"] is None:
                         v = self.get(task["id"])
                         taskb = json.loads(v)
-                        # XXX todo find taskset last date_done
+                        date_done = None
                         if hasattr(taskb, 'date_done') and taskb["date_done"] is not None:
-                            taskids[i] = { "id": task["id"], "finished": taskb["date_done"] }
+                            date_done = taskb["date_done"]
+                        if not hasattr(taskb, 'name'): # taskset
+                            (x, y, date_done) = self.get_taskset_details("celery-taskset-meta-" + task["id"])
+                        if date_done is not None:
+                            taskids[i] = { "id": task["id"], "finished": date_done }
                 return taskids
         return None
 
