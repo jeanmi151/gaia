@@ -74,7 +74,7 @@ const DisplayPrev = (type, resid, taskids, showdelete = false) => {
     const arr = sorted.map(t => {
         const link = $("<a>");
         link.attr("id", 'display-taskres-' + t['id'])
-        link.attr("href","javascript:PollTaskRes('" + type +"',"+ resid + ",'" + t['id'] + "');");
+        link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + t['id'] + "');");
         link.attr("title","Show result for task " + t['id']);
         link.text("check at " + t['finished']);
         if (showdelete) {
