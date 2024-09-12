@@ -80,8 +80,8 @@ class OwsCapCache:
                 and not force_fetch
             ):
                 if self.services[service_type][url]["service"] == None:
-                    tasklogger.warning(f"already got a {type(self.services[service_type][url]['exception'])} for {service_type} {url} in cache, returning None")
-                    return None
+                    tasklogger.warning(f"already got a {type(self.services[service_type][url]['exception'])} for {service_type} {url} in cache, returning cached failure")
+                    return self.services[service_type][url]
                 tasklogger.debug(
                     "returning {} getcapabilities from cache for {}".format(
                         service_type, url
