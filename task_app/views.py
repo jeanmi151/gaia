@@ -43,8 +43,15 @@ def result(id: str) -> dict[str, object]:
 @tasks_bp.get("/forget/<id>")
 @check_role(role='SUPERUSER')
 def forget(id: str):
-    result = AsyncResult(id)
+    # forget first in the revmap
     rcli.forget(id)
+    result = GroupResult.restore(id)
+    if result is None:
+        result = AsyncResult(id)
+    else:
+        # delete taskset from redis
+        result.delete()
+    # if is a taskset, should also forget all subtasks
     result.forget()
     return jsonify("ok")
 
