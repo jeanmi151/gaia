@@ -115,7 +115,8 @@ def ows(stype, url):
     if s['service'] is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
-    return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), consumers=used_by, bootstrap=app.extensions["bootstrap"])
+    all_jobs_for_ows = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.owsservice',[stype, url])
+    return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), consumers=used_by, previous_jobs=all_jobs_for_ows, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>/<string:lname>")
 def owslayer(stype, url, lname):
