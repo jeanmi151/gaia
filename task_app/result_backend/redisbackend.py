@@ -11,7 +11,11 @@ class RedisClient:
         self.task_by_taskname = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):
             v = self.get(k.decode())
-            task = json.loads(v)
+            try:
+                task = json.loads(v)
+            except json.JSONDecodeError as e:
+                print(f"discarding {k}, not json ? {e}")
+                continue
             name = task["name"]
             args = task["args"]
             if name not in self.task_by_taskname:
