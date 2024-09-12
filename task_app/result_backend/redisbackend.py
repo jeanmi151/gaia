@@ -121,7 +121,8 @@ class RedisClient:
                     if task["finished"] is None:
                         v = self.get(task["id"])
                         taskb = json.loads(v)
-                        if taskb["date_done"] is not None:
+                        # XXX todo find taskset last date_done
+                        if hasattr(taskb, 'date_done') and taskb["date_done"] is not None:
                             taskids[i] = { "id": task["id"], "finished": taskb["date_done"] }
                 return taskids
         return None
