@@ -48,8 +48,24 @@ class RedisClient:
         if v is None:
             return None
         task = json.loads(v)
-        taskname = task["name"]
-        args = task["args"]
+        taskname = None
+        args = None
+        if hasattr(task, 'name'):
+            taskname = task["name"]
+            args = task["args"]
+        else:
+            # taskset, take name & args from the first task of the set
+            ftid = task['result'][1][0][0][0]
+            tj = self.get(ftid)
+            try:
+                task = json.loads(tj)
+            except json.JSONDecodeError as e:
+                print(f"discarding {ftid}, not json ?")
+                return None
+            if task["name"].endswith('owslayer'):
+                taskname = 'task_app.checks.ows.owsservice'
+            args = task["args"][0:2]
+
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
