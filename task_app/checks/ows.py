@@ -154,19 +154,3 @@ def owslayer(stype, url, layername):
     else:
        tasklogger.debug(f"{operation} on {layername} in {stype} at {url} succeeded")
     return ret
-
-@shared_task()
-def owsservice(stype, url):
-    """
-    Given an ows service check all its layers
-    :param stype: the service type
-    :param url: the service url
-    :return: the list of errors
-    """
-    taskids = list()
-    service = msc.owscache.get(stype, url)
-    for lname in service['service'].contents:
-        result = owslayer.delay(stype, url, lname)
-        taskids.append(result.id)
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owslayer', [stype, url, lname], result.id)
-    return taskids
