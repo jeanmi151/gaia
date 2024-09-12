@@ -59,7 +59,7 @@ def home():
 def csw():
     # XXX for now only support the local GN
     service = owscache.get('csw', '/' + conf.get('localgn', 'urls') + '/srv/fre/csw')
-    if service is None:
+    if s['service'] is None:
         return abort(404)
     is_dataset = PropertyIsEqualTo("Type", "dataset")
     is_service = PropertyIsEqualTo("Type", "service")
@@ -87,7 +87,7 @@ def cswentry(uuid):
     # XXX for now only support the local GN
     localgn = conf.get('localgn', 'urls')
     service = owscache.get('csw', '/' + localgn + '/srv/fre/csw')
-    if service is None:
+    if s['service'] is None:
         return abort(404)
     csw = service["service"]
     csw.getrecordbyid([uuid])
@@ -112,7 +112,7 @@ def ows(stype, url):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service is None:
+    if s['service'] is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
     return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), consumers=used_by, bootstrap=app.extensions["bootstrap"])
