@@ -64,7 +64,7 @@ class RedisClient:
                 return None
             if task["name"].endswith('owslayer'):
                 taskname = 'task_app.checks.ows.owsservice'
-            args = task["args"][0:2]
+            args = task["args"][:-1]
 
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
