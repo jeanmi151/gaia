@@ -133,11 +133,12 @@ const PollTaskRes = (type, resid, taskid) => {
                       var p = data['value'].filter(function(f) {
                         return f['problems'].length > 0
                       });
-                      data["value"].problems = p.map(j => {
+                      const probs = p.map(j => {
                         return j.problems.map(i => {
-                          return j.args + '/' + i
+                          return j.args + ' has this issue: ' + i
                         })
                       });
+                      data["value"].problems = probs.flat(1)
                   }
                   if (data["value"].problems.length > 0) {
                     $('#pbtitle').text('Problems');
