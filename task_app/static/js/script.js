@@ -129,6 +129,16 @@ const PollTaskRes = (type, resid, taskid) => {
                   $('#problems').text('Something crashed, check browser console');
                   console.error(data)
                 } else {
+                  if (Array.isArray(data["value"])) {
+                      var p = data['value'].filter(function(f) {
+                        return f['problems'].length > 0
+                      });
+                      data["value"].problems = p.map(j => {
+                        return j.problems.map(i => {
+                          return j.args + '/' + i
+                        })
+                      });
+                  }
                   if (data["value"].problems.length > 0) {
                     $('#pbtitle').text('Problems');
                     $('#problems').html(ArrayToHtmlList(data["value"].problems));
