@@ -18,11 +18,7 @@ class RedisClient:
                 continue
             name = task["name"]
             args = task["args"]
-            if name not in self.task_by_taskname:
-                self.task_by_taskname[name] = dict()
-            if tuple(args) not in self.task_by_taskname[name]:
-                self.task_by_taskname[name][tuple(args)] = list()
-            self.task_by_taskname[name][tuple(args)].append({ 'id': k.decode()[17:], 'finished': task["date_done"]})
+            self.add_taskid_for_taskname_and_args(name, args, k.decode()[17:], task["date_done"])
 
     def get(self, key):
 #        print(f"get({key}) called")
