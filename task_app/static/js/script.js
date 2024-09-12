@@ -123,7 +123,11 @@ const PollTaskRes = (type, resid, taskid) => {
                 if (data === null) {
                   $('#pbtitle').text('got null, shouldnt happen ?');
                 } else if(!data["ready"]) {
-                  $('#pbtitle').text('Waiting');
+                  if (data['completed'] !== null) {
+                    $('#pbtitle').text(data["completed"]);
+                  } else {
+                    $('#pbtitle').text('Waiting');
+                  }
                   setTimeout(poll, 500)
                 } else if (!data["successful"]) {
                   $('#problems').text('Something crashed, check browser console');
