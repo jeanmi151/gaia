@@ -26,14 +26,22 @@ class RedisClient:
 
     def get(self, key):
 #        print(f"get({key}) called")
-        if key[:17] == "celery-task-meta-":
+        if key[:17] == "celery-task-meta-" or key[:20] == "celery-taskset-meta-":
             return self.r.get(key)
         else:
             if isinstance(key, str):
                 nk = "celery-task-meta-".encode() + key.encode()
             else:
                 nk = "celery-task-meta-".encode() + key
-            return self.r.get(nk)
+            x = self.r.get(nk)
+            if x is not None:
+                return x
+            else:
+                if isinstance(key, str):
+                    nk = "celery-taskset-meta-".encode() + key.encode()
+                else:
+                    nk = "celery-taskset-meta-".encode() + key
+                return self.r.get(nk)
 
     def forget(self, taskid):
         v = self.get(taskid)
