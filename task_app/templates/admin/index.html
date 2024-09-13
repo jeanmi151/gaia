@@ -9,6 +9,7 @@
         {% block styles %}
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         {% endblock %}
 
         <title>Dashboard</title>
@@ -22,85 +23,57 @@
             {{ bootstrap.load_js() }}
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+let prev1 = {{ previous_resources_jobs | tojson() }};
+if (prev1) {
+  const last = prev1.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('mapstore', 'resources', last['id'], '#pbtitle1');
+} else {
+  CheckRes('mapstore', 'resources', '#pbtitle1');
+}
+
+let prev2 = {{ previous_configs_jobs | tojson() }};
+if (prev2) {
+  const last = prev2.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('mapstore', 'configs', last['id'], '#pbtitle2');
+} else {
+  CheckRes('mapstore', 'configs', '#pbtitle2');
+}
+$(document).ready(function(){
+  DisplayPrev('mapstore', 'resources', prev1, {{ showdelete|int }}, '#previouslist1');
+  DisplayPrev('mapstore', 'configs', prev2, {{ showdelete|int }}, '#previouslist2');
+});
+</script>
         {% endblock %}
         <!-- Your page content -->
         {% block content %}
    <div class="container">
 <hr>
-<h4>Check mapstore</h4>
-<p>check all mapstore resources.
-<form id=checkms method=post action="{{ url_for("dashboard.tasks.check_mapstore") }}">
-<input type=radio name=subtasks value=1><label>as subtasks</label><br>
-<input type=radio name=subtasks value=0><label>as a single task with progress</label><br>
-  <input type=submit>
+<div>
+<h2>Check mapstore resources</h2>
+<p>check all mapstore resources.</p>
+<form id='check1' action="javascript:CheckRes('mapstore', 'resources');">
+<input type=submit value="check all mapstore resources now">
 </form>
-<p>Result: <span id=checkms-result></span></p>
-<p>check mapstore global configs.
-<form id='checkconf' method="GET" action="{{ url_for("dashboard.tasks.check_mapstore_configs") }}">
-<input type=submit value="check now">
+<h4 id='pbtitle1'>Problems</h4>
+<div id="problems1"></div>
+<h4 id='previous'>Previous</h4>
+<p id='previouslist1'></p>
+</div>
+<div>
+<h2>Check mapstore configs</h2>
+<form id='check2' action="javascript:CheckRes('mapstore', 'configs');">
+<input type=submit value="check all mapstore configs now">
 </form>
-<p>Result: <span id=checkconf-result></span></p>
-  </div>
-       {% endblock %}
-
-<script>
-  const taskForm = (formName, resName, report) => {
-    document.forms[formName].addEventListener("submit", (event) => {
-      let fetchargs = { method: document.forms[formName].method };
-      if (fetchargs.method == 'post') {
-        fetchargs.body = new FormData(event.target);
-      };
-      event.preventDefault()
-      fetch(event.target.action, fetchargs)
-        .then(response => response.json())
-        .then(data => {
-          $('#'+resName).text("submitted");
-          const poll = () => {
-            fetch(`/dashboard/tasks/result/${data["result_id"]}`)
-              .then(response => response.json())
-              .then(data => {
-                if (!data["ready"]) {
-                  setTimeout(poll, 500);
-                  if (typeof data["value"]["current"] !== 'undefined' && typeof data["value"]["total"] !== 'undefined') {
-                    $('#'+resName).text(`${data["value"]["current"]} / ${data["value"]["total"]}`)
-                  } else {
-                    $('#'+resName).text('working')
-                  }
-                } else if (!data["successful"]) {
-                  $('#'+resName).text("error, check console")
-                  console.error(formName, data)
-                } else {
-                  $('#'+resName).html(report(data["value"]));
-                }
-                console.log(data);
-              })
-          }
-
-          poll()
-        })
-    })
-  }
-
-  taskForm("checkms", "checkms-result", data = (res) => {
-      return res;
-  })
-
-  taskForm("checkconf", "checkconf-result", data = (res) => {
-     ret = [];
-     for (i of ['new','config', 'localconfig']) {
-       if ( res[i].length > 0) {
-         const title = $("<h3>");
-         title.text(res[i].length + " errors for " + i);
-         title.attr("id", "errtitle-" + i);
-         ret.push(title[0]);
-         const errs = $("<div>");
-         errs.attr("id", "errs-" + i);
-         errs.html(ArrayToHtmlList(res[i]));
-         ret.push(errs[0]);
-       }
-    }
-    return ret;
-  })
-</script>
+<h4 id='pbtitle2'>Problems</h4>
+<div id="problems2"></div>
+<h4 id='previous'>Previous</h4>
+<p id='previouslist2'></p>
+</div>
+   </div>
 </body>
 </html>
