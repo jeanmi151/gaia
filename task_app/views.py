@@ -58,7 +58,7 @@ def forget(id: str):
     result.forget()
     return jsonify("ok")
 
-@tasks_bp.route("/check/mapstore.json")
+@tasks_bp.route("/check/mapstore/configs.json")
 def check_mapstore_configs():
     result = check_configs.delay()
     if result.id:
