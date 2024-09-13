@@ -110,8 +110,7 @@ class RedisClient:
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
-                for i in range(len(taskids)):
-                    task = taskids[i]
+                for task in taskids:
                     if task["id"] == taskid:
                         taskids.remove(task)
                         return taskid
@@ -120,8 +119,7 @@ class RedisClient:
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
-                for i in range(len(taskids)):
-                    task = taskids[i]
+                for task in taskids:
                     # refresh finished ts from backend if not set
                     if task["finished"] is None:
                         v = self.get(task["id"])
