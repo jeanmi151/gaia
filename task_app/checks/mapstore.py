@@ -74,18 +74,18 @@ def check_configs():
     - catalog entries provided in localConfig.json are valid
     - layers & backgrounds in new/config.json exist in services
     """
-    ret = dict()
+    ret = list()
     with open("/etc/georchestra/mapstore/configs/localConfig.json") as file:
         localconfig = json.load(file)
         catalogs = localconfig["initialState"]["defaultState"]["catalog"]["default"]["services"]
-        ret["localconfig"] = check_catalogs(catalogs)
+        ret.append({'args': "localconfig", "problems": check_catalogs(catalogs)})
 
     for filetype in ["new", "config"]:
         with open(f"/etc/georchestra/mapstore/configs/{filetype}.json") as file:
             s = file.read()
             mapconfig = json.loads(s)
             layers = mapconfig["map"]["layers"]
-            ret[filetype] = check_layers(layers, 'MAP', filetype)
+            ret.append({'args': filetype, "problems": check_layers(layers, 'MAP', filetype)})
     return ret
 
 @shared_task()
