@@ -114,23 +114,24 @@ const CheckRes = (type, resid, targetdivid = '#pbtitle') => {
     });
 }
 
-const PollTaskRes = (type, resid, taskid) => {
+const PollTaskRes = (type, resid, taskid, targetdivid = '#pbtitle') => {
     const poll = () => {
+        const targetpbdivid = targetdivid.replace('#pbtitle', '#problems')
         fetch('/dashboard/tasks/result/' + taskid)
             .then(response => response.json())
             .then(data => {
 //                console.log(data)
                 if (data === null) {
-                  $('#pbtitle').text('got null, shouldnt happen ?');
+                  $(targetdivid).text('got null, shouldnt happen ?');
                 } else if(!data["ready"]) {
                   if (data['completed'] !== null) {
-                    $('#pbtitle').text(data["completed"]);
+                    $(targetdivid).text(data["completed"]);
                   } else {
-                    $('#pbtitle').text('Waiting');
+                    $(targetdivid).text('Waiting');
                   }
                   setTimeout(poll, 500)
                 } else if (!data["successful"]) {
-                  $('#problems').text('Something crashed, check browser console');
+                  $(targetpbdivid).text('Something crashed, check browser console');
                   console.error(data)
                 } else {
                   if (Array.isArray(data["value"])) {
@@ -145,11 +146,11 @@ const PollTaskRes = (type, resid, taskid) => {
                       data["value"].problems = probs.flat(1)
                   }
                   if (data["value"].problems.length > 0) {
-                    $('#pbtitle').text('Problems');
-                    $('#problems').html(ArrayToHtmlList(data["value"].problems));
+                    $(targetdivid).text('Problems');
+                    $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
                   } else {
-                    $('#pbtitle').text('No problemo! in ' + type + ' owned by '+data["value"].owner);
-                    $('#problems').remove();
+                    $(targetdivid).text('No problemo! in ' + type + ' owned by '+data["value"].owner);
+                    $(targetpvdivid).remove();
                   }
                   const d = new Date(data["finished"] * 1000);
                   $('#details').text('details for ' + type + ' ' + resid + ', valid at '+ d);
