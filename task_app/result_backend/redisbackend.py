@@ -63,6 +63,9 @@ class RedisClient:
             # print(f"{tid} {task['name']} {task['args'][:-1]} {task['date_done']} {date_done}")
         if name.endswith('owslayer'):
             name = 'task_app.checks.ows.owsservice'
+        if name.endswith('check_res'):
+            name = 'task_app.checks.mapstore.check_resources'
+            args = []
         return (name, args, date_done)
 
     def get(self, key):
@@ -103,9 +106,12 @@ class RedisClient:
             except json.JSONDecodeError as e:
                 print(f"discarding {ftid}, not json ?")
                 return None
+            args = task["args"][:-1]
             if task["name"].endswith('owslayer'):
                 taskname = 'task_app.checks.ows.owsservice'
-            args = task["args"][:-1]
+            if task["name"].endswith('check_res'):
+                taskname = 'task_app.checks.mapstore.check_resources'
+                args = []
 
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
