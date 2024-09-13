@@ -68,7 +68,7 @@ const fetchForHome = () => {
     });
 }
 
-const DisplayPrev = (type, resid, taskids, showdelete = false) => {
+const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previouslist') => {
     if (taskids === null) { return ; }
     const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
     const arr = sorted.map(t => {
@@ -86,7 +86,7 @@ const DisplayPrev = (type, resid, taskids, showdelete = false) => {
         }
         return link[0];
     });
-    $('#previouslist').html(ArrayToHtmlList(arr));
+    $(targetdivid).html(ArrayToHtmlList(arr));
 }
 
 const ArrayToHtmlList = (array) => {
