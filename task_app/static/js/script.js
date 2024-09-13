@@ -105,12 +105,12 @@ const DeleteTask = (taskid) => {
     });
 }
 
-const CheckRes = (type, resid) => {
+const CheckRes = (type, resid, targetdivid = '#pbtitle') => {
   fetch('/dashboard/tasks/check/' + type + '/' + resid + '.json')
     .then(response => response.json())
     .then(mydata => {
-        $('#pbtitle').text("En cours d'analyse");
-        PollTaskRes(type, resid, mydata["result_id"]);
+        $(targetdivid).text("En cours d'analyse");
+        PollTaskRes(type, resid, mydata["result_id"], targetdivid);
     });
 }
 
