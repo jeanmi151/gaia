@@ -9,7 +9,7 @@ from flask import request
 from flask import jsonify
 
 from task_app.dashboard import rcli, unmunge, owscache
-from task_app.checks.mapstore import check_res, check_all_mapstore_res, check_all_mapstore_res_subtasks, check_configs
+from task_app.checks.mapstore import msc, check_res, check_configs
 import task_app.checks.ows
 from task_app.decorators import check_role
 
@@ -79,14 +79,21 @@ def check_ctx(ctxid):
         rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid], result.id)
     return {"result_id": result.id}
 
-@tasks_bp.route("/check/mapstore", methods=['POST'])
-def check_mapstore():
-    as_subtasks = request.form.get("subtasks", default=0, type=int)
-    if as_subtasks != 0:
-        result = check_all_mapstore_res_subtasks.delay()
-    else:
-        result = check_all_mapstore_res.delay()
-    return {"result_id": result.id}
+@tasks_bp.route("/check/mapstore/resources.json")
+def check_mapstore_resources():
+    taskslist = list()
+    for rescat in ('MAP', 'CONTEXT'):
+        res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
+        print(f"found {len(res)} {rescat} objects in database")
+        for r in res:
+            taskslist.append(check_res.s(rescat, r.id))
+    print(taskslist)
+    grouptask = group(taskslist)
+    groupresult = grouptask.apply_async()
+    groupresult.save()
+    if groupresult.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_resources', [], groupresult.id)
+    return {"result_id": groupresult.id}
 
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
 def check_owslayer(stype, url, lname):
