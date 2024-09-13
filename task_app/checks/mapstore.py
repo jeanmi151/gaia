@@ -220,30 +220,3 @@ def get_resources_using_ows(owstype, url, layer=None):
     if layer is None:
         return servicemap.get((owstype, url), None)
     return layermap.get((owstype, url, layer), None)
-
-# this task enqueues subtasks
-# XXX test as a celery group
-@shared_task()
-def check_all_mapstore_res_subtasks():
-    taskids = list()
-    for rescat in ('MAP', 'CONTEXT'):
-        res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
-        tasklogger.debug(f"found {len(res)} {rescat} objects in database")
-        for r in res:
-            result = check_res.delay(rescat,r.id)
-            taskids.append(result.id)
-    return taskids
-
-@shared_task(bind=True)
-def check_all_mapstore_res(self: Task):
-    taskres = dict()
-    for rescat in ('MAP', 'CONTEXT'):
-        taskres[rescat] = dict()
-        res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
-        i = 0
-        total = len(res)
-        for r in res:
-            taskres[r.id] = check_res(rescat,r.id)
-            i += 1
-            self.update_state(state="PROGRESS", meta={"current": i, "total": total})
-    return taskres
