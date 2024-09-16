@@ -32,8 +32,6 @@ class RedisClient:
         except json.JSONDecodeError as e:
             print(f"discarding {key}, not json ? {e}")
         # just makes sure we're on the same task
-        print (key[20:])
-        print (task['result'][0][0])
         assert(task['result'][0][0] == key[20:])
         name = None
         args = None
