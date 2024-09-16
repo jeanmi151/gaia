@@ -143,6 +143,8 @@ class RedisClient:
     def add_taskid_for_taskname_and_args(self, taskname, args, taskid, finished=None):
         if taskname not in self.task_by_taskname:
             self.task_by_taskname[taskname] = dict()
+        if args is None: # invalid task ?
+            return
         if tuple(args) not in self.task_by_taskname[taskname]:
             self.task_by_taskname[taskname][tuple(args)] = list()
         self.task_by_taskname[taskname][tuple(args)].append({ 'id': taskid, 'finished': finished})
