@@ -116,19 +116,18 @@ class RedisClient:
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
-                for task in taskids:
-                    if task["id"] == taskid:
-                        taskids.remove(task)
-                        return taskid
+                if taskid in taskids:
+                    del taskids[taskid]
+                    return taskid
 
     def get_taskids_by_taskname_and_args(self, taskname, args):
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
-                for task in taskids:
+                for taskid in taskids:
                     # refresh finished ts from backend if not set
-                    if task["finished"] is None:
-                        v = self.get(task["id"])
+                    if taskids[taskid]["finished"] is None:
+                        v = self.get(taskid)
                         taskb = json.loads(v)
                         date_done = None
                         if 'date_done' in taskb and taskb["date_done"] is not None:
@@ -136,8 +135,10 @@ class RedisClient:
                         if not 'name' in taskb: # taskset
                             (x, y, date_done) = self.get_taskset_details("celery-taskset-meta-" + task["id"])
                         if date_done is not None:
-                            taskids[i] = { "id": task["id"], "finished": date_done }
-                return taskids
+                            taskids[taskid] = { "finished": date_done }
+                # flatten the dict, sorting is done client-side
+                r = [ {'id': tid, 'finished': taskids[tid]['finished'] } for tid in taskids ]
+                return r
         return None
 
     def add_taskid_for_taskname_and_args(self, taskname, args, taskid, finished=None):
@@ -146,8 +147,8 @@ class RedisClient:
         if args is None: # invalid task ?
             return
         if tuple(args) not in self.task_by_taskname[taskname]:
-            self.task_by_taskname[taskname][tuple(args)] = list()
-        self.task_by_taskname[taskname][tuple(args)].append({ 'id': taskid, 'finished': finished})
+            self.task_by_taskname[taskname][tuple(args)] = dict()
+        self.task_by_taskname[taskname][tuple(args)][taskid] = {'finished': finished}
 
 if __name__ == '__main__':
     import sys
