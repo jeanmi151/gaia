@@ -27,6 +27,9 @@ class RedisClient:
 
     def get_taskset_details(self, key):
         v = self.get(key)
+        if v is None:
+            print(f"found nothing for a taskset with {key}, shouldnt happen")
+            return (None, None, None)
         try:
             task = json.loads(v)
         except json.JSONDecodeError as e:
