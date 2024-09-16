@@ -150,7 +150,7 @@ const PollTaskRes = (type, resid, taskid, targetdivid = '#pbtitle') => {
                     $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
                   } else {
                     $(targetdivid).text('No problemo! in ' + type + ' owned by '+data["value"].owner);
-                    $(targetpvdivid).remove();
+                    $(targetpbdivid).empty();
                   }
                   const d = new Date(data["finished"] * 1000);
                   $('#details').text('details for ' + type + ' ' + resid + ', valid at '+ d);
