@@ -31,6 +31,9 @@ def result(id: str) -> dict[str, object]:
         if result.ready():
             value = list()
             for r in result.results:
+                # args are 'realized' only when all jobs are triggered
+                # so might aswell do it when everything is done
+                rcli.add_taskid_for_taskname_and_args(r.name, r.args, r.id)
                 value.append({'args': r.args, 'problems': r.get()['problems']})
     ready = result.ready()
     return {
