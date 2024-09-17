@@ -11,6 +11,7 @@ from flask import jsonify
 from task_app.dashboard import rcli, unmunge, owscache
 from task_app.checks.mapstore import check_res, check_configs, check_resources
 import task_app.checks.ows
+import task_app.checks.csw
 from task_app.decorators import check_role
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -125,3 +126,12 @@ def check_owsservice(stype, url):
     if groupresult.id:
         rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owsservice', [stype, url], groupresult.id)
     return {"result_id": groupresult.id}
+
+@tasks_bp.route("/check/csw/<string:url>/<string:uuid>.json")
+def check_cswrecord(url, uuid):
+    url = unmunge(url)
+    service = owscache.get('csw', url)
+    if service['service'] is None:
+        return abort(404)
+    result = task_app.checks.csw.check_record.delay(url, uuid)
+    return {"result_id": result.id}
