@@ -18,6 +18,7 @@ database_engine_options = {'echo': True}
 # store task name etc in the backend https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-extended
 result_extended = True
 result_expires = None
+task_send_sent_event = True
 
 beat_schedule = {
   'check-every-night': {
