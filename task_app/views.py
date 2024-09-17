@@ -9,7 +9,7 @@ from flask import request
 from flask import jsonify
 
 from task_app.dashboard import rcli, unmunge, owscache
-from task_app.checks.mapstore import msc, check_res, check_configs
+from task_app.checks.mapstore import check_res, check_configs, check_resources
 import task_app.checks.ows
 from task_app.decorators import check_role
 
@@ -84,16 +84,7 @@ def check_ctx(ctxid):
 
 @tasks_bp.route("/check/mapstore/resources.json")
 def check_mapstore_resources():
-    taskslist = list()
-    for rescat in ('MAP', 'CONTEXT'):
-        res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
-        print(f"found {len(res)} {rescat} objects in database")
-        for r in res:
-            taskslist.append(check_res.s(rescat, r.id))
-    print(taskslist)
-    grouptask = group(taskslist)
-    groupresult = grouptask.apply_async()
-    groupresult.save()
+    groupresult = check_resources()
     if groupresult.id:
         rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_resources', [], groupresult.id)
     return {"result_id": groupresult.id}
