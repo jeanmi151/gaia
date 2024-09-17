@@ -26,3 +26,5 @@ beat_schedule = {
     'schedule': crontab(minute=0, hour=0),
   },
 }
+#otherwise scheduled hours is taken as UTC
+timezone = 'Europe/Paris'
