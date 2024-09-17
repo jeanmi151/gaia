@@ -22,7 +22,7 @@ task_send_sent_event = True
 
 beat_schedule = {
   'check-every-night': {
-    'task': 'task_app.checks.mapstore.check_all_mapstore_res',
+    'task': 'task_app.checks.mapstore.check_resources',
     'schedule': crontab(minute=0, hour=0),
   },
 }
