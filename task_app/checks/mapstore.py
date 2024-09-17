@@ -16,6 +16,7 @@ from owslib.util import ServiceException
 
 from celery import shared_task
 from celery import Task
+from celery import group
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
 from task_app.georchestraconfig import GeorchestraConfig
@@ -123,6 +124,21 @@ def check_res(rescat, resid):
         catalogs = data["mapConfig"]["catalogServices"]["services"]
     ret['problems'] += check_catalogs(catalogs)
     return ret
+
+@shared_task
+def check_resources():
+    """
+    called by beat scheduler, or check_mapstore_resources() route in views
+    """
+    taskslist = list()
+    for rescat in ('MAP', 'CONTEXT'):
+        res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
+        for r in res:
+            taskslist.append(check_res.s(rescat, r.id))
+    grouptask = group(taskslist)
+    groupresult = grouptask.apply_async()
+    groupresult.save()
+    return groupresult
 
 def check_layers(layers, rescat, resid):
     ret = list()
