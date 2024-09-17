@@ -7,6 +7,8 @@ from celery import Task
 from flask import Flask
 from flask import render_template
 from flask_bootstrap import Bootstrap5
+from task_app.events import CeleryEventsHandler
+import threading
 
 # this celery app object is used by the beat and worker threads
 capp = Celery(__name__)
@@ -56,4 +58,7 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app.config_from_object(app.config["CELERY"])
     celery_app.set_default()
     app.extensions["celery"] = celery_app
+    events_handler = CeleryEventsHandler(celery_app)
+    evht = threading.Thread(name='evh',target=events_handler.start_listening, daemon=True)
+    evht.start()
     return celery_app
