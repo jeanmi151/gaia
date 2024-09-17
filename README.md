@@ -24,7 +24,7 @@ written using the versions of python/flask/celery provided by debian 12, it
 should only require 'recent' versions of those:
 
 ```
-apt install python3-flask-bootstrap python3-flask python3-celery
+apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy python3-owslib python3-redis
 ```
 
 ## integration
