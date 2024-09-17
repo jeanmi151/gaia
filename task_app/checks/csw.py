@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4 sw=4 et
 
-from task_app.owscapcache import OwsCapCache
+from task_app.checks.mapstore import msc
+from task_app.dashboard import unmunge
 from owslib.fes import PropertyIsEqualTo, Not, Or, And
 from owslib import namespaces
 from celery import shared_task
@@ -76,7 +77,7 @@ def cswrecord(url, uuid):
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
             url = u['url'].rstrip('?')
-            localdomain = "https://" + conf.get("domainName")
+            localdomain = "https://" + msc.conf.get("domainName")
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
