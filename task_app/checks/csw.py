@@ -15,7 +15,7 @@ is_dataset = PropertyIsEqualTo("Type", "dataset")
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
 
 @shared_task()
-def cswservice(url):
+def check_catalog(url):
     """
     Given an csw service url check all its records:
     - all its records point to existing ogc services/records
@@ -37,7 +37,7 @@ def cswservice(url):
             maxrecords=100
         )
         for uuid in csw.records:
-            tasklists.append(cswrecord.s(uuid))
+            tasklists.append(check_record.s(uuid))
         tasklogger.debug(f"start = {startpos}, res={csw.results}, returned {len(csw.records)}")
         startpos = csw.results['nextrecord'] # len(mds) + 1
         if startpos > csw.results['matches']:
@@ -48,7 +48,7 @@ def cswservice(url):
     return groupresult
 
 @shared_task()
-def cswrecord(url, uuid):
+def check_record(url, uuid):
     """
     Given an csw record check:
     - all the ogc links point to existing ogc services/layers
@@ -81,3 +81,4 @@ def cswrecord(url, uuid):
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
+    return owslinks
