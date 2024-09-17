@@ -23,6 +23,14 @@ def result(id: str) -> dict[str, object]:
     completed = None
     if result is None:
         result = AsyncResult(id)
+        # regular task triggered by beat, the asyncresult first result entry contains the groupresult id
+        if type(result.result) == list and not hasattr(result, 'name'):
+#            print(f"real taskset id is {result.result[0][0]}")
+            result = GroupResult.restore(result.result[0][0])
+            # shouldnt happen, but make sure we have 'a result'...
+            if result is None:
+                result = AsyncResult(id)
+    if type(result) == AsyncResult:
         # date_done is a datetime
         finished = result.date_done
         value = result.get() if result.ready() else result.result
