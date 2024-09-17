@@ -21,6 +21,8 @@ def result(id: str) -> dict[str, object]:
     finished = None
     value = None
     completed = None
+    args = None
+    name = None
     if result is None:
         result = AsyncResult(id)
         # regular task triggered by beat, the asyncresult first result entry contains the groupresult id
@@ -36,6 +38,7 @@ def result(id: str) -> dict[str, object]:
         value = result.get() if result.ready() else result.result
     else:
         completed = f"{result.completed_count()} / {len(result.children)}"
+        (name, args, finished) = rcli.get_taskset_details(result.id)
         if result.ready():
             value = list()
             for r in result.results:
@@ -44,9 +47,9 @@ def result(id: str) -> dict[str, object]:
     return {
         "ready": ready,
         "completed": completed,
-        "task": result.name if hasattr(result,'name') else "grouptask",
+        "task": result.name if hasattr(result,'name') else name,
         "finished": (finished.strftime('%s') if finished is not None else False),
-        "args": result.args if hasattr(result,'args') else "grouptask",
+        "args": result.args if hasattr(result,'args') else args,
         "successful": result.successful() if ready else None,
         "value": value,
     }
