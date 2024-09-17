@@ -39,9 +39,6 @@ def result(id: str) -> dict[str, object]:
         if result.ready():
             value = list()
             for r in result.results:
-                # args are 'realized' only when all jobs are triggered
-                # so might aswell do it when everything is done
-                rcli.add_taskid_for_taskname_and_args(r.name, r.args, r.id)
                 value.append({'args': r.args, 'problems': r.get()['problems']})
     ready = result.ready()
     return {
@@ -72,22 +69,16 @@ def forget(id: str):
 @tasks_bp.route("/check/mapstore/configs.json")
 def check_mapstore_configs():
     result = check_configs.delay()
-    if result.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_configs', [], result.id)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/map/<int:mapid>.json")
 def check_map(mapid):
     result = check_res.delay('MAP',mapid)
-    if result.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid], result.id)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/context/<int:ctxid>.json")
 def check_ctx(ctxid):
     result = check_res.delay('CONTEXT',ctxid)
-    if result.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid], result.id)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/mapstore/resources.json")
@@ -112,8 +103,6 @@ def check_owslayer(stype, url, lname):
     if lname not in service['service'].contents:
         return abort(404)
     result = task_app.checks.ows.owslayer.delay(stype, url, lname)
-    if result.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owslayer', [stype, url, lname], result.id)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/owsservice/<string:stype>/<string:url>.json")
