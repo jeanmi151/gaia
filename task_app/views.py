@@ -97,7 +97,7 @@ def check_owslayer(stype, url, lname):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service is None:
+    if service['service'] is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
     if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
@@ -114,7 +114,7 @@ def check_owsservice(stype, url):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service is None:
+    if service['service'] is None:
         return abort(404)
     taskslist = list()
     for lname in service['service'].contents:
