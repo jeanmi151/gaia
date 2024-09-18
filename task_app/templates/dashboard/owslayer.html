@@ -57,7 +57,7 @@ $(document).ready(function(){
 {%   endfor %}
 {%   if localmduuids is not none %}
 {%     for m in localmduuids %}
-<li><a href='{{ url_for('dashboard.cswentry', uuid=m) }}'>voir les détails pour la métadonnée</a></li>
+<li><a href='{{ url_for('dashboard.cswentry', portal='srv', uuid=m) }}'>voir les détails pour la métadonnée</a></li>
 {%     endfor %}
 {%   endif %}
 </ul>
