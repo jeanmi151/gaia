@@ -55,10 +55,12 @@ def get_rescontent_from_resid(restype, resid):
 def home():
     return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
-@dash_bp.route("/csw")
-def csw():
+@dash_bp.route("/csw/<string:portal>")
+def csw(portal):
     # XXX for now only support the local GN
-    service = owscache.get('csw', '/' + conf.get('localgn', 'urls') + '/srv/fre/csw')
+    localgn = conf.get('localgn', 'urls')
+    cswurl = '/' + localgn + '/' + portal + '/fre/csw'
+    service = owscache.get('csw', cswurl)
     if service['service'] is None:
         return abort(404)
     is_dataset = PropertyIsEqualTo("Type", "dataset")
@@ -80,7 +82,7 @@ def csw():
         startpos = csw.results['nextrecord'] # len(mds) + 1
         if startpos > csw.results['matches']:
             break
-    return render_template('csw.html', s=service, r=mds, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+    return render_template('csw.html', s=service, portal=portal, r=mds, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/csw/<string:uuid>")
 def cswentry(uuid):
