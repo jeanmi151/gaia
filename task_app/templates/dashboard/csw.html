@@ -35,7 +35,7 @@
 {% if r.items() | length > 0 %}
 <ul>
 {% for md in r.values() | sort(attribute='title') %}
-<li><a href='{{ url_for("dashboard.cswentry", uuid=md.identifier) }}'>{{ md.title }} ({{ md.identifier }})</a></li>
+<li><a href='{{ url_for("dashboard.cswentry", portal=portal, uuid=md.identifier) }}'>{{ md.title }} ({{ md.identifier }})</a></li>
 {% endfor %}
 </ul>
 {% endif %}
