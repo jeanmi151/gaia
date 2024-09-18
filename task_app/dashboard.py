@@ -105,7 +105,7 @@ def cswentry(uuid):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
     all_jobs_for_cswrecord = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_record',['/' + localgn + '/srv/fre/csw', uuid])
-    return render_template('cswentry.html', localgn=localgn, s=service, r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('cswentry.html', localgn=localgn, s=service, url='~'+ localgn + '~srv~fre~csw', r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
