@@ -27,7 +27,7 @@ def result(id: str) -> dict[str, object]:
     if result is None:
         result = AsyncResult(id)
         # regular task triggered by beat, the asyncresult first result entry contains the groupresult id
-        if type(result.result) == list and not hasattr(result, 'name'):
+        if type(result.result) == list and result.name in ('task_app.checks.mapstore.check_resources', 'task_app.checks.ows.check_owsservice'):
 #            print(f"real taskset id is {result.result[0][0]}")
             result = GroupResult.restore(result.result[0][0])
             # shouldnt happen, but make sure we have 'a result'...
