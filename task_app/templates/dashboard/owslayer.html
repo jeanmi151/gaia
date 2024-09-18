@@ -63,6 +63,7 @@ $(document).ready(function(){
 </ul>
 {% endif %}
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+<p>Retourner sur le <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>contenu du service {{ s.service.url }}</a></p>
 <p><a href="javascript:SendToMapstore('{{ type }}', '{{ s.service.url }}', '{{ lname }}')">view it in mapstore</a></p>
 {% if not url.startswith('http')  %}
 {%   set base=url.split('~')[1] %}
