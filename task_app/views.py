@@ -46,6 +46,7 @@ def result(id: str) -> dict[str, object]:
                 value.append({'args': r.args, 'problems': r.get()['problems']})
     ready = result.ready()
     return {
+        "taskid": result.id,
         "ready": ready,
         "completed": completed,
         "task": result.name if hasattr(result,'name') else name,
