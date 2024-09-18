@@ -23,6 +23,21 @@
             {{ bootstrap.load_js() }}
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+let prev = {{ previous_jobs | tojson() }};
+if (prev && Array.isArray(prev) && prev.length > 0) {
+  const last = prev.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('csw', '{{ r.identifier }}', last['id']);
+} else {
+  CheckRes('csw/{{ url }}', '{{ r.identifier }}');
+}
+
+$(document).ready(function(){
+  DisplayPrev('csw', '{{ r.identifier }}', prev, {{ showdelete|int }});
+});
+</script>
         {% endblock scripts %}
         <!-- Your page content -->
         {% block content %}
@@ -45,6 +60,11 @@
 <form id='check' action="javascript:CheckRes('csw/{{ url }}', '{{ r.identifier }}');">
 <input type=submit value="check now">
 </form>
+<h2 id='pbtitle'>Problems</h2>
+<div id='pbdetails'></div>
+<div id="problems"></div>
+<h2 id='previous'>Previous</h2>
+<p id='previouslist'></p>
 </div>
 	{% endblock content %}
     </body>
