@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4 sw=4 et
 
+import requests
+
 from task_app.checks.mapstore import msc
 from task_app.dashboard import unmunge
 from owslib.fes import PropertyIsEqualTo, Not, Or, And
@@ -71,7 +73,6 @@ def check_record(url, uuid):
         ret['problems'].append(f"no metadata with uuid {uuid} in {url}")
         return ret
 
-    owslinks = list()
     r = csw.records[uuid]
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
@@ -80,5 +81,31 @@ def check_record(url, uuid):
             localdomain = "https://" + msc.conf.get("domainName")
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
-            owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
-    return owslinks
+            lname = u['name']
+            service = msc.owscache.get(stype, url)
+            if service['service'] is None:
+                ret['problems'].append(f"no {stype} service at {url}")
+            else:
+                if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
+                    ws = url.split('/')[-2]
+                    lname = f"{ws}:{lname}"
+                    tasklogger.debug(f"modified lname for {lname}")
+                if lname not in service['service'].contents:
+                    ret['problems'].append(f"no layer named {lname} in {stype} service at {url}")
+                else:
+                    tasklogger.debug(f"layer {lname} exists in {stype} service at {url}")
+        else:
+            if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')):
+                # check that the url exists
+                try:
+                    r = requests.head(u['url'], timeout = 5)
+                    if r.status_code != 200:
+                        ret['problems'].append(f"{u['protocol']} link at {u['url']} doesn't seem to exist (returned code {r.status_code})")
+                    tasklogger.debug(f"{u['url']} -> {r.status_code}")
+                except requests.exceptions.Timeout:
+                    ret['problems'].append(f"{u['protocol']} link at {u['url']} timed out")
+                except requests.exceptions.ConnectError as e:
+                    ret['problems'].append(f"{u['protocol']} link at {u['url']} failed to connect ({e}) (DNS?)")
+            else:
+                tasklogger.debug(f"non-ogc url as {u['protocol']} : {u['url']}")
+    return ret
