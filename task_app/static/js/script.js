@@ -117,6 +117,7 @@ const CheckRes = (type, resid, targetdivid = '#pbtitle') => {
 const PollTaskRes = (type, resid, taskid, targetdivid = '#pbtitle') => {
     const poll = () => {
         const targetpbdivid = targetdivid.replace('#pbtitle', '#problems')
+        const targetpbdetdivid = targetdivid.replace('#pbtitle', '#pbdetails')
         fetch('/dashboard/tasks/result/' + taskid)
             .then(response => response.json())
             .then(data => {
@@ -153,7 +154,7 @@ const PollTaskRes = (type, resid, taskid, targetdivid = '#pbtitle') => {
                     $(targetpbdivid).empty();
                   }
                   const d = new Date(data["finished"] * 1000);
-                  $('#details').text('details for ' + type + ' ' + resid + ', valid at '+ d);
+                  $(targetpbdetdivid).text('dernière vérification faite le '+ d);
                 }
             })
     }
