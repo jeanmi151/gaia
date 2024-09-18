@@ -84,11 +84,12 @@ def csw(portal):
             break
     return render_template('csw.html', s=service, portal=portal, r=mds, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
-@dash_bp.route("/csw/<string:uuid>")
-def cswentry(uuid):
+@dash_bp.route("/csw/<string:portal>/<string:uuid>")
+def cswentry(portal, uuid):
     # XXX for now only support the local GN
     localgn = conf.get('localgn', 'urls')
-    service = owscache.get('csw', '/' + localgn + '/srv/fre/csw')
+    cswurl = '/' + localgn + '/' + portal + '/fre/csw'
+    service = owscache.get('csw', cswurl)
     if service['service'] is None:
         return abort(404)
     csw = service["service"]
@@ -106,8 +107,8 @@ def cswentry(uuid):
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
-    all_jobs_for_cswrecord = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_record',['/' + localgn + '/srv/fre/csw', uuid])
-    return render_template('cswentry.html', localgn=localgn, s=service, url='~'+ localgn + '~srv~fre~csw', r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    all_jobs_for_cswrecord = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_record',[cswurl, uuid])
+    return render_template('cswentry.html', localgn=localgn, s=service, portal=portal, url=cswurl.replace('/', '~'), r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
