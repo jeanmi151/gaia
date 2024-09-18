@@ -31,7 +31,7 @@ if (prev) {
   });
   PollTaskRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id']);
 } else {
-  CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id']);
+  CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}');
 }
 
 $(document).ready(function(){
