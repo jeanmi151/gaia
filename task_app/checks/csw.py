@@ -104,7 +104,7 @@ def check_record(url, uuid):
                     tasklogger.debug(f"{u['url']} -> {r.status_code}")
                 except requests.exceptions.Timeout:
                     ret['problems'].append(f"{u['protocol']} link at {u['url']} timed out")
-                except requests.exceptions.ConnectError as e:
+                except requests.exceptions.ConnectionError as e:
                     ret['problems'].append(f"{u['protocol']} link at {u['url']} failed to connect ({e}) (DNS?)")
             else:
                 tasklogger.debug(f"non-ogc url as {u['protocol']} : {u['url']}")
