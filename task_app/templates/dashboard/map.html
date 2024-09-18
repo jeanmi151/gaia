@@ -25,7 +25,7 @@
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 <script>
 let prev = {{ previous_jobs | tojson() }};
-if (prev) {
+if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
