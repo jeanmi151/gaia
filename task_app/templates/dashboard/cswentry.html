@@ -42,7 +42,7 @@
 {%   endfor %}
 </ul>
 {% endif %}
-<form id='check' action="javascript:CheckRes('csw/{{ s.service.url.replace('/','~') }}', '{{ r.identifier }}');">
+<form id='check' action="javascript:CheckRes('csw/{{ url }}', '{{ r.identifier }}');">
 <input type=submit value="check now">
 </form>
 </div>
