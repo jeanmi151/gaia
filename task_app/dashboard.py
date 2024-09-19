@@ -61,7 +61,7 @@ def csw(portal):
     service = owscache.get('csw', cswurl)
     if service['service'] is None:
         return abort(404)
-    return render_template('csw.html', s=service, portal=portal, r=service['contents'], reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+    return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), r=service['contents'], reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
