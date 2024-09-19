@@ -5,20 +5,15 @@
 import requests
 
 from task_app.checks.mapstore import msc
-from task_app.dashboard import unmunge
-from owslib.fes import PropertyIsEqualTo, Not, Or, And
-from owslib import namespaces
 from celery import shared_task
 from celery import group
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
 
-is_dataset = PropertyIsEqualTo("Type", "dataset")
-non_harvested = PropertyIsEqualTo("isHarvested", "false")
-
 @shared_task()
 def check_catalog(url):
     """
+    called by beat scheduler, or check_catalog() route in views
     Given an csw service url check all its records:
     - all its records point to existing ogc services/records
     - all the external links resolve
@@ -30,20 +25,10 @@ def check_catalog(url):
     if service['service'] is None:
         return False
 
-    csw = service['service']
-    startpos = 0
-    while True:
-        csw.getrecords2(
-            constraints=[And([non_harvested] + [is_dataset])],
-            startposition=startpos,
-            maxrecords=100
-        )
-        for uuid in csw.records:
-            tasklists.append(check_record.s(uuid))
-        tasklogger.debug(f"start = {startpos}, res={csw.results}, returned {len(csw.records)}")
-        startpos = csw.results['nextrecord'] # len(mds) + 1
-        if startpos > csw.results['matches']:
-            break
+    # at that point, contents is populated
+    for uuid in service['contents']:
+        print(uuid)
+        taskslist.append(check_record.s(url, uuid))
     grouptask = group(taskslist)
     groupresult = grouptask.apply_async()
     groupresult.save()
