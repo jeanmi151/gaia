@@ -67,6 +67,8 @@ class RedisClient:
         if name.endswith('check_res'):
             name = 'task_app.checks.mapstore.check_resources'
             args = []
+        if name.endswith('check_record'):
+            name = 'task_app.checks.csw.check_catalog'
         return (name, args, date_done)
 
     def get(self, key):
@@ -113,6 +115,8 @@ class RedisClient:
             if task["name"].endswith('check_res'):
                 taskname = 'task_app.checks.mapstore.check_resources'
                 args = []
+            if task["name"].endswith('check_record'):
+                taskname = 'task_app.checks.csw.check_catalog'
 
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
