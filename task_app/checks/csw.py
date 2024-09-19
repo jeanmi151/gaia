@@ -74,6 +74,7 @@ def check_record(url, uuid):
         return ret
 
     r = csw.records[uuid]
+    hasvalidlink = False
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
@@ -93,6 +94,7 @@ def check_record(url, uuid):
                 if lname not in service['service'].contents:
                     ret['problems'].append(f"no layer named {lname} in {stype} service at {url}")
                 else:
+                    hasvalidlink = True
                     tasklogger.debug(f"layer {lname} exists in {stype} service at {url}")
         else:
             if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')) and u['url'].startswith('http'):
@@ -101,6 +103,8 @@ def check_record(url, uuid):
                     r = requests.head(u['url'], timeout = 5)
                     if r.status_code != 200:
                         ret['problems'].append(f"{u['protocol']} link at {u['url']} doesn't seem to exist (returned code {r.status_code})")
+                    else:
+                        hasvalidlink = True
                     tasklogger.debug(f"{u['url']} -> {r.status_code}")
                 except requests.exceptions.Timeout:
                     ret['problems'].append(f"{u['protocol']} link at {u['url']} timed out")
@@ -108,4 +112,6 @@ def check_record(url, uuid):
                     ret['problems'].append(f"{u['protocol']} link at {u['url']} failed to connect ({e}) (DNS?)")
             else:
                 tasklogger.debug(f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}")
+    if not hasvalidlink:
+        ret['problems'].append(f"no links to OGC layers or download links ?")
     return ret
