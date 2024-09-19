@@ -80,7 +80,7 @@ def csw(portal):
             mds[uuid] = csw.records[uuid]
         print(f"start = {startpos}, res={csw.results}, returned {len(csw.records)} allmds={len(mds)}")
         startpos = csw.results['nextrecord'] # len(mds) + 1
-        if startpos > csw.results['matches']:
+        if startpos > csw.results['matches'] or startpos == 0: # or len(mds) == csw.results['matches'] or len(csw.records) < 100:
             break
     return render_template('csw.html', s=service, portal=portal, r=mds, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
