@@ -136,3 +136,16 @@ def check_cswrecord(url, uuid):
         return abort(404)
     result = task_app.checks.csw.check_record.delay(url, uuid)
     return {"result_id": result.id}
+
+@tasks_bp.route("/check/cswservice/<string:url>.json")
+def check_cswservice(url):
+    url = unmunge(url)
+    service = owscache.get('csw', url)
+    if service['service'] is None:
+        return abort(404)
+    groupresult = task_app.checks.csw.check_catalog(url)
+    if not groupresult:
+        return abort(404)
+    if groupresult.id:
+        rcli.add_taskid_for_taskname_and_args('task_app.checks.csw.check_catalog', [url], groupresult.id)
+    return {"result_id": groupresult.id}
