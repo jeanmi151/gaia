@@ -79,7 +79,7 @@ def owslayer(stype, url, layername):
     service = msc.owscache.get(stype, url)
     l = service['service'].contents[layername]
     if hasattr(l, 'metadataUrls'):
-        for m in service['service'].contents[layername].metadataUrls:
+        for m in l.metadataUrls:
             mdurl = m['url']
             # check first that the url exists
             r = requests.head(mdurl)
