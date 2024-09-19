@@ -59,7 +59,7 @@ $(document).ready(function(){
 </ul>
 </p>
 {% endif %}
-<h2 id='contents'>Contents</h2>
+<h2 id='contents'>Contents: {{ s.service.contents.items() | length }} layers</h2>
 {% if s.service.contents.items() | length > 0 %}
 <ul>
 {% for lname, l in s.service.contents.items() %}
