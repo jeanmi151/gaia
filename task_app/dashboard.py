@@ -61,7 +61,8 @@ def csw(portal):
     service = owscache.get('csw', cswurl)
     if service['service'] is None:
         return abort(404)
-    return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), r=service['contents'], reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+    all_jobs_for_csw = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_catalog',[cswurl])
+    return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), r=service['contents'], reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
