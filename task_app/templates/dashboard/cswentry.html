@@ -48,6 +48,7 @@ $(document).ready(function(){
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 <p><a href='/datahub/dataset/{{ r.identifier }}'>voir dans datahub</a></p>
 <p><a href='/{{ localgn }}/srv/fre/catalog.search#/metadata/{{ r.identifier }}'>voir dans geonetwork</a></p>
+<p><a href='/{{ localgn }}/srv/api/records/{{ r.identifier }}/formatters/xml'>voir le XML</a></p>
 <p><a href='/{{ localgn }}/srv/fre/catalog.edit#/metadata/{{ gnid }}?redirectUrl=catalog.search%23%2Fmetadata%2F{{ r.identifier }}'>modifier dans geonetwork</a></p>
 {% if owslinks | length  > 0 %}
 <h2>references</h2>
