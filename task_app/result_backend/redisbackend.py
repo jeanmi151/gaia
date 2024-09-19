@@ -134,7 +134,7 @@ class RedisClient:
                         if 'date_done' in taskb and taskb["date_done"] is not None:
                             date_done = taskb["date_done"]
                         if not 'name' in taskb: # taskset
-                            (x, y, date_done) = self.get_taskset_details("celery-taskset-meta-" + task["id"])
+                            (x, y, date_done) = self.get_taskset_details("celery-taskset-meta-" + taskid)
                         if date_done is not None:
                             taskids[taskid] = { "finished": date_done }
                 # flatten the dict, sorting is done client-side
