@@ -1,4 +1,6 @@
 # todo/ideas
+- share database session between all worker runs
+- use a common capabilities cache between worker and flask
 - a page by ogc service (eg localgs by default):
   - listing/linking to layers
   - for localgs, listing workspaces entrypoints
