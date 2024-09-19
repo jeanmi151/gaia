@@ -110,14 +110,14 @@ def owslayer(stype, url, layername):
             if operation not in [op.name for op in service["service"].operations]:
                 ret['problems'].append(f"{operation} unavailable")
                 return ret
+            defformat = service["service"].getOperationByName('GetMap').formatOptions[0]
             r = service["service"].getmap(layers=[layername],
                 srs='EPSG:4326',
-                format='image/png',
+                format=defformat,
                 size=(10,10),
                 bbox=reduced_bbox(l.boundingBoxWGS84))
             headers = r.info()
-            defformat = service["service"].getOperationByName('GetMap').formatOptions[0]
-            if headers['content-type'] != defformat:
+            if headers['content-type'] != defformat: # and headers['content-type'] != 'image/jpeg':
                 ret['problems'].append(f"{operation} succeded but returned format {headers['content-type']} didn't match expected {defformat}")
             # content-length only available for HEAD requests ?
             if 'content-length' in headers and not int(headers['content-length']) > 0:
