@@ -37,14 +37,66 @@ add this line to `/etc/georchestra/security-proxy/target-mappings.properties`:
 dashboard=http://<hostname>:<port>/dashboard/
 ```
 
-and visit https://<idsurl>/dashboard/home, which should list for now:
+and visit https://<idsurl>/dashboard/, which should list for now:
 - your metadatas
 - the maps & contexts you can access
+
+## pages
+
+here's a quick list of pages/routes implemented so far, the goal is to have as
+much interlinking as possible.
+
+the logic behind each url/route is that if you know what you want to access, be
+it a given OGC layer by its short name, a metadata by its uuid, or a mapstore
+map by its numeric id, you should be able to directly access it by typing the
+url in your browser.
+
+### `/`
+lists:
+- metadatas belonging to the connected user
+- maps and contexts he is allowed to visit
+
+### `/admin/`
+- lists all maps and contexts current problems
+- allows to manually trigger a check for the integrity of all maps/contexts
+
+### `/map/<mapid>`
+- displays map details & current problems
+- links to the OGC layers used by the map
+
+### `/ctx/<mapid>`
+- displays ctx map details & current problems
+- links to the OGC layers used by the ctx map
+
+### `/ows/<{wms,wfs,wmts}>/<service url>/`
+- displays contents of a given OGC service
+- shows the list of all problems for all layers in the service
+- `service url` is an url with slashes replaced by `~`, eg `~geoserver~wms` for the default WMS geoserver, `~geoserver~workspace~ows` for a workspace
+- full urls such as `https:~~wmts.craig.fr~pci~service` can be used, if the `https:~~fqdn` part is omitted the georchestra FQDN is assumed
+
+### `/ows/<{wms,wfs,wmts}>/<service url>/<layername>`
+- displays the details about a given layer in a given OGC service
+- links to the mapstore maps & contexts that use this layer
+- links to the metadata page
+- allow to preview the layer in geoserver, or open it in mapstore
+- links to the geoserver layer edit page
+- shows the list of all problems for all layers in the service
+
+### `/csw/<portal>`
+- displays the lists of metadatas in a given CSW portal, eg `/csw/srv` for all
+  metadatas, and if you've created an `opendata` portal then `/csw/opendata`
+  lists the metadatas in this CSW endpoint.
+
+### `/csw/<portal>/<uuid>`
+- displays the details about a given metadata in a given CSW portal
+- allows to view the metadata in datahub/geonetwork
+- links to the editor view in geonetwork
+- links to the OGC:W{M,F}S layers listed in the metadata
 
 ## service
 
 needs two services running (TODO)
-- the flask webapp, accessed at https://<idsurl>/dashboard/
+- the flask webapp, accessed at `https://<idsurl>/dashboard/`
 - the celery worker, for long-running checks
 
 for now during development those are started by [`run.sh`](run.sh), proper
