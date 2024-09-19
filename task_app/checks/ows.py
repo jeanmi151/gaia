@@ -86,6 +86,8 @@ def owslayer(stype, url, layername):
             if r.status_code != 200:
                 ret['problems'].append(f"metadataurl at {mdurl} doesn't seem to exist (returned code {r.status_code})")
             tasklogger.debug(f"{mdurl} -> {r.status_code}")
+        if len(l.metadataUrls) == 0:
+            ret['problems'].append(f"{layername} has no metadataurl")
 
     localmduuids = find_localmduuid(service['service'], layername)
     # in a second time, make sure local md uuids are reachable via csw
