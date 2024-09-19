@@ -6,6 +6,7 @@ from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 from owslib.wmts import WebMapTileService
 from owslib.csw import CatalogueServiceWeb
+from owslib.fes import PropertyIsEqualTo, And
 from owslib.util import ServiceException
 from requests.exceptions import HTTPError, SSLError, ReadTimeout
 from urllib3.exceptions import MaxRetryError
@@ -15,6 +16,9 @@ from time import time
 from celery.utils.log import get_task_logger
 
 tasklogger = get_task_logger(__name__)
+is_dataset = PropertyIsEqualTo("Type", "dataset")
+non_harvested = PropertyIsEqualTo("isHarvested", "false")
+
 
 """ poorman's in-memory capabilities cache
 keep a timestamp for the last fetch, refresh every 12h by default, and
@@ -63,6 +67,24 @@ class OwsCapCache:
             # cache the failure
             entry["exception"] = e
         entry["timestamp"] = time()
+        if service_type == 'csw':
+            mds = dict()
+            startpos = 0
+            while True:
+                s.getrecords2(
+                    constraints=[And([non_harvested] + [is_dataset])],
+                    startposition=startpos,
+                    maxrecords=100
+                )
+                mds |= s.records
+#                tasklogger.debug(f"start = {startpos}, res={s.results}, returned {len(s.records)}, mds={len(mds)}")
+#                print(f"start = {startpos}, res={s.results}, returned {len(s.records)}, mds={len(mds)}")
+                startpos = s.results['nextrecord'] # len(mds) + 1
+                if startpos > s.results['matches'] or startpos == 0:
+                    break
+#            tasklogger.info(f"cached {len(mds)} csw records for {url}")
+#            print(f"cached {len(mds)} csw records for {url}")
+            entry["contents"] = mds
         self.services[service_type][url] = entry
         return entry
 
