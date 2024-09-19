@@ -13,8 +13,6 @@ from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxi
 from task_app.api import get, gninternalid
 from task_app.utils import find_localmduuid, conf
 
-from owslib.fes import PropertyIsEqualTo, Not, Or, And
-
 from config import url
 import json
 
@@ -63,26 +61,7 @@ def csw(portal):
     service = owscache.get('csw', cswurl)
     if service['service'] is None:
         return abort(404)
-    is_dataset = PropertyIsEqualTo("Type", "dataset")
-    is_service = PropertyIsEqualTo("Type", "service")
-    non_harvested = PropertyIsEqualTo("isHarvested", "false")
-    # collect the list of records XXX should be done in the API to populate the page client-side
-    startpos = 0
-    mds = {}
-    csw = service["service"]
-    while True:
-        csw.getrecords2(
-            constraints=[And([non_harvested] + [is_dataset])],
-            startposition=startpos,
-            maxrecords=100
-        )
-        for uuid in csw.records:
-            mds[uuid] = csw.records[uuid]
-        print(f"start = {startpos}, res={csw.results}, returned {len(csw.records)} allmds={len(mds)}")
-        startpos = csw.results['nextrecord'] # len(mds) + 1
-        if startpos > csw.results['matches'] or startpos == 0: # or len(mds) == csw.results['matches'] or len(csw.records) < 100:
-            break
-    return render_template('csw.html', s=service, portal=portal, r=mds, reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
+    return render_template('csw.html', s=service, portal=portal, r=service['contents'], reqhead=request.headers, bootstrap=app.extensions["bootstrap"])
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
