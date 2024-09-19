@@ -71,12 +71,10 @@ def cswentry(portal, uuid):
     service = owscache.get('csw', cswurl)
     if service['service'] is None:
         return abort(404)
-    csw = service["service"]
-    csw.getrecordbyid([uuid])
-    if len(csw.records) != 1:
+    if uuid not in service["contents"]:
         return abort(404)
     owslinks = list()
-    r = csw.records[uuid]
+    r = service["contents"][uuid]
     gnid = gninternalid(uuid)
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
