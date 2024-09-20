@@ -117,6 +117,7 @@ const CheckRes = (type, resid, showdelete, targetdivid = '#pbtitle') => {
 const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') => {
     const poll = () => {
         const targetpbdivid = targetdivid.replace('#pbtitle', '#problems')
+        const targetpreviousdivid = targetdivid.replace('#pbtitle', '#previouslist')
         const targetpbdetdivid = targetdivid.replace('#pbtitle', '#pbdetails')
         fetch('/dashboard/tasks/result/' + taskid)
             .then(response => response.json())
@@ -155,6 +156,26 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                   }
                   const d = new Date(data["finished"] * 1000);
                   $(targetpbdetdivid).text('dernière vérification faite le '+ d);
+                  if ($(targetpreviousdivid).children().length == 0) {
+                    $(targetpreviousdivid).html(ArrayToHtmlList([]));
+                  }
+                  if ($(targetpreviousdivid).find("#display-taskres-"+taskid).length == 0) {
+                    const link = $("<a>");
+                    link.attr("id", 'display-taskres-' + taskid)
+                    link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + data["taskid"] + "',"+ showdelete +");");
+                    link.attr("title","Show result for task " + data["taskid"]);
+                    link.text("check at " + d);
+                    if (showdelete) {
+                      const link2 = $("<a>");
+                      link2.attr("href","javascript:DeleteTask('" + data["taskid"] + "');");
+                      link2.attr("title","Forget result for task " + data['taskid']);
+                      link2.html('<i class="bi bi-trash"></i>');
+                      $(targetpreviousdivid).children(":first").prepend($("<li>").html([link[0], '&nbsp;', link2[0]]))
+                    }
+                    else {
+                      $(targetpreviousdivid).children(":first").prepend($("<li>").html(link[0]))
+                    }
+                  }
                 }
             })
     }
