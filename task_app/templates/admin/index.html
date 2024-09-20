@@ -29,9 +29,9 @@ if (prev1) {
   const last = prev1.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('mapstore', 'resources', last['id'], '#pbtitle1');
+  PollTaskRes('mapstore', 'resources', last['id'], {{ showdelete|int }}, '#pbtitle1');
 } else {
-  CheckRes('mapstore', 'resources', '#pbtitle1');
+  CheckRes('mapstore', 'resources', {{ showdelete|int}}, '#pbtitle1');
 }
 
 let prev2 = {{ previous_configs_jobs | tojson() }};
@@ -39,9 +39,9 @@ if (prev2) {
   const last = prev2.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('mapstore', 'configs', last['id'], '#pbtitle2');
+  PollTaskRes('mapstore', 'configs', last['id'], {{ showdelete|int }}, '#pbtitle2');
 } else {
-  CheckRes('mapstore', 'configs', '#pbtitle2');
+  CheckRes('mapstore', 'configs', {{ showdelete|int }}, '#pbtitle2');
 }
 $(document).ready(function(){
   DisplayPrev('mapstore', 'resources', prev1, {{ showdelete|int }}, '#previouslist1');
@@ -56,7 +56,7 @@ $(document).ready(function(){
 <div>
 <h2>Check mapstore resources</h2>
 <p>check all mapstore resources.</p>
-<form id='check1' action="javascript:CheckRes('mapstore', 'resources');">
+<form id='check1' action="javascript:CheckRes('mapstore', 'resources', {{ showdelete|int}} );">
 <input type=submit value="check all mapstore resources now">
 </form>
 <h4 id='pbtitle1'>Problems</h4>
@@ -67,7 +67,7 @@ $(document).ready(function(){
 </div>
 <div>
 <h2>Check mapstore configs</h2>
-<form id='check2' action="javascript:CheckRes('mapstore', 'configs');">
+<form id='check2' action="javascript:CheckRes('mapstore', 'configs', {{ showdelete|int }} );">
 <input type=submit value="check all mapstore configs now">
 </form>
 <h4 id='pbtitle2'>Problems</h4>

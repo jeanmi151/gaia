@@ -74,7 +74,7 @@ const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previousl
     const arr = sorted.map(t => {
         const link = $("<a>");
         link.attr("id", 'display-taskres-' + t['id'])
-        link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + t['id'] + "');");
+        link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + t['id'] + "'," + showdelete + ");");
         link.attr("title","Show result for task " + t['id']);
         link.text("check at " + t['finished']);
         if (showdelete) {
@@ -105,16 +105,16 @@ const DeleteTask = (taskid) => {
     });
 }
 
-const CheckRes = (type, resid, targetdivid = '#pbtitle') => {
+const CheckRes = (type, resid, showdelete, targetdivid = '#pbtitle') => {
   fetch('/dashboard/tasks/check/' + type + '/' + resid + '.json')
     .then(response => response.json())
     .then(mydata => {
         $(targetdivid).text("En cours d'analyse");
-        PollTaskRes(type, resid, mydata["result_id"], targetdivid);
+        PollTaskRes(type, resid, mydata["result_id"], showdelete, targetdivid);
     });
 }
 
-const PollTaskRes = (type, resid, taskid, targetdivid = '#pbtitle') => {
+const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') => {
     const poll = () => {
         const targetpbdivid = targetdivid.replace('#pbtitle', '#problems')
         const targetpbdetdivid = targetdivid.replace('#pbtitle', '#pbdetails')

@@ -29,9 +29,9 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('owsservice/{{ type }}', '{{ url }}', last['id']);
+  PollTaskRes('owsservice/{{ type }}', '{{ url }}', last['id'], {{ showdelete|int }});
 } else {
-  CheckRes('owsservice/{{ type }}', '{{ url }}');
+  CheckRes('owsservice/{{ type }}', '{{ url }}', {{ showdelete|int }});
 }
 
 $(document).ready(function(){
@@ -67,7 +67,7 @@ $(document).ready(function(){
 {% endfor %}
 </ul>
 {% endif %}
-<form id='check' action="javascript:CheckRes('owsservice/{{ type }}', '{{ url }}');">
+<form id='check' action="javascript:CheckRes('owsservice/{{ type }}', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all layers now">
 </form>
 <h2 id='pbtitle'>Problems</h2>
