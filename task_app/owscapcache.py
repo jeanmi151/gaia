@@ -19,6 +19,36 @@ tasklogger = get_task_logger(__name__)
 is_dataset = PropertyIsEqualTo("Type", "dataset")
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
 
+class CachedEntry:
+    def __init__(self, stype, url):
+        self.stype = stype
+        self.url = url
+        self.s = None
+        self.records = None
+        self.timestamp = None
+        self.exception = None
+
+    def contents(self):
+        if self.stype in ('wms', 'wmts', 'wfs'):
+            return self.s.contents
+        if self.stype == 'csw' and self.s is not None and self.records is None:
+            self.records = dict()
+            startpos = 0
+            while True:
+                self.s.getrecords2(
+                    constraints=[And([non_harvested] + [is_dataset])],
+                    startposition=startpos,
+                    maxrecords=100
+                )
+                self.records |= self.s.records
+#                tasklogger.debug(f"start = {startpos}, res={self.s.results}, returned {len(self.s.records)}, mds={len(self.records)}")
+#                print(f"start = {startpos}, res={self.s.results}, returned {len(self.s.records)}, mds={len(self.records)}")
+                startpos = self.s.results['nextrecord'] # len(mds) + 1
+                if startpos > self.s.results['matches'] or startpos == 0:
+                    break
+#            tasklogger.info(f"cached {len(self.records)} csw records for {self.url}")
+#            print(f"cached {len(self.records)} csw records for {self.url}")
+        return self.records
 
 """ poorman's in-memory capabilities cache
 keep a timestamp for the last fetch, refresh every 12h by default, and
