@@ -6,6 +6,7 @@ import requests
 
 from celery import shared_task
 from celery import Task
+from celery import group
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
 
@@ -60,6 +61,19 @@ def reduced_bbox(bbox):
          ymin+0.49*(ymax-ymin),
          xmax-0.49*(xmax-xmin),
          ymax-0.49*(ymax-ymin)]
+
+@shared_task()
+def owsservice(stype, url):
+    service = msc.owscache.get(stype, url)
+    if service.s is None:
+        return False
+    taskslist = list()
+    for lname in service.contents():
+        taskslist.append(owslayer.s(stype, url, lname))
+    grouptask = group(taskslist)
+    groupresult = grouptask.apply_async()
+    groupresult.save()
+    return groupresult
 
 @shared_task()
 def owslayer(stype, url, layername):
