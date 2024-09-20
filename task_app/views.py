@@ -118,12 +118,9 @@ def check_owsservice(stype, url):
     service = owscache.get(stype, url)
     if service.s is None:
         return abort(404)
-    taskslist = list()
-    for lname in service.contents()
-        taskslist.append(task_app.checks.ows.owslayer.s(stype, url, lname))
-    grouptask = group(taskslist)
-    groupresult = grouptask.apply_async()
-    groupresult.save()
+    groupresult = task_app.checks.ows.owsservice(stype, url)
+    if not groupresult:
+        return abort(404)
     if groupresult.id:
         rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owsservice', [stype, url], groupresult.id)
     return {"result_id": groupresult.id}
