@@ -82,7 +82,7 @@ def check_record(url, uuid):
                     hasvalidlink = True
                     tasklogger.debug(f"layer {lname} exists in {stype} service at {url}")
         else:
-            if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')) and u['url'].startswith('http'):
+            if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')) and (u['url'] != None and u['url'].startswith('http')):
                 # check that the url exists
                 try:
                     r = requests.head(u['url'], timeout = 5)
@@ -95,6 +95,8 @@ def check_record(url, uuid):
                     ret['problems'].append(f"{u['protocol']} link at {u['url']} timed out")
                 except requests.exceptions.ConnectionError as e:
                     ret['problems'].append(f"{u['protocol']} link at {u['url']} failed to connect ({e}) (DNS?)")
+            elif u['protocol'] != None and u['url'] == None:
+                    ret['problems'].append(f"{u['protocol']} link with empty URL ?")
             else:
                 tasklogger.debug(f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}")
     if not hasvalidlink:
