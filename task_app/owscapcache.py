@@ -67,7 +67,6 @@ class OwsCapCache:
             return None
         tasklogger.debug("fetching {} getcapabilities for {}".format(service_type, url))
         entry = CachedEntry(service_type, url)
-        entry.s = None
         try:
             # XX consider passing parse_remote_metadata ?
             if service_type == "wms":
