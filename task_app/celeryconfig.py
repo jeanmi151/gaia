@@ -21,9 +21,14 @@ result_expires = None
 task_send_sent_event = True
 
 beat_schedule = {
-  'check-every-night': {
+  'check-ms-resources-every-night': {
     'task': 'task_app.checks.mapstore.check_resources',
     'schedule': crontab(minute=0, hour=0),
+  },
+  'check-gs-layers-every-night': {
+    'task': 'task_app.checks.ows.owsservice',
+    'args': ('wms','/geoserver/ows'),
+    'schedule': crontab(minute=15, hour=0),
   },
 }
 #otherwise scheduled hours is taken as UTC
