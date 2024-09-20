@@ -77,7 +77,7 @@ def owslayer(stype, url, layername):
     ret['problems'] = list()
     url = unmunge(url)
     service = msc.owscache.get(stype, url)
-    l = service['service'].contents[layername]
+    l = service.contents()[layername]
     if hasattr(l, 'metadataUrls'):
         for m in l.metadataUrls:
             mdurl = m['url']
@@ -89,12 +89,12 @@ def owslayer(stype, url, layername):
         if len(l.metadataUrls) == 0:
             ret['problems'].append(f"{layername} has no metadataurl")
 
-    localmduuids = find_localmduuid(service['service'], layername)
+    localmduuids = find_localmduuid(service.s, layername)
     # in a second time, make sure local md uuids are reachable via csw
     if len(localmduuids) > 0:
         localgn = msc.conf.get('localgn', 'urls')
         cswservice = msc.owscache.get('csw', '/' + localgn + '/srv/fre/csw')
-        csw = cswservice['service']
+        csw = cswservice.s
         csw.getrecordbyid(list(localmduuids))
         tasklogger.debug(csw.records)
         for uuid in localmduuids:
@@ -107,11 +107,11 @@ def owslayer(stype, url, layername):
     try:
         if stype == "wms":
             operation = "GetMap"
-            if operation not in [op.name for op in service["service"].operations]:
+            if operation not in [op.name for op in service.s.operations]:
                 ret['problems'].append(f"{operation} unavailable")
                 return ret
-            defformat = service["service"].getOperationByName('GetMap').formatOptions[0]
-            r = service["service"].getmap(layers=[layername],
+            defformat = service.s.getOperationByName('GetMap').formatOptions[0]
+            r = service.s.getmap(layers=[layername],
                 srs='EPSG:4326',
                 format=defformat,
                 size=(10,10),
@@ -125,7 +125,7 @@ def owslayer(stype, url, layername):
 
         elif stype == "wfs":
             operation = "GetFeature"
-            feat = service["service"].getfeature(typename=[layername],
+            feat = service.s.getfeature(typename=[layername],
                 srsname=l.crsOptions[0],
 #                bbox=reduced_bbox(l.boundingBoxWGS84),
                 maxfeatures=1)
@@ -140,8 +140,8 @@ def owslayer(stype, url, layername):
 
         elif stype == "wmts":
             operation = "GetTile"
-            (tms, tm, r, c) = find_tilematrix_center(service['service'], layername)
-            tile = service["service"].gettile(layer=layername, tilematrixset = tms, tilematrix = tm, row = r, column = c)
+            (tms, tm, r, c) = find_tilematrix_center(service.s, layername)
+            tile = service.s.gettile(layer=layername, tilematrixset = tms, tilematrix = tm, row = r, column = c)
             headers = tile.info()
             if headers['content-type'] != l.formats[0]:
                 ret['problems'].append(f"{operation} succeded but returned format {headers['content-type']} didn't match expected {l.formats[0]}")

@@ -42,7 +42,7 @@ $(document).ready(function(){
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p id='details'>Details pour la md '{{ r.identifier }}' dans <a href='{{ url_for('dashboard.csw', portal=portal) }}'>{{ s.service.url }}</a></p>
+<p id='details'>Details pour la md '{{ r.identifier }}' dans <a href='{{ url_for('dashboard.csw', portal=portal) }}'>{{ s.s.url }}</a></p>
 <p>titre: {{ r.title }}<p>
 <p>résumé: {{ r.abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>

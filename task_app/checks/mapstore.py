@@ -147,11 +147,11 @@ def check_layers(layers, rescat, resid):
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                 s = msc.owscache.get(l['type'], l['url'])
-                if s['service'] is None:
+                if s.s is None:
                     ret.append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
                 else:
-                    tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s['timestamp']))
-                    if l['name'] not in s['service'].contents:
+                    tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s.timestamp))
+                    if l['name'] not in s.contents():
                         ret.append('layer {} referenced by {} {} doesnt exist in {} service at {}'.format(l['name'], 'la carte' if rescat == 'MAP' else 'le contexte', resid, l['type'], l['url']))
             case '3dtiles':
                 tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
@@ -173,7 +173,7 @@ def check_catalogs(catalogs):
         match c['type']:
             case 'wms'|'wfs'|'wmts'|'csw':
                 s = msc.owscache.get(c['type'], c['url'])
-                if s['service'] is None:
+                if s.s is None:
                     ret.append(msg + "doesn't seem to be an OGC service")
             case '3dtiles' | 'cog':
                 try:

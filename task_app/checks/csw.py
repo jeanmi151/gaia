@@ -22,11 +22,11 @@ def check_catalog(url):
     """
     taskslist = list()
     service = msc.owscache.get('csw', url)
-    if service['service'] is None:
+    if service.s is None:
         return False
 
     # at that point, contents is populated
-    for uuid in service['contents']:
+    for uuid in service.contents():
         print(uuid)
         taskslist.append(check_record.s(url, uuid))
     grouptask = group(taskslist)
@@ -48,11 +48,11 @@ def check_record(url, uuid):
     ret = dict()
     ret['problems'] = list()
     service = msc.owscache.get('csw', url)
-    if service['service'] is None:
+    if service.s is None:
         ret['problems'].append(f"{url} isnt a csw ?")
         return ret
 
-    csw = service['service']
+    csw = service.s
     csw.getrecordbyid([uuid])
     if len(csw.records) != 1:
         ret['problems'].append(f"no metadata with uuid {uuid} in {url}")
@@ -69,14 +69,14 @@ def check_record(url, uuid):
                 url = url.removeprefix(localdomain)
             lname = u['name']
             service = msc.owscache.get(stype, url)
-            if service['service'] is None:
+            if service.s is None:
                 ret['problems'].append(f"no {stype} service at {url}")
             else:
-                if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
+                if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
                     ws = url.split('/')[-2]
                     lname = f"{ws}:{lname}"
                     tasklogger.debug(f"modified lname for {lname}")
-                if lname not in service['service'].contents:
+                if lname not in service.contents():
                     ret['problems'].append(f"no layer named {lname} in {stype} service at {url}")
                 else:
                     hasvalidlink = True

@@ -42,13 +42,13 @@ $(document).ready(function(){
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p id='details'>Details pour la couche {{ type }} '{{ lname }}' dans <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>{{ s.service.url }}</a></p>
-<p>titre: {{ s.service.contents[lname].title }}<p>
-<p>résumé: {{ s.service.contents[lname].abstract }}</p>
-{% if s.service.contents[lname].metadataUrls | length > 0 %}
+<p id='details'>Details pour la couche {{ type }} '{{ lname }}' dans <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>{{ s.s.url }}</a></p>
+<p>titre: {{ s.contents()[lname].title }}<p>
+<p>résumé: {{ s.contents()[lname].abstract }}</p>
+{% if s.contents()[lname].metadataUrls | length > 0 %}
 <p>métadonnées:
 <ul>
-{%   for m in s.service.contents[lname].metadataUrls %}
+{%   for m in s.contents()[lname].metadataUrls %}
 {%     if m.format == 'text/html' %}
 <li><a href='{{ m.url }}'>voir les métadonnées au format HTML (type {{ m.type }})</li>
 {%     elif m.format == 'text/xml' %}
@@ -63,8 +63,8 @@ $(document).ready(function(){
 </ul>
 {% endif %}
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
-<p>Retourner sur le <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>contenu du service {{ s.service.url }}</a></p>
-<p><a href="javascript:SendToMapstore('{{ type }}', '{{ s.service.url }}', '{{ lname }}')">view it in mapstore</a></p>
+<p>Retourner sur le <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>contenu du service {{ s.s.url }}</a></p>
+<p><a href="javascript:SendToMapstore('{{ type }}', '{{ s.s.url }}', '{{ lname }}')">view it in mapstore</a></p>
 {% if not url.startswith('http')  %}
 {%   set base=url.split('~')[1] %}
 {%   set ws=url.split('~')[2] %}

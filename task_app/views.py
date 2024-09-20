@@ -99,13 +99,13 @@ def check_owslayer(stype, url, lname):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
-    if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
+    if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
         ws = url.split('/')[-2]
         lname = f"{ws}:{lname}"
-    if lname not in service['service'].contents:
+    if lname not in service.contents():
         return abort(404)
     result = task_app.checks.ows.owslayer.delay(stype, url, lname)
     return {"result_id": result.id}
@@ -116,10 +116,10 @@ def check_owsservice(stype, url):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     taskslist = list()
-    for lname in service['service'].contents:
+    for lname in service.contents()
         taskslist.append(task_app.checks.ows.owslayer.s(stype, url, lname))
     grouptask = group(taskslist)
     groupresult = grouptask.apply_async()
@@ -132,7 +132,7 @@ def check_owsservice(stype, url):
 def check_cswrecord(url, uuid):
     url = unmunge(url)
     service = owscache.get('csw', url)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     result = task_app.checks.csw.check_record.delay(url, uuid)
     return {"result_id": result.id}
@@ -141,7 +141,7 @@ def check_cswrecord(url, uuid):
 def check_cswservice(url):
     url = unmunge(url)
     service = owscache.get('csw', url)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     groupresult = task_app.checks.csw.check_catalog(url)
     if not groupresult:

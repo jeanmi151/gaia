@@ -63,22 +63,21 @@ class OwsCapCache:
         self.conf = conf
 
     def fetch(self, service_type, url):
-        s = None
         if service_type not in ("wms", "wmts", "wfs", "csw"):
             return None
         tasklogger.debug("fetching {} getcapabilities for {}".format(service_type, url))
-        entry = dict()
+        entry = CachedEntry(service_type, url)
+        entry.s = None
         try:
             # XX consider passing parse_remote_metadata ?
             if service_type == "wms":
-                s = WebMapService(url, version="1.3.0")
+                entry.s = WebMapService(url, version="1.3.0")
             elif service_type == "wfs":
-                s = WebFeatureService(url, version="1.1.0")
+                entry.s = WebFeatureService(url, version="1.1.0")
             elif service_type == "csw":
-                s = CatalogueServiceWeb(url, timeout=60)
+                entry.s = CatalogueServiceWeb(url, timeout=60)
             elif service_type == "wmts":
-                s = WebMapTileService(url)
-            entry["service"] = s
+                entry.s = WebMapTileService(url)
         except ServiceException as e:
             # XXX hack parses the 403 page returned by the s-p ?
             if type(e.args) == tuple and "interdit" in e.args[0]:
@@ -86,35 +85,17 @@ class OwsCapCache:
             else:
                 tasklogger.error(f"failed loading {service_type} from {url}")
                 tasklogger.error(e)
-            entry["exception"] = e
+            entry.exception = e
             # cache the failure
-            entry["service"] = None
+            entry.s = None
 #        except (HTTPError, SSLError, ReadTimeout, MaxRetryError, XMLSyntaxError, KeyError) as e:
         except Exception as e:
             tasklogger.error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
             tasklogger.error(e)
-            entry["service"] = None
+            entry.s = None
             # cache the failure
-            entry["exception"] = e
-        entry["timestamp"] = time()
-        if service_type == 'csw':
-            mds = dict()
-            startpos = 0
-            while True:
-                s.getrecords2(
-                    constraints=[And([non_harvested] + [is_dataset])],
-                    startposition=startpos,
-                    maxrecords=100
-                )
-                mds |= s.records
-#                tasklogger.debug(f"start = {startpos}, res={s.results}, returned {len(s.records)}, mds={len(mds)}")
-#                print(f"start = {startpos}, res={s.results}, returned {len(s.records)}, mds={len(mds)}")
-                startpos = s.results['nextrecord'] # len(mds) + 1
-                if startpos > s.results['matches'] or startpos == 0:
-                    break
-#            tasklogger.info(f"cached {len(mds)} csw records for {url}")
-#            print(f"cached {len(mds)} csw records for {url}")
-            entry["contents"] = mds
+            entry.exception = e
+        entry.timestamp = time()
         self.services[service_type][url] = entry
         return entry
 
@@ -128,12 +109,12 @@ class OwsCapCache:
             return self.fetch(service_type, url)
         else:
             if (
-                self.services[service_type][url]["timestamp"] + self.cache_lifetime
+                self.services[service_type][url].timestamp + self.cache_lifetime
                 > time()
                 and not force_fetch
             ):
-                if self.services[service_type][url]["service"] == None:
-                    tasklogger.warning(f"already got a {type(self.services[service_type][url]['exception'])} for {service_type} {url} in cache, returning cached failure")
+                if self.services[service_type][url].s == None:
+                    tasklogger.warning(f"already got a {type(self.services[service_type][url].exception)} for {service_type} {url} in cache, returning cached failure")
                     return self.services[service_type][url]
                 tasklogger.debug(
                     "returning {} getcapabilities from cache for {}".format(

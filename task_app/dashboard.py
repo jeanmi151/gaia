@@ -59,10 +59,10 @@ def csw(portal):
     localgn = conf.get('localgn', 'urls')
     cswurl = '/' + localgn + '/' + portal + '/fre/csw'
     service = owscache.get('csw', cswurl)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     all_jobs_for_csw = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_catalog',[cswurl])
-    return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), r=service['contents'], reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
@@ -70,12 +70,12 @@ def cswentry(portal, uuid):
     localgn = conf.get('localgn', 'urls')
     cswurl = '/' + localgn + '/' + portal + '/fre/csw'
     service = owscache.get('csw', cswurl)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
-    if uuid not in service["contents"]:
+    if uuid not in service.contents():
         return abort(404)
     owslinks = list()
-    r = service["contents"][uuid]
+    r = service.contents()[uuid]
     gnid = gninternalid(uuid)
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
@@ -94,7 +94,7 @@ def ows(stype, url):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
     all_jobs_for_ows = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.owsservice',[stype, url])
@@ -106,18 +106,18 @@ def owslayer(stype, url, lname):
         return abort(412)
     url = unmunge(url)
     service = owscache.get(stype, url)
-    if service['service'] is None:
+    if service.s is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
-    if stype == 'wfs' and ':' not in lname and service['service'].updateSequence and service['service'].updateSequence.isdigit():
+    if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
         ws = url.split('/')[-2]
         lname = f"{ws}:{lname}"
-    if lname not in service['service'].contents:
+    if lname not in service.contents():
         return abort(404)
-    localmduuids = find_localmduuid(service['service'], lname)
+    localmduuids = find_localmduuid(service.s, lname)
     params = ""
     if not url.startswith('http') and stype == 'wms':
-        bbox = service['service'].contents[lname].boundingBox
+        bbox = service.contents()[lname].boundingBox
         params = "service=WMS&version=1.1.1&request=GetMap&styles=&format=application/openlayers&"
         params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
     used_by = get_resources_using_ows(stype, url, lname)

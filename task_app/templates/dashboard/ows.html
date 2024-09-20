@@ -42,9 +42,9 @@ $(document).ready(function(){
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p id='details'>Details pour le service {{ type }} {{ s.service.url }}</p>
-<p>titre: {{ s.service.identification.title }}<p>
-<p>résumé: {{ s.service.identification.abstract }}</p>
+<p id='details'>Details pour le service {{ type }} {{ s.s.url }}</p>
+<p>titre: {{ s.s.identification.title }}<p>
+<p>résumé: {{ s.s.identification.abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 {% if consumers is not none %}
 <h2 id='consumers'>Consommateurs</h2>
@@ -59,10 +59,10 @@ $(document).ready(function(){
 </ul>
 </p>
 {% endif %}
-<h2 id='contents'>Contents: {{ s.service.contents.items() | length }} layers</h2>
-{% if s.service.contents.items() | length > 0 %}
+<h2 id='contents'>Contents: {{ s.contents().items() | length }} layers</h2>
+{% if s.contents().items() | length > 0 %}
 <ul>
-{% for lname, l in s.service.contents.items() %}
+{% for lname, l in s.contents().items() %}
 <li><a href='{{ url_for("dashboard.owslayer", stype=type, url=url, lname=lname) }}'>{{ l.title }} ({{ l.id }})</a></li>
 {% endfor %}
 </ul>
