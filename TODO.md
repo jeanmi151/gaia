@@ -3,7 +3,6 @@
 - use a common capabilities cache between worker and flask
 - distinguish internal links from external links
 - add a button to force-reload a service capabilities doc
-- move csw records caching to OwsCapCache
 - a page by ogc service (eg localgs by default):
   - for localgs, listing workspaces entrypoints
 - a page by layer:
