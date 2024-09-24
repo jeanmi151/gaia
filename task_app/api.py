@@ -4,11 +4,10 @@
 
 from flask import Blueprint
 from flask import request, jsonify, abort
+from flask import current_app as app
 import requests
 import json
 
-from task_app.georchestraconfig import GeorchestraConfig
-conf = GeorchestraConfig()
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 def get(request, url, accept_json = True):
@@ -19,7 +18,7 @@ def get(request, url, accept_json = True):
         headers['sec-username'] = request.headers.get('Sec-Username')
     if 'sec-roles' in request.headers:
         headers['sec-roles'] = request.headers.get('Sec-Roles')
-    msurl = conf.get('mapstore', 'secproxytargets')
+    msurl = app.extensions["conf"].get('mapstore', 'secproxytargets')
     return requests.get(msurl + url, headers = headers)
 
 @api_bp.route("/mapstore/maps.json")
@@ -37,7 +36,7 @@ def contexts():
     return maps.json()
 
 def gninternalid(uuid):
-    gnurl = conf.get(conf.get('localgn', 'urls'), 'secproxytargets')
+    gnurl = app.extensions["conf"].get(app.extensions["conf"].get('localgn', 'urls'), 'secproxytargets')
     query = { "size": 1,
               "_source": {"includes": ["id"]},
               "query": { "bool": { "must": [ { "query_string" : { "query": "uuid: " + uuid } }, { "terms": { "isTemplate": [ "y", "n" ] } }]}}
@@ -58,7 +57,7 @@ def metadatas():
     username = request.headers.get('Sec-Username','anonymous')
     if username == 'anonymous':
         return abort(403)
-    gnurl = conf.get(conf.get('localgn', 'urls'), 'secproxytargets')
+    gnurl = app.extensions["conf"].get(app.extensions["conf"].get('localgn', 'urls'), 'secproxytargets')
     preauth = requests.get(gnurl + "srv/api/me", headers={'Accept': 'application/json'})
     if preauth.status_code == 204:
       if 'XSRF-TOKEN' in preauth.cookies:
