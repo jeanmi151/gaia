@@ -24,7 +24,7 @@ written using the versions of python/flask/celery provided by debian 12, it
 should only require 'recent' versions of those:
 
 ```
-apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy python3-owslib python3-redis
+apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy python3-owslib python3-jsonpickle python3-redis
 ```
 
 those dependencies are used for:
@@ -32,7 +32,11 @@ those dependencies are used for:
 - the job queue to run the checks in background tasks : [celery 5.2] (https://docs.celeryq.dev/en/v5.2.6/)
 - interaction with the sql database: [sqlalchemy 1.4](https://docs.sqlalchemy.org/en/14/)
 - interaction with the WMS/WFS/WMTS/CSW services: [owslib](https://owslib.readthedocs.io/en/latest/)
-- caching the capabilities to those services [redis](https://redis.io/docs/latest/develop/connect/clients/python/redis-py/)
+- serializing the capabilities of the services: [jsonpickle](https://jsonpickle.github.io/)
+- and finally caching them: [redis](https://redis.io/docs/latest/develop/connect/clients/python/redis-py/)
+
+with this caching, we avoid hammering the remote OGC services continually asking
+them for a capabilities document that might be expensive to produce sometimes.
 
 ## integration
 
