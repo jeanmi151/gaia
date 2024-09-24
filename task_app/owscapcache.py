@@ -61,7 +61,7 @@ force-fetch on demand.
 
 
 class OwsCapCache:
-    def __init__(self, conf):
+    def __init__(self, conf, app):
         self.services = dict()
         self.cache_lifetime = 12 * 60 * 60
         from config import url

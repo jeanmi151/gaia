@@ -45,7 +45,7 @@ def create_app() -> Flask:
 
     conf = GeorchestraConfig()
     app.extensions["conf"] = conf
-    app.extensions["owscache"] = OwsCapCache(conf)
+    app.extensions["owscache"] = OwsCapCache(conf, app)
     from . import views, api, admin, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)
