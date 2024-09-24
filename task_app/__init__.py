@@ -11,6 +11,7 @@ from task_app.events import CeleryEventsHandler
 from task_app.owscapcache import OwsCapCache
 from task_app.georchestraconfig import GeorchestraConfig
 import threading
+import logging
 
 # this celery app object is used by the beat and worker threads
 capp = Celery(__name__)
@@ -51,6 +52,7 @@ def create_app() -> Flask:
     dashboard.dash_bp.register_blueprint(api.api_bp)
     dashboard.dash_bp.register_blueprint(admin.admin_bp)
     app.register_blueprint(dashboard.dash_bp)
+    app.logger.setLevel(logging.DEBUG)
     return app
 
 def celery_init_app(app: Flask) -> Celery:
