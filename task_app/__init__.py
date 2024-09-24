@@ -14,11 +14,6 @@ from task_app.checks.mapstore import MapstoreChecker
 import threading
 import logging
 
-# this celery app object is used by the beat and worker threads
-capp = Celery(__name__)
-capp.config_from_object('task_app.celeryconfig')
-capp.set_default()
-
 from datetime import datetime, date, time
 def format_datetime(value, format="%d %b %Y %I:%M %p"):
     """Format a date time to (Default): d Mon YYYY HH:MM P"""
@@ -33,9 +28,6 @@ def format_datetime(value, format="%d %b %Y %I:%M %p"):
 def create_app() -> Flask:
     app = Flask(__name__, static_url_path='/dashboard/static')
     app.jinja_env.filters['datetimeformat'] = format_datetime
-    app.config.from_mapping(
-        CELERY=capp.conf
-    )
     # cant work since its at /bootstrap and cant be below /dashboard ?
     # app.config.update(BOOTSTRAP_SERVE_LOCAL=True)
     app.config.from_prefixed_env()
@@ -64,7 +56,7 @@ def celery_init_app(app: Flask) -> Celery:
                 return self.run(*args, **kwargs)
 
     celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.config_from_object('task_app.celeryconfig')
     celery_app.set_default()
     app.extensions["celery"] = celery_app
     events_handler = CeleryEventsHandler(celery_app)
