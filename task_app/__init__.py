@@ -8,6 +8,8 @@ from flask import Flask
 from flask import render_template
 from flask_bootstrap import Bootstrap5
 from task_app.events import CeleryEventsHandler
+from task_app.owscapcache import OwsCapCache
+from task_app.georchestraconfig import GeorchestraConfig
 import threading
 
 # this celery app object is used by the beat and worker threads
@@ -40,6 +42,9 @@ def create_app() -> Flask:
     app.extensions["bootstrap"] = Bootstrap5(app)
     celery_init_app(app)
 
+    conf = GeorchestraConfig()
+    app.extensions["conf"] = conf
+    app.extensions["owscache"] = OwsCapCache(conf)
     from . import views, api, admin, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)
