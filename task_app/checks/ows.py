@@ -10,7 +10,7 @@ from celery import group
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
 
-from task_app.checks.mapstore import msc
+from flask import current_app as app
 from task_app.dashboard import rcli, unmunge
 from task_app.utils import find_localmduuid
 
@@ -64,7 +64,7 @@ def reduced_bbox(bbox):
 
 @shared_task()
 def owsservice(stype, url):
-    service = msc.owscache.get(stype, url)
+    service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return False
     taskslist = list()
@@ -90,7 +90,7 @@ def owslayer(stype, url, layername):
     ret = dict()
     ret['problems'] = list()
     url = unmunge(url)
-    service = msc.owscache.get(stype, url)
+    service = app.extensions["owscache"].get(stype, url)
     l = service.contents()[layername]
     if hasattr(l, 'metadataUrls'):
         for m in l.metadataUrls:
@@ -106,8 +106,8 @@ def owslayer(stype, url, layername):
     localmduuids = find_localmduuid(service.s, layername)
     # in a second time, make sure local md uuids are reachable via csw
     if len(localmduuids) > 0:
-        localgn = msc.conf.get('localgn', 'urls')
-        cswservice = msc.owscache.get('csw', '/' + localgn + '/srv/fre/csw')
+        localgn = app.extensions["conf"].get('localgn', 'urls')
+        cswservice = app.extensions["owscache"].get('csw', '/' + localgn + '/srv/fre/csw')
         csw = cswservice.s
         csw.getrecordbyid(list(localmduuids))
         tasklogger.debug(csw.records)

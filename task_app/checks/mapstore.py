@@ -14,13 +14,12 @@ from owslib.wfs import WebFeatureService
 from owslib.wmts import WebMapTileService
 from owslib.util import ServiceException
 
+from flask import current_app as app
 from celery import shared_task
 from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
 tasklogger = get_task_logger(__name__)
-from task_app.georchestraconfig import GeorchestraConfig
-from task_app.owscapcache import OwsCapCache
 
 # solves conflicts in relationship naming ?
 def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
@@ -36,21 +35,19 @@ def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
     return name
 
 class MapstoreChecker():
-    def __init__(self):
-        self.conf = GeorchestraConfig()
-        self.owscache = OwsCapCache(self.conf)
+    def __init__(self, conf):
         url = URL.create(
             drivername="postgresql",
-            username=self.conf.get('pgsqlUser'),
-            host=self.conf.get('pgsqlHost'),
-            password=self.conf.get('pgsqlPassword'),
-            database=self.conf.get('pgsqlDatabase')
+            username=conf.get('pgsqlUser'),
+            host=conf.get('pgsqlHost'),
+            password=conf.get('pgsqlPassword'),
+            database=conf.get('pgsqlDatabase')
         )
 
         engine = create_engine(url)
 
 # these three lines perform the "database reflection" to analyze tables and relationships
-        m = MetaData(schema=self.conf.get('pgsqlGeoStoreSchema','mapstoregeostore'))
+        m = MetaData(schema=conf.get('pgsqlGeoStoreSchema','mapstoregeostore'))
         Base = automap_base(metadata=m)
         Base.prepare(autoload_with=engine,name_for_collection_relationship=name_for_collection_relationship)
 
@@ -66,7 +63,6 @@ class MapstoreChecker():
         for c in categories:
             self.cat[c.name] = c.id
 
-msc = MapstoreChecker()
 
 
 @shared_task()
@@ -91,6 +87,7 @@ def check_configs():
 
 @shared_task()
 def check_res(rescat, resid):
+    msc = app.extensions["msc"]
     m = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
     tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
     # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
@@ -130,6 +127,7 @@ def check_resources():
     """
     called by beat scheduler, or check_mapstore_resources() route in views
     """
+    msc = app.extensions["msc"]
     taskslist = list()
     for rescat in ('MAP', 'CONTEXT'):
         res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
@@ -146,7 +144,7 @@ def check_layers(layers, rescat, resid):
         match l['type']:
             case 'wms'|'wfs'|'wmts':
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
-                s = msc.owscache.get(l['type'], l['url'])
+                s = app.extensions["owscache"].get(l['type'], l['url'])
                 if s.s is None:
                     ret.append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
                 else:
@@ -172,7 +170,7 @@ def check_catalogs(catalogs):
         msg = f"{c['type']} catalog entry with key {k}, title {c['title']} and url {c['url']} "
         match c['type']:
             case 'wms'|'wfs'|'wmts'|'csw':
-                s = msc.owscache.get(c['type'], c['url'])
+                s = app.extensions["owscache"].get(c['type'], c['url'])
                 if s.s is None:
                     ret.append(msg + "doesn't seem to be an OGC service")
             case '3dtiles' | 'cog':
@@ -189,6 +187,7 @@ def check_catalogs(catalogs):
     return ret
 
 def get_name_from_ctxid(ctxid):
+    msc = app.extensions["msc"]
     r = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat['CONTEXT'], msc.Resource.id == ctxid)).one()
     if r:
         return r.name
@@ -203,6 +202,7 @@ def get_resources_using_ows(owstype, url, layer=None):
     if layer is not set, then it will return the set of resources using
     the given service
     """
+    msc = app.extensions["msc"]
     if '~' in url:
         url = url.replace('~','/')
     layermap = dict()

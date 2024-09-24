@@ -10,6 +10,7 @@ from flask_bootstrap import Bootstrap5
 from task_app.events import CeleryEventsHandler
 from task_app.owscapcache import OwsCapCache
 from task_app.georchestraconfig import GeorchestraConfig
+from task_app.checks.mapstore import MapstoreChecker
 import threading
 import logging
 
@@ -46,6 +47,7 @@ def create_app() -> Flask:
     conf = GeorchestraConfig()
     app.extensions["conf"] = conf
     app.extensions["owscache"] = OwsCapCache(conf, app)
+    app.extensions["msc"] = MapstoreChecker(conf)
     from . import views, api, admin, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)

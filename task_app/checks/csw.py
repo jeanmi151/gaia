@@ -4,7 +4,7 @@
 
 import requests
 
-from task_app.checks.mapstore import msc
+from flask import current_app as app
 from celery import shared_task
 from celery import group
 from celery.utils.log import get_task_logger
@@ -21,7 +21,7 @@ def check_catalog(url):
     :return: the list of errors
     """
     taskslist = list()
-    service = msc.owscache.get('csw', url)
+    service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         return False
 
@@ -47,7 +47,7 @@ def check_record(url, uuid):
     tasklogger.info(f"checking uuid {uuid} in csw {url}")
     ret = dict()
     ret['problems'] = list()
-    service = msc.owscache.get('csw', url)
+    service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         ret['problems'].append(f"{url} isnt a csw ?")
         return ret
@@ -64,11 +64,11 @@ def check_record(url, uuid):
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
             url = u['url'].rstrip('?')
-            localdomain = "https://" + msc.conf.get("domainName")
+            localdomain = "https://" + app.extensions["conf"].get("domainName")
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             lname = u['name']
-            service = msc.owscache.get(stype, url)
+            service = app.extensions["owscache"].get(stype, url)
             if service.s is None:
                 ret['problems'].append(f"no {stype} service at {url}")
             else:
