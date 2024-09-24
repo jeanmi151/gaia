@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4 sw=4 et
 
-from task_app.georchestraconfig import GeorchestraConfig
-conf = GeorchestraConfig()
+from flask import current_app as app
 
 def find_localmduuid(service, layername):
     localmduuids = set()
-    localdomain = "https://" + conf.get("domainName")
+    localdomain = "https://" + app.extensions["conf"].get("domainName")
     l = service.contents[layername]
     # wmts doesnt have metadataUrls
     if not hasattr(l, 'metadataUrls'):
