@@ -8,17 +8,15 @@ from flask import current_app as app
 
 from task_app.result_backend.redisbackend import RedisClient
 from task_app.decorators import is_superuser
-from task_app.owscapcache import OwsCapCache
 from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
 from task_app.api import get, gninternalid
-from task_app.utils import find_localmduuid, conf
+from task_app.utils import find_localmduuid
 
 from config import url
 import json
 
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
 
-owscache = OwsCapCache(conf)
 rcli = RedisClient(url)
 
 def unmunge(url):
@@ -29,7 +27,7 @@ def unmunge(url):
     url = url.replace('~','/')
     if not url.startswith('/') and not url.startswith('http'):
         url = '/' + url
-    localdomain = "https://" + conf.get("domainName")
+    localdomain = "https://" + app.extensions["conf"].get("domainName")
     if url.startswith(localdomain):
         url = url.removeprefix(localdomain)
     return url
@@ -56,9 +54,9 @@ def home():
 @dash_bp.route("/csw/<string:portal>")
 def csw(portal):
     # XXX for now only support the local GN
-    localgn = conf.get('localgn', 'urls')
+    localgn = app.extensions["conf"].get('localgn', 'urls')
     cswurl = '/' + localgn + '/' + portal + '/fre/csw'
-    service = owscache.get('csw', cswurl)
+    service = app.extensions["owscache"].get('csw', cswurl)
     if service.s is None:
         return abort(404)
     all_jobs_for_csw = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_catalog',[cswurl])
@@ -67,9 +65,9 @@ def csw(portal):
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
     # XXX for now only support the local GN
-    localgn = conf.get('localgn', 'urls')
+    localgn = app.extensions["conf"].get('localgn', 'urls')
     cswurl = '/' + localgn + '/' + portal + '/fre/csw'
-    service = owscache.get('csw', cswurl)
+    service = app.extensions["owscache"].get('csw', cswurl)
     if service.s is None:
         return abort(404)
     if uuid not in service.contents():
@@ -81,7 +79,7 @@ def cswentry(portal, uuid):
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
             url = u['url'].rstrip('?')
-            localdomain = "https://" + conf.get("domainName")
+            localdomain = "https://" + app.extensions["conf"].get("domainName")
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
@@ -93,7 +91,7 @@ def ows(stype, url):
     if stype not in ('wms', 'wmts', 'wfs'):
         return abort(412)
     url = unmunge(url)
-    service = owscache.get(stype, url)
+    service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
@@ -105,7 +103,7 @@ def owslayer(stype, url, lname):
     if stype not in ('wms', 'wmts', 'wfs'):
         return abort(412)
     url = unmunge(url)
-    service = owscache.get(stype, url)
+    service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
