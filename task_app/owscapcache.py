@@ -13,6 +13,10 @@ from urllib3.exceptions import MaxRetryError
 from lxml.etree import XMLSyntaxError
 from time import time
 
+from redis import Redis
+import jsonpickle
+import json
+
 from celery.utils.log import get_task_logger
 
 tasklogger = get_task_logger(__name__)
@@ -60,12 +64,22 @@ class OwsCapCache:
     def __init__(self, conf):
         self.services = dict()
         self.cache_lifetime = 12 * 60 * 60
+        from config import url
+        self.rediscli = Redis.from_url(url)
         self.conf = conf
 
     def fetch(self, service_type, url):
         if service_type not in ("wms", "wmts", "wfs", "csw"):
             return None
         tasklogger.debug("fetching {} getcapabilities for {}".format(service_type, url))
+        # check first in redis
+        rkey = f"{service_type}-{url.replace('/','~')}"
+        re = self.rediscli.get(rkey)
+        if re:
+            ce = jsonpickle.decode(json.loads(re.decode('utf-8')))
+            # if found, only return fetched value from redis if ts is valid
+            if ce.timestamp + self.cache_lifetime > time():
+                return ce
         entry = CachedEntry(service_type, url)
         try:
             # XX consider passing parse_remote_metadata ?
@@ -96,6 +110,9 @@ class OwsCapCache:
             entry.exception = e
         entry.timestamp = time()
         self.services[service_type][url] = entry
+        # persist entry in redis
+        json_entry = json.dumps(jsonpickle.encode(entry))
+        self.rediscli.set(rkey, json_entry)
         return entry
 
     def get(self, service_type, url, force_fetch=False):
@@ -116,7 +133,7 @@ class OwsCapCache:
                     tasklogger.warning(f"already got a {type(self.services[service_type][url].exception)} for {service_type} {url} in cache, returning cached failure")
                     return self.services[service_type][url]
                 tasklogger.debug(
-                    "returning {} getcapabilities from cache for {}".format(
+                    "returning {} getcapabilities from process in-memory cache for {}".format(
                         service_type, url
                     )
                 )

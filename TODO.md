@@ -1,6 +1,5 @@
 # todo/ideas
 - share database session between all worker runs
-- use a common capabilities cache between worker and flask
 - distinguish internal links from external links
 - add a button to force-reload a service capabilities doc
 - a page by ogc service (eg localgs by default):
