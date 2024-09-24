@@ -4,11 +4,12 @@
 
 from celery.result import AsyncResult, GroupResult
 from celery import group
+from flask import current_app as app
 from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from task_app.dashboard import rcli, unmunge, owscache
+from task_app.dashboard import rcli, unmunge
 from task_app.checks.mapstore import check_res, check_configs, check_resources
 import task_app.checks.ows
 import task_app.checks.csw
@@ -98,7 +99,7 @@ def check_owslayer(stype, url, lname):
     if stype not in ('wms', 'wmts', 'wfs'):
         return abort(412)
     url = unmunge(url)
-    service = owscache.get(stype, url)
+    service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
@@ -115,7 +116,7 @@ def check_owsservice(stype, url):
     if stype not in ('wms', 'wmts', 'wfs'):
         return abort(412)
     url = unmunge(url)
-    service = owscache.get(stype, url)
+    service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
     groupresult = task_app.checks.ows.owsservice(stype, url)
@@ -128,7 +129,7 @@ def check_owsservice(stype, url):
 @tasks_bp.route("/check/csw/<string:url>/<string:uuid>.json")
 def check_cswrecord(url, uuid):
     url = unmunge(url)
-    service = owscache.get('csw', url)
+    service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         return abort(404)
     result = task_app.checks.csw.check_record.delay(url, uuid)
@@ -137,7 +138,7 @@ def check_cswrecord(url, uuid):
 @tasks_bp.route("/check/cswservice/<string:url>.json")
 def check_cswservice(url):
     url = unmunge(url)
-    service = owscache.get('csw', url)
+    service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         return abort(404)
     groupresult = task_app.checks.csw.check_catalog(url)
