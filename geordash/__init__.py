@@ -59,7 +59,7 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app.config_from_object('geordash.celeryconfig')
     celery_app.set_default()
     app.extensions["celery"] = celery_app
-    events_handler = CeleryEventsHandler(celery_app)
+    events_handler = CeleryEventsHandler(app)
     evht = threading.Thread(name='evh',target=events_handler.start_listening, daemon=True)
     evht.start()
     return celery_app

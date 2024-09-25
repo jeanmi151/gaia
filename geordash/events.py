@@ -5,9 +5,10 @@
 from geordash.dashboard import rcli
 
 class CeleryEventsHandler:
-    def __init__(self, celery_app):
-        self._app = celery_app
-        self._state = celery_app.events.State()
+    def __init__(self, flask_app):
+        self._app = flask_app.extensions["celery"]
+        self.fapp = flask_app
+        self._state = self._app.events.State()
 
     def task_sent(self, event):
         self._state.event(event)
