@@ -83,7 +83,9 @@ class OwsCapCache:
         if re:
             ce = jsonpickle.decode(json.loads(re.decode('utf-8')))
             # if found, only return fetched value from redis if ts is valid
-            if ce.timestamp + self.cache_lifetime > time():
+            if type(ce) != CachedEntry:
+                self.logger.error(f"cached entry behind {rkey} isnt a CachedEntry but a {type(ce)}?")
+            elif ce.timestamp + self.cache_lifetime > time():
                 self.logger.debug(f"returning {service_type} entry from redis cache for key {rkey}")
                 return ce
         self.logger.info("fetching {} getcapabilities for {}".format(service_type, url))
