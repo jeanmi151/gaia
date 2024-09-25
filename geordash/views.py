@@ -37,7 +37,17 @@ def result(id: str) -> dict[str, object]:
     if type(result) == AsyncResult:
         # date_done is a datetime
         finished = result.date_done
-        value = result.get() if result.ready() else result.result
+        if result.state == "FAILURE" and isinstance(result.result, Exception):
+            s = f"{str(result.result)} {result.traceback}"
+            app.logger.error(f"task {result.id} badly failed with a {type(result.result)} exception, returning exception string/traceback to the client: {s}")
+            return {
+                "taskid": result.id,
+                "ready": True,
+                "successful": False,
+                "value": s
+            }
+        else:
+            value = result.get() if result.ready() else result.result
     else:
         completed = f"{result.completed_count()} / {len(result.children)}"
         (name, args, finished) = app.extensions["rcli"].get_taskset_details(result.id)
