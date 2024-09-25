@@ -6,11 +6,11 @@ from flask import Blueprint
 from flask import request, render_template, abort
 from flask import current_app as app
 
-from task_app.result_backend.redisbackend import RedisClient
-from task_app.decorators import is_superuser
-from task_app.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
-from task_app.api import get, gninternalid
-from task_app.utils import find_localmduuid
+from geordash.result_backend.redisbackend import RedisClient
+from geordash.decorators import is_superuser
+from geordash.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
+from geordash.api import get, gninternalid
+from geordash.utils import find_localmduuid
 
 from config import url
 import json
@@ -59,7 +59,7 @@ def csw(portal):
     service = app.extensions["owscache"].get('csw', cswurl)
     if service.s is None:
         return abort(404)
-    all_jobs_for_csw = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_catalog',[cswurl])
+    all_jobs_for_csw = rcli.get_taskids_by_taskname_and_args('geordash.checks.csw.check_catalog',[cswurl])
     return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
@@ -83,7 +83,7 @@ def cswentry(portal, uuid):
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
-    all_jobs_for_cswrecord = rcli.get_taskids_by_taskname_and_args('task_app.checks.csw.check_record',[cswurl, uuid])
+    all_jobs_for_cswrecord = rcli.get_taskids_by_taskname_and_args('geordash.checks.csw.check_record',[cswurl, uuid])
     return render_template('cswentry.html', localgn=localgn, s=service, portal=portal, url=cswurl.replace('/', '~'), r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
@@ -95,7 +95,7 @@ def ows(stype, url):
     if service.s is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
-    all_jobs_for_ows = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.owsservice',[stype, url])
+    all_jobs_for_ows = rcli.get_taskids_by_taskname_and_args('geordash.checks.ows.owsservice',[stype, url])
     return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), consumers=used_by, previous_jobs=all_jobs_for_ows, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>/<string:lname>")
@@ -119,15 +119,15 @@ def owslayer(stype, url, lname):
         params = "service=WMS&version=1.1.1&request=GetMap&styles=&format=application/openlayers&"
         params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
     used_by = get_resources_using_ows(stype, url, lname)
-    all_jobs_for_owslayer = rcli.get_taskids_by_taskname_and_args('task_app.checks.ows.owslayer',[stype, url, lname])
+    all_jobs_for_owslayer = rcli.get_taskids_by_taskname_and_args('geordash.checks.ows.owslayer',[stype, url, lname])
     return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, localmduuids=localmduuids, previous_jobs=all_jobs_for_owslayer, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
-    all_jobs_for_mapid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["MAP", mapid])
+    all_jobs_for_mapid = rcli.get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["MAP", mapid])
     return render_template('map.html', mapid=mapid, layers=get_rescontent_from_resid("MAP", mapid), previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
-    all_jobs_for_ctxid = rcli.get_taskids_by_taskname_and_args('task_app.checks.mapstore.check_res', ["CONTEXT", ctxid])
+    all_jobs_for_ctxid = rcli.get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["CONTEXT", ctxid])
     return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), layers=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())

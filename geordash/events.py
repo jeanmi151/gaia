@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4 sw=4 et
 
-from task_app.dashboard import rcli
+from geordash.dashboard import rcli
 
 class CeleryEventsHandler:
     def __init__(self, celery_app):

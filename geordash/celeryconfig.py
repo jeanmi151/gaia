@@ -5,7 +5,7 @@ broker_url = url
 result_backend = url
 worker_concurrency = 1
 #autoscale = 8,1
-imports = ('task_app.checks.mapstore', 'task_app.checks.ows', 'task_app.checks.csw')
+imports = ('geordash.checks.mapstore', 'geordash.checks.ows', 'geordash.checks.csw')
 #worker_pool = solo
 worker_log_format = "[%(asctime)s: %(levelname)s/%(processName)s/%(threadName)s] WORKER %(message)s"
 worker_task_log_format = "[%(asctime)s: %(levelname)s/%(processName)s/%(threadName)s] TASK %(task_name)s[%(task_id)s]: %(message)s"
@@ -22,12 +22,12 @@ task_send_sent_event = True
 
 beat_schedule = {
   'check-ms-resources-every-night': {
-    'task': 'task_app.checks.mapstore.check_resources',
+    'task': 'geordash.checks.mapstore.check_resources',
     'schedule': crontab(minute=0, hour=0),
   },
   'check-gs-layers-every-night': {
-    'task': 'task_app.checks.ows.owsservice',
-    'args': ('wms','/geoserver/ows'),
+    'task': 'geordash.checks.ows.owsservice',
+    'args': ('wms','/wxs/rtge/ows'),
     'schedule': crontab(minute=15, hour=0),
   },
 }

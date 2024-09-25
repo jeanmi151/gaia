@@ -7,10 +7,10 @@ from celery import Task
 from flask import Flask
 from flask import render_template
 from flask_bootstrap import Bootstrap5
-from task_app.events import CeleryEventsHandler
-from task_app.owscapcache import OwsCapCache
-from task_app.georchestraconfig import GeorchestraConfig
-from task_app.checks.mapstore import MapstoreChecker
+from geordash.events import CeleryEventsHandler
+from geordash.owscapcache import OwsCapCache
+from geordash.georchestraconfig import GeorchestraConfig
+from geordash.checks.mapstore import MapstoreChecker
 import threading
 import logging
 
@@ -56,7 +56,7 @@ def celery_init_app(app: Flask) -> Celery:
                 return self.run(*args, **kwargs)
 
     celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object('task_app.celeryconfig')
+    celery_app.config_from_object('geordash.celeryconfig')
     celery_app.set_default()
     app.extensions["celery"] = celery_app
     events_handler = CeleryEventsHandler(celery_app)

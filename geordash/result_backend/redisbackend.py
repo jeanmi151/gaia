@@ -63,12 +63,12 @@ class RedisClient:
                 date_done = subtask_done
             # print(f"{tid} {task['name']} {task['args'][:-1]} {task['date_done']} {date_done}")
         if name.endswith('owslayer'):
-            name = 'task_app.checks.ows.owsservice'
+            name = 'geordash.checks.ows.owsservice'
         if name.endswith('check_res'):
-            name = 'task_app.checks.mapstore.check_resources'
+            name = 'geordash.checks.mapstore.check_resources'
             args = []
         if name.endswith('check_record'):
-            name = 'task_app.checks.csw.check_catalog'
+            name = 'geordash.checks.csw.check_catalog'
         return (name, args, date_done)
 
     def get(self, key):
@@ -111,12 +111,12 @@ class RedisClient:
                 return None
             args = task["args"][:-1]
             if task["name"].endswith('owslayer'):
-                taskname = 'task_app.checks.ows.owsservice'
+                taskname = 'geordash.checks.ows.owsservice'
             if task["name"].endswith('check_res'):
-                taskname = 'task_app.checks.mapstore.check_resources'
+                taskname = 'geordash.checks.mapstore.check_resources'
                 args = []
             if task["name"].endswith('check_record'):
-                taskname = 'task_app.checks.csw.check_catalog'
+                taskname = 'geordash.checks.csw.check_catalog'
 
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
@@ -160,13 +160,13 @@ if __name__ == '__main__':
     sys.path.append('.')
     import config
     rc = RedisClient(config.url)
-    print(rc.task_by_taskname["task_app.checks.mapstore.check_res"].keys())
-    print(rc.task_by_taskname["task_app.checks.mapstore.check_res"][("CONTEXT", 38)])
-    print(tuple(["CONTEXT", 38]) in rc.task_by_taskname["task_app.checks.mapstore.check_res"])
+    print(rc.task_by_taskname["geordash.checks.mapstore.check_res"].keys())
+    print(rc.task_by_taskname["geordash.checks.mapstore.check_res"][("CONTEXT", 38)])
+    print(tuple(["CONTEXT", 38]) in rc.task_by_taskname["geordash.checks.mapstore.check_res"])
     print(len(rc.get("celery-task-meta-0cbc9aee-a2ea-4933-99b9-f448fb127044")))
     print(len(rc.get("0cbc9aee-a2ea-4933-99b9-f448fb127044")))
     print(len(rc.get("celery-task-meta-489dfd21-ad1a-4317-97da-af33d4111099")))
-    tasks = rc.get_taskids_by_taskname_and_args("task_app.checks.mapstore.check_res", ["MAP", 1])
+    tasks = rc.get_taskids_by_taskname_and_args("geordash.checks.mapstore.check_res", ["MAP", 1])
     print(tasks)
     for f in tasks:
         print(len(rc.get(f['id'])))

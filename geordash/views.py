@@ -9,11 +9,11 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from task_app.dashboard import rcli, unmunge
-from task_app.checks.mapstore import check_res, check_configs, check_resources
-import task_app.checks.ows
-import task_app.checks.csw
-from task_app.decorators import check_role
+from geordash.dashboard import rcli, unmunge
+from geordash.checks.mapstore import check_res, check_configs, check_resources
+import geordash.checks.ows
+import geordash.checks.csw
+from geordash.decorators import check_role
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -28,7 +28,7 @@ def result(id: str) -> dict[str, object]:
     if result is None:
         result = AsyncResult(id)
         # regular task triggered by beat, the asyncresult first result entry contains the groupresult id
-        if type(result.result) == list and result.name in ('task_app.checks.mapstore.check_resources', 'task_app.checks.ows.owsservice', 'task_app.checks.csw.check_catalog'):
+        if type(result.result) == list and result.name in ('geordash.checks.mapstore.check_resources', 'geordash.checks.ows.owsservice', 'geordash.checks.csw.check_catalog'):
 #            print(f"real taskset id is {result.result[0][0]}")
             result = GroupResult.restore(result.result[0][0])
             # shouldnt happen, but make sure we have 'a result'...
@@ -91,7 +91,7 @@ def check_ctx(ctxid):
 def check_mapstore_resources():
     groupresult = check_resources()
     if groupresult.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.mapstore.check_resources', [], groupresult.id)
+        rcli.add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', [], groupresult.id)
     return {"result_id": groupresult.id}
 
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
@@ -108,7 +108,7 @@ def check_owslayer(stype, url, lname):
         lname = f"{ws}:{lname}"
     if lname not in service.contents():
         return abort(404)
-    result = task_app.checks.ows.owslayer.delay(stype, url, lname)
+    result = geordash.checks.ows.owslayer.delay(stype, url, lname)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/owsservice/<string:stype>/<string:url>.json")
@@ -119,11 +119,11 @@ def check_owsservice(stype, url):
     service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
-    groupresult = task_app.checks.ows.owsservice(stype, url)
+    groupresult = geordash.checks.ows.owsservice(stype, url)
     if not groupresult:
         return abort(404)
     if groupresult.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.ows.owsservice', [stype, url], groupresult.id)
+        rcli.add_taskid_for_taskname_and_args('geordash.checks.ows.owsservice', [stype, url], groupresult.id)
     return {"result_id": groupresult.id}
 
 @tasks_bp.route("/check/csw/<string:url>/<string:uuid>.json")
@@ -132,7 +132,7 @@ def check_cswrecord(url, uuid):
     service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         return abort(404)
-    result = task_app.checks.csw.check_record.delay(url, uuid)
+    result = geordash.checks.csw.check_record.delay(url, uuid)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/cswservice/<string:url>.json")
@@ -141,9 +141,9 @@ def check_cswservice(url):
     service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         return abort(404)
-    groupresult = task_app.checks.csw.check_catalog(url)
+    groupresult = geordash.checks.csw.check_catalog(url)
     if not groupresult:
         return abort(404)
     if groupresult.id:
-        rcli.add_taskid_for_taskname_and_args('task_app.checks.csw.check_catalog', [url], groupresult.id)
+        rcli.add_taskid_for_taskname_and_args('geordash.checks.csw.check_catalog', [url], groupresult.id)
     return {"result_id": groupresult.id}
