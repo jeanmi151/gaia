@@ -62,13 +62,14 @@ class RedisClient:
             elif subtask_done > date_done:
                 date_done = subtask_done
             # print(f"{tid} {task['name']} {task['args'][:-1]} {task['date_done']} {date_done}")
-        if name.endswith('owslayer'):
-            name = 'geordash.checks.ows.owsservice'
-        if name.endswith('check_res'):
-            name = 'geordash.checks.mapstore.check_resources'
-            args = []
-        if name.endswith('check_record'):
-            name = 'geordash.checks.csw.check_catalog'
+        if name is not None:
+            if name.endswith('owslayer'):
+                name = 'geordash.checks.ows.owsservice'
+            if name.endswith('check_res'):
+                name = 'geordash.checks.mapstore.check_resources'
+                args = []
+            if name.endswith('check_record'):
+                name = 'geordash.checks.csw.check_catalog'
         return (name, args, date_done)
 
     def get(self, key):
