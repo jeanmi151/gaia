@@ -63,10 +63,14 @@ class RedisClient:
             if args is None:
                 args = task["args"][:-1]
             # find the last finishing job
-            subtask_done = datetime.fromisoformat(task["date_done"])
+            if type(task["date_done"]) == str:
+                subtask_done = datetime.fromisoformat(task["date_done"])
+            else:
+                subtask_done = task["date_done"]
+                self.logger.debug(f"sd={subtask_done}, type={type(subtask_done)}")
             if date_done is None:
                 date_done = subtask_done
-            elif subtask_done > date_done:
+            elif subtask_done is not None and subtask_done > date_done:
                 date_done = subtask_done
             # print(f"{tid} {task['name']} {task['args'][:-1]} {task['date_done']} {date_done}")
         if name is not None:
