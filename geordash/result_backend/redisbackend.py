@@ -103,6 +103,7 @@ class RedisClient:
                 return self.r.get(nk)
 
     def forget(self, taskid):
+        self.logger.debug(f"forgetting {taskid}")
         v = self.get(taskid)
         if v is None:
             return None
