@@ -9,24 +9,11 @@ from flask import current_app as app
 from geordash.decorators import is_superuser
 from geordash.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
 from geordash.api import get, gninternalid
-from geordash.utils import find_localmduuid
+from geordash.utils import find_localmduuid, unmunge
 
 import json
 
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
-
-def unmunge(url):
-    """
-    takes a munged url in the form ~geoserver(|~ws)~ows or http(s):~~fqdn~geoserver(|~ws)~ows
-    returns: a proper url with slashes, eventually stripped of the local ids domainName (eg /geoserver/ws/ows)
-    """
-    url = url.replace('~','/')
-    if not url.startswith('/') and not url.startswith('http'):
-        url = '/' + url
-    localdomain = "https://" + app.extensions["conf"].get("domainName")
-    if url.startswith(localdomain):
-        url = url.removeprefix(localdomain)
-    return url
 
 def get_rescontent_from_resid(restype, resid):
     r = get(request, f'rest/geostore/data/{resid}', False)

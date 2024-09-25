@@ -28,3 +28,16 @@ def find_localmduuid(service, layername):
                 # XXX find the uuid in https://ids.craig.fr/geocat/srv/fre/catalog.search#/metadata/e37c057b-5884-429b-8bec-5db0baef0ee1
                 localmduuids.add(mdurl.split('/')[8])
     return localmduuids
+
+def unmunge(url):
+    """
+    takes a munged url in the form ~geoserver(|~ws)~ows or http(s):~~fqdn~geoserver(|~ws)~ows
+    returns: a proper url with slashes, eventually stripped of the local ids domainName (eg /geoserver/ws/ows)
+    """
+    url = url.replace('~','/')
+    if not url.startswith('/') and not url.startswith('http'):
+        url = '/' + url
+    localdomain = "https://" + app.extensions["conf"].get("domainName")
+    if url.startswith(localdomain):
+        url = url.removeprefix(localdomain)
+    return url

@@ -11,8 +11,7 @@ from celery.utils.log import get_task_logger
 tasklogger = get_task_logger("CheckOws")
 
 from flask import current_app as app
-from geordash.dashboard import unmunge
-from geordash.utils import find_localmduuid
+from geordash.utils import find_localmduuid, unmunge
 
 import xml.etree.ElementTree as ET
 from owslib.util import ServiceException

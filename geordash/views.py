@@ -9,7 +9,7 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from geordash.dashboard import unmunge
+from geordash.utils import unmunge
 from geordash.checks.mapstore import check_res, check_configs, check_resources
 import geordash.checks.ows
 import geordash.checks.csw
