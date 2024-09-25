@@ -120,7 +120,10 @@ class OwsCapCache:
         entry.timestamp = time()
         self.services[service_type][url] = entry
         # persist entry in redis
-        json_entry = json.dumps(jsonpickle.encode(entry))
+        if entry.exception is not None:
+            json_entry = json.dumps(jsonpickle.encode(entry, unpicklable=False))
+        else:
+            json_entry = json.dumps(jsonpickle.encode(entry))
         self.rediscli.set(rkey, json_entry)
         self.logger.debug(f"persisted {rkey} in redis")
         return entry
