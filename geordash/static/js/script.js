@@ -133,6 +133,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                   }
                   setTimeout(poll, 500)
                 } else if (!data["successful"]) {
+                  $(targetdivid).text("Protch !");
                   $(targetpbdivid).text('Something crashed, check browser console');
                   console.error(data)
                 } else {
