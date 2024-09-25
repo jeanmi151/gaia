@@ -4,18 +4,25 @@
 
 import redis
 import json
+from celery.utils.log import get_task_logger
+import sys
 from datetime import datetime
 
 class RedisClient:
-    def __init__(self, url):
+    def __init__(self, url, app):
         self.r = redis.Redis.from_url(url)
+        # gross, gotta find a better way to know we're within a flask or celery context
+        if '/usr/bin/flask' in sys.argv:
+            self.logger = app.logger
+        else:
+            self.logger = get_task_logger(__name__)
         self.task_by_taskname = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):
             v = self.get(k.decode())
             try:
                 task = json.loads(v)
             except json.JSONDecodeError as e:
-                print(f"discarding {k}, not json ? {e}")
+                self.logger.error(f"discarding {k}, not json ? {e}")
                 continue
             name = task["name"]
             args = task["args"]
@@ -29,12 +36,12 @@ class RedisClient:
     def get_taskset_details(self, key):
         v = self.get(key)
         if v is None:
-            print(f"found nothing for a taskset with {key}, shouldnt happen")
+            self.logger.error(f"found nothing for a taskset with {key}, shouldnt happen")
             return (None, None, None)
         try:
             task = json.loads(v)
         except json.JSONDecodeError as e:
-            print(f"discarding {key}, not json ? {e}")
+            self.logger.error(f"discarding {key}, not json ? {e}")
         name = None
         args = None
         date_done = None
@@ -46,13 +53,13 @@ class RedisClient:
             try:
                 task = json.loads(tj)
             except json.JSONDecodeError as e:
-                print(f"discarding {tid}, not json ? {e}")
+                self.logger.error(f"discarding {tid}, not json ? {e}")
                 continue
             if name is None:
                 name = task["name"]
             else:
                 if task["name"] != name:
-                    print(f"{name} mismatched task name for {tid}")
+                    self.logger.error(f"{name} mismatched task name for {tid}")
             if args is None:
                 args = task["args"][:-1]
             # find the last finishing job
@@ -108,7 +115,7 @@ class RedisClient:
             try:
                 task = json.loads(tj)
             except json.JSONDecodeError as e:
-                print(f"discarding {ftid}, not json ?")
+                self.logger.error(f"discarding {ftid}, not json ?")
                 return None
             args = task["args"][:-1]
             if task["name"].endswith('owslayer'):

@@ -10,7 +10,9 @@ from flask_bootstrap import Bootstrap5
 from geordash.events import CeleryEventsHandler
 from geordash.owscapcache import OwsCapCache
 from geordash.georchestraconfig import GeorchestraConfig
+from geordash.result_backend.redisbackend import RedisClient
 from geordash.checks.mapstore import MapstoreChecker
+from config import url as redisurl
 import threading
 import logging
 
@@ -40,6 +42,7 @@ def create_app() -> Flask:
     app.extensions["conf"] = conf
     app.extensions["owscache"] = OwsCapCache(conf, app)
     app.extensions["msc"] = MapstoreChecker(conf)
+    app.extensions["rcli"] = RedisClient(redisurl, app)
     from . import views, api, admin, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)

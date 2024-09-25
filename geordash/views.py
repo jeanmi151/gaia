@@ -9,7 +9,7 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from geordash.dashboard import rcli, unmunge
+from geordash.dashboard import unmunge
 from geordash.checks.mapstore import check_res, check_configs, check_resources
 import geordash.checks.ows
 import geordash.checks.csw
@@ -40,7 +40,7 @@ def result(id: str) -> dict[str, object]:
         value = result.get() if result.ready() else result.result
     else:
         completed = f"{result.completed_count()} / {len(result.children)}"
-        (name, args, finished) = rcli.get_taskset_details(result.id)
+        (name, args, finished) = app.extensions["rcli"].get_taskset_details(result.id)
         if result.ready():
             value = list()
             for r in result.results:
@@ -61,7 +61,7 @@ def result(id: str) -> dict[str, object]:
 @check_role(role='SUPERUSER')
 def forget(id: str):
     # forget first in the revmap
-    rcli.forget(id)
+    app.extensions["rcli"].forget(id)
     result = GroupResult.restore(id)
     if result is None:
         result = AsyncResult(id)
@@ -91,7 +91,7 @@ def check_ctx(ctxid):
 def check_mapstore_resources():
     groupresult = check_resources()
     if groupresult.id:
-        rcli.add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', [], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', [], groupresult.id)
     return {"result_id": groupresult.id}
 
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
@@ -123,7 +123,7 @@ def check_owsservice(stype, url):
     if not groupresult:
         return abort(404)
     if groupresult.id:
-        rcli.add_taskid_for_taskname_and_args('geordash.checks.ows.owsservice', [stype, url], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.ows.owsservice', [stype, url], groupresult.id)
     return {"result_id": groupresult.id}
 
 @tasks_bp.route("/check/csw/<string:url>/<string:uuid>.json")
@@ -145,5 +145,5 @@ def check_cswservice(url):
     if not groupresult:
         return abort(404)
     if groupresult.id:
-        rcli.add_taskid_for_taskname_and_args('geordash.checks.csw.check_catalog', [url], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.csw.check_catalog', [url], groupresult.id)
     return {"result_id": groupresult.id}
