@@ -19,7 +19,7 @@ from celery import shared_task
 from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
-tasklogger = get_task_logger(__name__)
+tasklogger = get_task_logger("CheckMapstore")
 
 # solves conflicts in relationship naming ?
 def name_for_collection_relationship(base, local_cls, referred_cls, constraint):

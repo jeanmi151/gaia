@@ -68,7 +68,7 @@ class OwsCapCache:
         if '/usr/bin/flask' in sys.argv:
             self.logger = app.logger
         else:
-            self.logger = get_task_logger(__name__)
+            self.logger = get_task_logger("OwsCapCache")
         self.cache_lifetime = 12 * 60 * 60
         from config import url
         self.rediscli = Redis.from_url(url)

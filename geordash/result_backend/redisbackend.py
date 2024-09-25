@@ -15,7 +15,7 @@ class RedisClient:
         if '/usr/bin/flask' in sys.argv:
             self.logger = app.logger
         else:
-            self.logger = get_task_logger(__name__)
+            self.logger = get_task_logger("RedisClient")
         self.task_by_taskname = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):
             v = self.get(k.decode())

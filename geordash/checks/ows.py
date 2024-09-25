@@ -8,7 +8,7 @@ from celery import shared_task
 from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
-tasklogger = get_task_logger(__name__)
+tasklogger = get_task_logger("CheckOws")
 
 from flask import current_app as app
 from geordash.dashboard import unmunge
