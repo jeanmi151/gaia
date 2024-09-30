@@ -40,6 +40,7 @@ class MapstoreChecker():
             drivername="postgresql",
             username=conf.get('pgsqlUser'),
             host=conf.get('pgsqlHost'),
+            port=conf.get('pgsqlPort'),
             password=conf.get('pgsqlPassword'),
             database=conf.get('pgsqlDatabase')
         )
