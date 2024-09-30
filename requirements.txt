@@ -1,0 +1,6 @@
+bootstrap-flask
+celery
+sqlalchemy
+owslib
+jsonpickle
+redis
