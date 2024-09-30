@@ -24,13 +24,13 @@ written using the versions of python/flask/celery provided by debian 12, it
 should only require 'recent' versions of those:
 
 ```
-apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy python3-owslib python3-jsonpickle python3-redis
+apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy python3-psycopg2 python3-owslib python3-jsonpickle python3-redis
 ```
 
 those dependencies are used for:
-- the web interface : [flask 2.2] (https://flask.palletsprojects.com/en/2.2.x/) and [flask-bootstrap](https://bootstrap-flask.readthedocs.io/en/stable/)
-- the job queue to run the checks in background tasks : [celery 5.2] (https://docs.celeryq.dev/en/v5.2.6/)
-- interaction with the sql database: [sqlalchemy 1.4](https://docs.sqlalchemy.org/en/14/)
+- the web interface : [flask 2.2](https://flask.palletsprojects.com/en/2.2.x/) and [flask-bootstrap](https://bootstrap-flask.readthedocs.io/en/stable/)
+- the job queue to run the checks in background tasks : [celery 5.2](https://docs.celeryq.dev/en/v5.2.6/)
+- interaction with the sql database: [sqlalchemy 1.4](https://docs.sqlalchemy.org/en/14/) and [psycopg2](https://www.psycopg.org/)
 - interaction with the WMS/WFS/WMTS/CSW services: [owslib](https://owslib.readthedocs.io/en/latest/)
 - serializing the capabilities of the services: [jsonpickle](https://jsonpickle.github.io/)
 - and finally caching them: [redis](https://redis.io/docs/latest/develop/connect/clients/python/redis-py/)
