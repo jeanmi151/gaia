@@ -70,7 +70,12 @@ class OwsCapCache:
         else:
             self.logger = get_task_logger("OwsCapCache")
         self.cache_lifetime = 12 * 60 * 60
-        from config import url
+        try:
+            from config import url
+        except:
+            # running owscapcache from a python cli for tests
+            from os import getenv
+            url=getenv('REDISURL')
         self.rediscli = Redis.from_url(url)
         self.conf = conf
 
@@ -156,11 +161,12 @@ class OwsCapCache:
 
 if __name__ == "__main__":
     import logging
+    from flask import Flask
 
     logging.basicConfig(level=logging.DEBUG)
     from georchestraconfig import GeorchestraConfig
 
-    c = OwsCapCache(GeorchestraConfig())
+    c = OwsCapCache(GeorchestraConfig(), Flask(__name__))
     s = c.get("wfs", "/wxs/ows")
     print(s)
     s = c.get("wfs", "/wxs/ows")
