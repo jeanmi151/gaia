@@ -4,26 +4,29 @@
 
 from configparser import ConfigParser
 from itertools import chain
+from os import getenv
 import json
 
 class GeorchestraConfig:
     def __init__(self):
         self.sections = dict()
+        self.datadirpath = getenv('georchestra.datadir', '/etc/georchestra')
         parser = ConfigParser()
-        with open("/etc/georchestra/default.properties") as lines:
+        with open(f"{self.datadirpath}/default.properties") as lines:
             lines = chain(("[section]",), lines)  # This line does the trick.
             parser.read_file(lines)
         self.sections['default'] = parser['section']
-        with open("/etc/georchestra/mapstore/geostore.properties") as lines:
+        self.sections['default']['datadirpath'] = self.datadirpath
+        with open(f"{self.datadirpath}/mapstore/geostore.properties") as lines:
             lines = chain(("[section]",), lines)  # This line does the trick.
             parser.read_file(lines)
         self.sections['mapstoregeostore'] = parser['section']
-        with open("/etc/georchestra/security-proxy/targets-mapping.properties") as lines:
+        with open(f"{self.datadirpath}/security-proxy/targets-mapping.properties") as lines:
             lines = chain(("[section]",), lines)  # This line does the trick.
             parser.read_file(lines)
         self.sections['secproxytargets'] = parser['section']
         self.sections['urls'] = dict()
-        with open("/etc/georchestra/mapstore/configs/localConfig.json") as file:
+        with open(f"{self.datadirpath}/mapstore/configs/localConfig.json") as file:
             s = file.read()
             localconfig = json.loads(s)
             # used to find geonetwork entry in sec-proxy targets

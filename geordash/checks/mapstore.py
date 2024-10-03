@@ -8,6 +8,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
 import json
 import requests
+from os import getenv
 
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
@@ -73,13 +74,14 @@ def check_configs():
     - layers & backgrounds in new/config.json exist in services
     """
     ret = list()
-    with open("/etc/georchestra/mapstore/configs/localConfig.json") as file:
+    datadirpath = getenv('georchestra.datadir', '/etc/georchestra')
+    with open(f"{datadirpath}/mapstore/configs/localConfig.json") as file:
         localconfig = json.load(file)
         catalogs = localconfig["initialState"]["defaultState"]["catalog"]["default"]["services"]
         ret.append({'args': "localconfig", "problems": check_catalogs(catalogs)})
 
     for filetype in ["new", "config"]:
-        with open(f"/etc/georchestra/mapstore/configs/{filetype}.json") as file:
+        with open(f"{datadirpath}/mapstore/configs/{filetype}.json") as file:
             s = file.read()
             mapconfig = json.loads(s)
             layers = mapconfig["map"]["layers"]
