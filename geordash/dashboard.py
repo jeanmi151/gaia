@@ -21,9 +21,11 @@ def get_rescontent_from_resid(restype, resid):
     if r.status_code == 200:
         msmap = json.loads(r.content)
         if restype == 'MAP':
-           llist = msmap['map']['layers']
+            llist = msmap['map']['layers']
         else:
-           llist = msmap['mapConfig']['map']['layers']
+            if 'map' not in msmap['mapConfig']:
+                return dict()
+            llist = msmap['mapConfig']['map']['layers']
         for l in llist:
             if 'group' not in l or ('group' in l and l['group'] != 'background'):
                 if l['type'] in ('wms', 'wfs', 'wmts'):

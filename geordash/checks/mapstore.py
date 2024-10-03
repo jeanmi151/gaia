@@ -113,16 +113,23 @@ def check_res(rescat, resid):
     # uses automapped attribute from relationship instead of a query
     data = json.loads(m.gs_stored_data[0].stored_data)
     ret['problems'] = list()
+    layers = list()
+    catalogs = list()
     if rescat == 'MAP':
         layers = data["map"]["layers"]
     else:
-        layers = data["mapConfig"]["map"]["layers"]
-    ret['problems'] += check_layers(layers, rescat, resid)
+        if "map" in data["mapConfig"]:
+            layers = data["mapConfig"]["map"]["layers"]
+    if layers:
+        ret['problems'] += check_layers(layers, rescat, resid)
+
     if rescat == 'MAP':
         catalogs = data["catalogServices"]["services"]
     else:
-        catalogs = data["mapConfig"]["catalogServices"]["services"]
-    ret['problems'] += check_catalogs(catalogs)
+        if "catalogServices" in data["mapConfig"]:
+            catalogs = data["mapConfig"]["catalogServices"]["services"]
+    if catalogs:
+        ret['problems'] += check_catalogs(catalogs)
     return ret
 
 @shared_task
@@ -218,6 +225,9 @@ def get_resources_using_ows(owstype, url, layer=None):
             layers = data["map"]["layers"]
             rcat = 'MAP'
         else:
+            # context without map ?
+            if "map" not in data["mapConfig"]:
+                return None
             layers = data["mapConfig"]["map"]["layers"]
             rcat = 'CONTEXT'
         for l in layers:
