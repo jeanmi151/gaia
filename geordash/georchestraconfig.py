@@ -10,7 +10,7 @@ import json
 class GeorchestraConfig:
     def __init__(self):
         self.sections = dict()
-        self.datadirpath = getenv('georchestra.datadir', '/etc/georchestra')
+        self.datadirpath = getenv('georchestradatadir', '/etc/georchestra')
         parser = ConfigParser()
         with open(f"{self.datadirpath}/default.properties") as lines:
             lines = chain(("[section]",), lines)  # This line does the trick.

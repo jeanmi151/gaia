@@ -52,7 +52,7 @@ and visit https://<idsurl>/dashboard/, which should list for now:
 - your metadatas
 - the maps & contexts you can access
 
-if your datadir isn't in `/etc/georchestra`, point the `georchestra.datadir`
+if your datadir isn't in `/etc/georchestra`, point the `georchestradatadir`
 environment variable to the path where your datadir is located.
 
 ## pages

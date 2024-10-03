@@ -74,7 +74,7 @@ def check_configs():
     - layers & backgrounds in new/config.json exist in services
     """
     ret = list()
-    datadirpath = getenv('georchestra.datadir', '/etc/georchestra')
+    datadirpath = getenv('georchestradatadir', '/etc/georchestra')
     with open(f"{datadirpath}/mapstore/configs/localConfig.json") as file:
         localconfig = json.load(file)
         catalogs = localconfig["initialState"]["defaultState"]["catalog"]["default"]["services"]
