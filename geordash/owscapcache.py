@@ -19,6 +19,7 @@ import os
 import sys
 import threading
 import json
+import traceback
 
 from celery.utils.log import get_task_logger
 
@@ -98,7 +99,13 @@ class OwsCapCache:
         try:
             # XX consider passing parse_remote_metadata ?
             if service_type == "wms":
-                entry.s = WebMapService(url, version="1.3.0")
+                try:
+                    entry.s = WebMapService(url, version="1.3.0")
+                except (AttributeError, ServiceException) as e:
+                    err = traceback.format_exception(e, limit=-1)
+                    self.logger.error(f"failed loading {service_type} 1.3.0, exception catched: {err}")
+                    self.logger.info("retrying with version=1.1.1")
+                    entry.s = WebMapService(url, version="1.1.1")
             elif service_type == "wfs":
                 entry.s = WebFeatureService(url, version="1.1.0")
             elif service_type == "csw":
