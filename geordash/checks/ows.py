@@ -108,13 +108,17 @@ def owslayer(stype, url, layername):
         localgn = app.extensions["conf"].get('localgn', 'urls')
         cswservice = app.extensions["owscache"].get('csw', '/' + localgn + '/srv/fre/csw')
         csw = cswservice.s
-        csw.getrecordbyid(list(localmduuids))
-        tasklogger.debug(csw.records)
-        for uuid in localmduuids:
-            if uuid not in csw.records:
-                ret['problems'].append(f"md with uuid {uuid} not found in local csw")
-            else:
-                tasklogger.debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
+        try:
+            csw.getrecordbyid(list(localmduuids))
+        except Exception as e:
+            tasklogger.error(f"exception {str(e)} on getrecordbyid({list(localmduuids)})")
+        else:
+            tasklogger.debug(csw.records)
+            for uuid in localmduuids:
+                if uuid not in csw.records:
+                    ret['problems'].append(f"md with uuid {uuid} not found in local csw")
+                else:
+                    tasklogger.debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
 
     operation = ""
     try:
