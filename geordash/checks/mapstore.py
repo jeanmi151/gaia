@@ -101,7 +101,9 @@ def get_res(rescat, resid):
 @shared_task()
 def check_res(rescat, resid):
     msc = app.extensions["msc"]
-    m = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
+    m = get_res(rescat, resid)
+    if not m:
+        return {'problems':[{'type': 'NoSuchResource', 'restype': rescat, 'resid': resid }]}
     tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
     # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
     ret = dict()
@@ -208,7 +210,7 @@ def check_catalogs(catalogs):
 
 def get_name_from_ctxid(ctxid):
     msc = app.extensions["msc"]
-    r = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat['CONTEXT'], msc.Resource.id == ctxid)).one()
+    r = get_res('CONTEXT', ctxid)
     if r:
         return r.name
     return None
