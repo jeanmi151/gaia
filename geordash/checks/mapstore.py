@@ -5,6 +5,7 @@
 from sqlalchemy import create_engine, MetaData, inspect, select, or_, and_
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
 import json
 import requests
@@ -87,6 +88,15 @@ def check_configs():
             layers = mapconfig["map"]["layers"]
             ret.append({'args': filetype, "problems": check_layers(layers, 'MAP', filetype)})
     return ret
+
+def get_res(rescat, resid):
+    msc = app.extensions["msc"]
+    try:
+        r = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
+    except NoResultFound as e:
+        tasklogger.error(f"no such {rescat} with id {resid}")
+        return None
+    return r
 
 @shared_task()
 def check_res(rescat, resid):
