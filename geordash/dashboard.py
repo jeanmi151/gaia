@@ -7,7 +7,7 @@ from flask import request, render_template, abort
 from flask import current_app as app
 
 from geordash.decorators import is_superuser
-from geordash.checks.mapstore import get_resources_using_ows, get_name_from_ctxid
+from geordash.checks.mapstore import get_resources_using_ows, get_name_from_ctxid, get_res
 from geordash.api import get, gninternalid
 from geordash.utils import find_localmduuid, unmunge
 
@@ -109,10 +109,14 @@ def owslayer(stype, url, lname):
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
+    if not get_res('MAP', mapid):
+        return abort(404)
     all_jobs_for_mapid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["MAP", mapid])
     return render_template('map.html', mapid=mapid, layers=get_rescontent_from_resid("MAP", mapid), previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
+    if not get_res('CONTEXT', ctxid):
+        return abort(404)
     all_jobs_for_ctxid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["CONTEXT", ctxid])
     return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), layers=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
