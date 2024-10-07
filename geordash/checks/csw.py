@@ -58,6 +58,7 @@ def check_record(url, uuid):
         ret['problems'].append(f"no metadata with uuid {uuid} in {url}")
         return ret
 
+    # since we've just done a getrecordbyid we have the full view
     r = csw.records[uuid]
     hasvalidlink = False
     for u in r.uris:
