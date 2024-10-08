@@ -20,6 +20,7 @@ import sys
 import threading
 import json
 import traceback
+import requests
 
 from celery.utils.log import get_task_logger
 
@@ -104,7 +105,7 @@ class OwsCapCache:
                     entry.s = WebMapService(url, version="1.3.0")
                 except (AttributeError, ServiceException) as e:
                     err = traceback.format_exception(e, limit=-1)
-                    self.logger.error(f"failed loading {service_type} 1.3.0, exception catched: {err}")
+                    self.logger.error(f"failed loading {service_type} 1.3.0, exception catched: {err[-1]}")
                     self.logger.info("retrying with version=1.1.1")
                     entry.s = WebMapService(url, version="1.1.1")
             elif service_type == "wfs":
@@ -125,8 +126,17 @@ class OwsCapCache:
             entry.s = None
 #        except (HTTPError, SSLError, ReadTimeout, MaxRetryError, XMLSyntaxError, KeyError) as e:
         except Exception as e:
+            err = traceback.format_exception(e, limit=-1)
+            if type(e) == requests.exceptions.ConnectionError and 'Name or service not known' in err[-1]:
+                self.logger.error(f"DNS not known for {url}")
+            elif type(e) == AttributeError and "'NoneType' object has no attribute 'find'" in err[-1]:
+                self.logger.error(f"Likely not XML in capabilities at {url}")
+            elif 'SSLError' in err[-1]:
+                self.logger.error(f"SSLError for {url}")
+            elif 'HTTPError' in err[-1] and '404' in err[-1]:
+                self.logger.error(f"404 for {url}")
             self.logger.error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
-            self.logger.error(e)
+            self.logger.error(err)
             entry.s = None
             # cache the failure
             entry.exception = e
