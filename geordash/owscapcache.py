@@ -180,6 +180,20 @@ class OwsCapCache:
                 return self.services[service_type][url]
             return self.fetch(service_type, url)
 
+    def forget(self, stype, url):
+        if not url.startswith("http"):
+            url = "https://" + self.conf.get("domainName") + url
+        if stype in self.services and url in self.services[stype]:
+            self.logger.debug(f"deleting {url} from {stype} in-memory cache")
+            del self.services[stype][url]
+        rkey = f"{stype}-{url.replace('/','~')}"
+        re = self.rediscli.get(rkey)
+        if re:
+            self.logger.debug(f"deleting {rkey} from capabilities cache")
+            return self.rediscli.delete(rkey)
+        else:
+            self.logger.debug(f"{rkey} not found in capabilities cache ?")
+            return 0
 
 if __name__ == "__main__":
     import logging
