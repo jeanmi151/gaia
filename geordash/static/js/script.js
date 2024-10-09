@@ -191,10 +191,15 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       });
                       const probs = p.map(j => {
                         return j.problems.map(i => {
-                          return j.args + ' has this issue: ' + i
+                          return GetPbStr(j.args, i)
                         })
                       });
                       data["value"].problems = probs.flat(1)
+                  } else {
+                      const probs = data["value"].problems.map(i => {
+                        return GetPbStr(data['args'], i)
+                      })
+                      data["value"].problems = probs
                   }
                   if (data["value"].problems.length > 0) {
                     $(targetdivid).text('Problems');
