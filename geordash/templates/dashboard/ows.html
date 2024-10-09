@@ -45,7 +45,11 @@ $(document).ready(function(){
 <p id='details'>Details pour le service {{ type }} {{ s.s.url }} en version {{ s.s.version }}</p>
 <p>titre: {{ s.s.identification.title }}<p>
 <p>résumé: {{ s.s.identification.abstract }}</p>
-<p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+<p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}
+{% if showdelete %}
+<a id='reloadlink' href="javascript:ReloadCapabilities('{{ type }}','{{ url }}')" title='Reload capabilities from the remote service and refresh the page'><i class="bi bi-arrow-repeat"></i></a>
+{% endif %}
+</p>
 {% if consumers is not none %}
 <h2 id='consumers'>Consommateurs</h2>
 <ul>
