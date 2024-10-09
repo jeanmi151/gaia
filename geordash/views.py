@@ -83,6 +83,15 @@ def forget(id: str):
     result.forget()
     return jsonify("ok")
 
+@tasks_bp.get("/forgetogc/<string:stype>/<string:url>")
+@check_role(role='SUPERUSER')
+def forgetogc(stype, url):
+    if stype not in ('wms', 'wmts', 'wfs', 'csw'):
+        return abort(412)
+    url = unmunge(url)
+    n = app.extensions["owscache"].forget(stype, url)
+    return {"deleted": n}
+
 @tasks_bp.route("/check/mapstore/configs.json")
 def check_mapstore_configs():
     result = check_configs.delay()
