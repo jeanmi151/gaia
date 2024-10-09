@@ -104,10 +104,14 @@ class OwsCapCache:
                 try:
                     entry.s = WebMapService(url, version="1.3.0")
                 except (AttributeError, ServiceException) as e:
-                    err = traceback.format_exception(e, limit=-1)
-                    self.logger.error(f"failed loading {service_type} 1.3.0, exception catched: {err[-1]}")
-                    self.logger.info("retrying with version=1.1.1")
-                    entry.s = WebMapService(url, version="1.1.1")
+                    # XXX hack parses the 403 page returned by the s-p ?
+                    if type(e) == ServiceException and type(e.args) == tuple and "interdit" in e.args[0]:
+                        self.logger.warning("{} needs auth ?".format(url))
+                    else:
+                        err = traceback.format_exception(e, limit=-1)
+                        self.logger.error(f"failed loading {service_type} 1.3.0, exception catched: {err[-1]}")
+                        self.logger.info("retrying with version=1.1.1")
+                        entry.s = WebMapService(url, version="1.1.1")
             elif service_type == "wfs":
                 entry.s = WebFeatureService(url, version="1.1.0")
             elif service_type == "csw":
