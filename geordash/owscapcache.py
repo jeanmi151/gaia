@@ -94,7 +94,7 @@ class OwsCapCache:
             if type(ce) != CachedEntry:
                 self.logger.error(f"cached entry behind {rkey} isnt a CachedEntry but a {type(ce)}?")
             elif ce.timestamp + self.cache_lifetime > time():
-                self.logger.debug(f"returning {service_type} entry from redis cache for key {rkey}")
+                self.logger.debug(f"returning {service_type} entry from redis cache for key {rkey}, ts={ce.timestamp}")
                 return ce
         self.logger.info("fetching {} getcapabilities for {}".format(service_type, url))
         entry = CachedEntry(service_type, url)
@@ -152,7 +152,7 @@ class OwsCapCache:
         else:
             json_entry = json.dumps(jsonpickle.encode(entry))
         self.rediscli.set(rkey, json_entry)
-        self.logger.debug(f"persisted {rkey} in redis")
+        self.logger.debug(f"persisted {rkey} in redis, ts={entry.timestamp}")
         return entry
 
     def get(self, service_type, url, force_fetch=False):
@@ -172,11 +172,7 @@ class OwsCapCache:
                 if self.services[service_type][url].s == None:
                     self.logger.warning(f"already got a {type(self.services[service_type][url].exception)} for {service_type} {url} in cache, returning cached failure")
                     return self.services[service_type][url]
-                self.logger.debug(
-                    "returning {} getcapabilities from process in-memory cache for {}".format(
-                        service_type, url
-                    )
-                )
+                self.logger.debug(f"returning {service_type} getcapabilities from process in-memory cache for {url}, ts={self.services[service_type][url].timestamp}")
                 return self.services[service_type][url]
             return self.fetch(service_type, url)
 
@@ -184,7 +180,7 @@ class OwsCapCache:
         if not url.startswith("http"):
             url = "https://" + self.conf.get("domainName") + url
         if stype in self.services and url in self.services[stype]:
-            self.logger.debug(f"deleting {url} from {stype} in-memory cache")
+            self.logger.debug(f"deleting {url} from {stype} in-memory cache, ts was {self.services[stype][url].timestamp}")
             del self.services[stype][url]
         rkey = f"{stype}-{url.replace('/','~')}"
         re = self.rediscli.get(rkey)
