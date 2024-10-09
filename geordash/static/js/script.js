@@ -89,6 +89,54 @@ const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previousl
     $(targetdivid).html(ArrayToHtmlList(arr));
 }
 
+const GetPbStr = (args, p) => {
+  if (p instanceof String) {
+    return `${args} has this issue: ${p}`
+  }
+  switch(p.type) {
+    /* from ows */
+    case 'NoMetadataUrl':
+      return `Layer ${args[2]} has no metadataurl`
+    case 'BrokenMetadataUrl':
+      return `Layer ${args[2]} has a broken metadataurl: ${p.url} returns ${p.code}`
+    case 'MissingMdUuid':
+      return `Layer ${args[2]} points at a metadauuid ${p.uuid} that was not found in local csw`
+    case 'NoSuchOwsOperation':
+      return `${args[0]} service at ${args[1]} doesnt support ${p.operation} operation`
+    case 'UnexpectedReturnedFormat':
+      return `${p.operation} succeded but returned format ${p.returned} didn't match expected ${p.expected}`
+    case 'UnexpectedContentLength':
+      return `${p.operation} succeded but the result size was ${p.length}`
+    case 'UnexpectedFirstXmlTag':
+      return `${p.operation} succeeded but the first XML tag was ${p.first_tag} instead of ${p.expected}`
+    case 'ExpectedXML':
+      return `${p.operation} succeeded but didnt return XML ? ${p.return}`
+    case 'ServiceException':
+      return `failed ${p.operation} on ${p.layername} in ${p.stype} at ${p.url}, got ${p.e}: ${p.estr}`
+    case 'ForbiddenAccess':
+      return `got a 403 for ${p.operation} on ${p.layername} in ${p.stype} at ${p.url}`
+    /* from mapstore */
+    case 'NoSuchLayer':
+      return `layer ${p.lname} doesnt exist in ${p.stype} service at ${p.url}`
+    case 'OGCException':
+      return `no ${p.stype} service at ${p.url}, got ${p.exception}: ${p.exceptionstr}`
+    case 'BrokenDatasetUrl':
+      return `Non-working dataset url: ${p.url} returns ${p.code}`
+    case 'ConnectionFailure':
+      return `Connection failure for url at ${p.url}, got ${p.exception}: ${p.exceptionstr}`
+    /* from csw */
+    case 'BrokenProtocolUrl':
+      return `Non-working ${p.protocol} url: ${p.url} returns ${p.code}`
+    case 'EmptyUrl':
+      return `Missing URL for ${p.protocol} entry`
+    case 'NoSuchMetadata':
+      return `metadata with uuid ${p.uuid} doesnt exist in CSW service at ${p.url}`
+    case 'MdHasNoLinks':
+      return `no links to OGC layers or download links ?`
+    default:
+      return `Unhandled error code ${p.type} for problem ${p} with args ${args}`
+  }
+}
 const ArrayToHtmlList = (array) => {
   const list = $('<ul>').append(
     array.map(p => $("<li>").html(p))
