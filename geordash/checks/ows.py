@@ -90,6 +90,8 @@ def owslayer(stype, url, layername):
     ret['problems'] = list()
     url = unmunge(url)
     service = app.extensions["owscache"].get(stype, url)
+    if service.s is None:
+        return False
     l = service.contents()[layername]
     if hasattr(l, 'metadataUrls'):
         for m in l.metadataUrls:
