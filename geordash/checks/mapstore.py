@@ -168,15 +168,18 @@ def check_layers(layers, rescat, resid):
                 tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                 s = app.extensions["owscache"].get(l['type'], l['url'])
                 if s.s is None:
-                    ret.append(f"{l['url']} doesn't provide a {l['type']} service to look for layer {l['name']}")
+                    ret.append({'type':'OGCException', 'url': l['url'], 'stype': l['type'], 'exception': str(type(s.exception)), 'exceptionstr': str(s.exception)})
                 else:
                     tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s.timestamp))
                     if l['name'] not in s.contents():
-                        ret.append('layer {} referenced by {} {} doesnt exist in {} service at {}'.format(l['name'], 'la carte' if rescat == 'MAP' else 'le contexte', resid, l['type'], l['url']))
-            case '3dtiles':
-                tasklogger.debug('uses {} from {} (id={})'.format(l['type'], l['url'], l['id']))
-            case 'cog':
-                tasklogger.debug(l)
+                        ret.append({'type':'NoSuchLayer', 'url': l['url'], 'stype': l['type'], 'lname': l['name']})
+            case '3dtiles' | 'cog':
+                try:
+                    response = requests.head(l['url'], allow_redirects=True)
+                    if response.status_code != 200:
+                        ret.append({'type': 'BrokenDatasetUrl', 'url': l['url'], 'code': response.status_code})
+                except Exception as e:
+                    ret.append({'type': 'ConnectionFailure', 'url': l['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
             case 'empty':
                 pass
             case 'osm':
@@ -189,21 +192,18 @@ def check_catalogs(catalogs):
     ret = list()
     for k,c in catalogs.items():
         tasklogger.debug(f"checking catalog entry {k} type {c['type']} at {c['url']}")
-        msg = f"{c['type']} catalog entry with key {k}, title {c['title']} and url {c['url']} "
         match c['type']:
             case 'wms'|'wfs'|'wmts'|'csw':
                 s = app.extensions["owscache"].get(c['type'], c['url'])
                 if s.s is None:
-                    ret.append(msg + "doesn't seem to be an OGC service")
+                    ret.append({'type':'OGCException', 'url': c['url'], 'stype': c['type'], 'exception': str(type(s.exception)), 'exceptionstr': str(s.exception)})
             case '3dtiles' | 'cog':
                 try:
                     response = requests.head(c['url'], allow_redirects=True)
                     if response.status_code != 200:
-                        ret.append(msg + f"doesn't seem to exist ({response.status_code}")
-                except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as e:
-                    ret.append(msg + f"Failure - Unable to establish connection: {e}.")
+                        ret.append({'type': 'BrokenDatasetUrl', 'url': c['url'], 'code': response.status_code})
                 except Exception as e:
-                    ret.append(msg + f"Failure - Unknown error occurred: {e}.")
+                    ret.append({'type': 'ConnectionFailure', 'url': c['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
             case _:
                 pass
     return ret

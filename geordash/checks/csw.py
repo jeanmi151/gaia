@@ -49,13 +49,13 @@ def check_record(url, uuid):
     ret['problems'] = list()
     service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
-        ret['problems'].append(f"{url} isnt a csw ?")
+        ret['problems'].append({'type':'OGCException', 'url': url, 'type': 'csw', 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
         return ret
 
     csw = service.s
     csw.getrecordbyid([uuid])
     if len(csw.records) != 1:
-        ret['problems'].append(f"no metadata with uuid {uuid} in {url}")
+        ret['problems'].append({'type': 'NoSuchMetadata', 'uuid': uuid, 'url': url})
         return ret
 
     # since we've just done a getrecordbyid we have the full view
@@ -71,14 +71,14 @@ def check_record(url, uuid):
             lname = u['name']
             service = app.extensions["owscache"].get(stype, url)
             if service.s is None:
-                ret['problems'].append(f"no {stype} service at {url}")
+                ret['problems'].append({'type':'OGCException', 'url': url, 'type': stype, 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
             else:
                 if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
                     ws = url.split('/')[-2]
                     lname = f"{ws}:{lname}"
                     tasklogger.debug(f"modified lname for {lname}")
                 if lname not in service.contents():
-                    ret['problems'].append(f"no layer named {lname} in {stype} service at {url}")
+                    ret['problems'].append({'type':'NoSuchLayer', 'url': url, 'stype': stype, 'lname': lname})
                 else:
                     hasvalidlink = True
                     tasklogger.debug(f"layer {lname} exists in {stype} service at {url}")
@@ -88,18 +88,16 @@ def check_record(url, uuid):
                 try:
                     r = requests.head(u['url'], timeout = 5)
                     if r.status_code != 200:
-                        ret['problems'].append(f"{u['protocol']} link at {u['url']} doesn't seem to exist (returned code {r.status_code})")
+                        ret['problems'].append({'type': 'BrokenProtocolUrl', 'url': u['url'], 'protocol': u['protocol'], 'code': r.status_code})
                     else:
                         hasvalidlink = True
                     tasklogger.debug(f"{u['url']} -> {r.status_code}")
-                except requests.exceptions.Timeout:
-                    ret['problems'].append(f"{u['protocol']} link at {u['url']} timed out")
-                except requests.exceptions.ConnectionError as e:
-                    ret['problems'].append(f"{u['protocol']} link at {u['url']} failed to connect ({e}) (DNS?)")
+                except Exception as e:
+                    ret['problems'].append({'type': 'ConnectionFailure', 'url': u['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
             elif u['protocol'] != None and u['url'] == None:
-                    ret['problems'].append(f"{u['protocol']} link with empty URL ?")
+                    ret['problems'].append({'type': 'EmptyUrl', 'protocol': u['protocol']})
             else:
                 tasklogger.debug(f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}")
     if not hasvalidlink:
-        ret['problems'].append(f"no links to OGC layers or download links ?")
+        ret['problems'].append({'type': 'MdHasNoLinks'})
     return ret

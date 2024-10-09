@@ -99,10 +99,10 @@ def owslayer(stype, url, layername):
             # check first that the url exists
             r = requests.head(mdurl)
             if r.status_code != 200:
-                ret['problems'].append(f"metadataurl at {mdurl} doesn't seem to exist (returned code {r.status_code})")
+                ret['problems'].append({'type': 'BrokenMetadataUrl', 'url': mdurl, 'code': r.status_code})
             tasklogger.debug(f"{mdurl} -> {r.status_code}")
         if len(l.metadataUrls) == 0:
-            ret['problems'].append(f"{layername} has no metadataurl")
+            ret['problems'].append({'type': 'NoMetadataUrl'})
 
     localmduuids = find_localmduuid(service.s, layername)
     # in a second time, make sure local md uuids are reachable via csw
@@ -118,7 +118,7 @@ def owslayer(stype, url, layername):
             tasklogger.debug(csw.records)
             for uuid in localmduuids:
                 if uuid not in csw.records:
-                    ret['problems'].append(f"md with uuid {uuid} not found in local csw")
+                    ret['problems'].append({'type': 'MissingMdUuid', 'uuid': uuid})
                 else:
                     tasklogger.debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
 
@@ -127,7 +127,7 @@ def owslayer(stype, url, layername):
         if stype == "wms":
             operation = "GetMap"
             if operation not in [op.name for op in service.s.operations]:
-                ret['problems'].append(f"{operation} unavailable")
+                ret['problems'].append({'type': 'NoSuchOwsOperation', 'operation': operation })
                 return ret
             defformat = service.s.getOperationByName('GetMap').formatOptions[0]
             r = service.s.getmap(layers=[layername],
@@ -137,10 +137,10 @@ def owslayer(stype, url, layername):
                 bbox=reduced_bbox(l.boundingBoxWGS84))
             headers = r.info()
             if headers['content-type'] != defformat: # and headers['content-type'] != 'image/jpeg':
-                ret['problems'].append(f"{operation} succeded but returned format {headers['content-type']} didn't match expected {defformat}")
+                ret['problems'].append({'type': 'UnexpectedReturnedFormat', 'operation': operation, 'returned': headers['content-type'], 'expected': defformat})
             # content-length only available for HEAD requests ?
             if 'content-length' in headers and not int(headers['content-length']) > 0:
-                ret['problems'].append(f"{operation} succeded but the result size was {headers['content-length']}")
+                ret['problems'].append({'type': 'UnexpectedContentLength', 'operation': operation, 'length': headers['content-length']})
 
         elif stype == "wfs":
             operation = "GetFeature"
@@ -153,9 +153,9 @@ def owslayer(stype, url, layername):
                 root = ET.fromstring(xml.decode())
                 first_tag = root.tag.lower()
                 if not first_tag.endswith("featurecollection"):
-                    ret['problems'].append(f"{operation} succeeded but the first XML tag of the response was {first_tag}")
+                    ret['problems'].append({'type': 'UnexpectedFirstXmlTag', 'operation': operation, 'first_tag': first_tag, 'expected': 'featurecollection'})
             except lxml.etree.XMLSyntaxError as e:
-                ret['problems'].append(f"{operation} succeeded but didnt return XML ? {xml.decode()}")
+                ret['problems'].append({'type': 'ExpectedXML', 'return': xml.decode()})
 
         elif stype == "wmts":
             operation = "GetTile"
@@ -163,15 +163,15 @@ def owslayer(stype, url, layername):
             tile = service.s.gettile(layer=layername, tilematrixset = tms, tilematrix = tm, row = r, column = c)
             headers = tile.info()
             if headers['content-type'] != l.formats[0]:
-                ret['problems'].append(f"{operation} succeded but returned format {headers['content-type']} didn't match expected {l.formats[0]}")
+                ret['problems'].append({'type': 'UnexpectedReturnedFormat', 'operation': operation, 'returned': headers['content-type'], 'expected': l.formats[0]})
             if 'content-length' in headers and not int(headers['content-length']) > 0:
-                ret['problems'].append(f"{operation} succeded but the result size was {headers['content-length']}")
+                ret['problems'].append({'type': 'UnexpectedContentLength', 'operation': operation, 'length': headers['content-length']})
 
     except ServiceException as e:
         if type(e.args) == tuple and "interdit" in e.args[0]:
-            ret['problems'].append(f"got a 403 for {operation} on {layername} in {stype} at {url}")
+            ret['problems'].append({'type': 'ForbiddenAccess', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url })
         else:
-            ret['problems'].append(f"failed {operation} on {layername} in {stype} at {url}: {e}")
+            ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': str(e) })
     else:
        tasklogger.debug(f"{operation} on {layername} in {stype} at {url} succeeded")
     return ret
