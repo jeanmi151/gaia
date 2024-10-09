@@ -89,6 +89,17 @@ const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previousl
     $(targetdivid).html(ArrayToHtmlList(arr));
 }
 
+const ReloadCapabilities = (type, url) => {
+  fetch('/dashboard/tasks/forgetogc/'+ type + '/' + url)
+    .then(response => response.json())
+    .then(res => {
+        if (res['deleted'] > 0) {
+          $('#reloadlink').text("Reloading..");
+          location.reload()
+        }
+    })
+}
+
 const GetPbStr = (args, p) => {
   if (p instanceof String) {
     return `${args} has this issue: ${p}`
