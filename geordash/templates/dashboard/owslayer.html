@@ -62,7 +62,10 @@ $(document).ready(function(){
 {%   endif %}
 </ul>
 {% endif %}
-<p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+<p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}
+{% if showdelete %}
+<a id='reloadlink' href="javascript:ReloadCapabilities('{{ type }}','{{ url }}')" title='Reload capabilities from the remote service and refresh the page'><i class="bi bi-arrow-repeat"></i></a>
+{% endif %}
 <p>Retourner sur le <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>contenu du service {{ s.s.url }}</a></p>
 <p><a href="javascript:SendToMapstore('{{ type }}', '{{ s.s.url }}', '{{ lname }}')">view it in mapstore</a></p>
 {% if not url.startswith('http')  %}
