@@ -170,6 +170,9 @@ def owslayer(stype, url, layername):
     except ServiceException as e:
         if type(e.args) == tuple and "interdit" in e.args[0]:
             ret['problems'].append({'type': 'ForbiddenAccess', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url })
+        elif 'pg_hba.conf' in str(e):
+            tasklogger.warning(f"{operation} failed on layer {layername} with {str(e)} exception, details not leaked in the job results")
+            ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': "Connection issue to postgis, check credentials" })
         else:
             ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': str(e) })
     else:
