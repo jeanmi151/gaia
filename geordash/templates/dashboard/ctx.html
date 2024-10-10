@@ -51,11 +51,11 @@ $(document).ready(function(){
 <div id='pbdetails'></div>
 <div id="problems"></div>
 <h2 id='usetitle'>Contents</h2>
-{% if layers.items() | length > 0 %}
+{% if resources.layers.items() | length > 0 %}
 <div id="uses">
 la carte du contexte utilise les ressources suivantes:
 <ul>
-{% for k,l in layers.items() %}
+{% for k,l in resources.layers.items() %}
 <li id='{{ k }}'>
 '{{ l.title }}': couche {{ l.type }}
 <a href='{{ url_for('dashboard.owslayer', stype=l.type, url=l.url.replace('/', '~'), lname=l.name) }}'>{{ l.name }}</a>
