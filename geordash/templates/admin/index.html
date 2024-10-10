@@ -30,8 +30,6 @@ if (prev1) {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
   PollTaskRes('mapstore', 'resources', last['id'], {{ showdelete|int }}, '#pbtitle1');
-} else {
-  CheckRes('mapstore', 'resources', {{ showdelete|int}}, '#pbtitle1');
 }
 
 let prev2 = {{ previous_configs_jobs | tojson() }};
@@ -40,8 +38,6 @@ if (prev2) {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
   PollTaskRes('mapstore', 'configs', last['id'], {{ showdelete|int }}, '#pbtitle2');
-} else {
-  CheckRes('mapstore', 'configs', {{ showdelete|int }}, '#pbtitle2');
 }
 $(document).ready(function(){
   DisplayPrev('mapstore', 'resources', prev1, {{ showdelete|int }}, '#previouslist1');

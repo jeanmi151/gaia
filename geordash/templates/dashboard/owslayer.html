@@ -30,8 +30,6 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
   PollTaskRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id'], {{ showdelete|int }});
-} else {
-  CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}', {{ showdelete|int }});
 }
 
 $(document).ready(function(){
