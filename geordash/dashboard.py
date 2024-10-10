@@ -17,20 +17,25 @@ dash_bp = Blueprint("dashboard", __name__, url_prefix="/gaia", template_folder='
 
 def get_rescontent_from_resid(restype, resid):
     r = get(request, f'rest/geostore/data/{resid}', False)
-    layers = dict()
+    res = dict()
     if r.status_code == 200:
         msmap = json.loads(r.content)
         if restype == 'MAP':
             llist = msmap['map']['layers']
+            catlist = msmap['catalogServices']['services']
         else:
             if 'map' not in msmap['mapConfig']:
                 return dict()
             llist = msmap['mapConfig']['map']['layers']
+            catlist = msmap['mapConfig']['catalogServices']['services']
+        layers = dict()
         for l in llist:
             if 'group' not in l or ('group' in l and l['group'] != 'background'):
                 if l['type'] in ('wms', 'wfs', 'wmts'):
                     layers[l['id']] = l
-    return layers
+        res['layers'] = layers
+        res['catalogs'] = catlist
+    return res
 
 @dash_bp.route("/")
 def home():
@@ -112,11 +117,11 @@ def map(mapid):
     if not get_res('MAP', mapid):
         return abort(404)
     all_jobs_for_mapid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["MAP", mapid])
-    return render_template('map.html', mapid=mapid, layers=get_rescontent_from_resid("MAP", mapid), previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('map.html', mapid=mapid, resources=get_rescontent_from_resid("MAP", mapid), previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
     if not get_res('CONTEXT', ctxid):
         return abort(404)
     all_jobs_for_ctxid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["CONTEXT", ctxid])
-    return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), layers=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), resources=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
