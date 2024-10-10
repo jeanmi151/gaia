@@ -1,4 +1,4 @@
-# geOrchestra dashboard
+# gaia (geOrchestra Automated Integrity Analysis) - a geOrchestra dashboard
 
 this project aims at providing a user-centric dashboard for [geOrchestra](https://georchestra.org):
 - for admins, showing inconsistencies/errors in the datasets/maps, reusing what
@@ -45,10 +45,10 @@ that it knows the connected user and can display user-tailored information.
 
 add this line to `/etc/georchestra/security-proxy/target-mappings.properties`:
 ```
-dashboard=http://<hostname>:<port>/dashboard/
+gaia=http://<hostname>:<port>/gaia/
 ```
 
-and visit https://<idsurl>/dashboard/, which should list for now:
+and visit https://<idsurl>/gaia/, which should list for now:
 - your metadatas
 - the maps & contexts you can access
 
@@ -110,7 +110,7 @@ lists:
 ## service
 
 needs two services running (TODO)
-- the flask webapp, accessed at `https://<idsurl>/dashboard/`
+- the flask webapp, accessed at `https://<idsurl>/gaia/`
 - the celery worker, for long-running checks
 
 for now during development those are started by [`run.sh`](run.sh), proper

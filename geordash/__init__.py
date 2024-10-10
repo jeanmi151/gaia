@@ -28,9 +28,9 @@ def format_datetime(value, format="%d %b %Y %I:%M %p"):
     return value.strftime(format)
 
 def create_app() -> Flask:
-    app = Flask(__name__, static_url_path='/dashboard/static')
+    app = Flask(__name__, static_url_path='/gaia/static')
     app.jinja_env.filters['datetimeformat'] = format_datetime
-    # cant work since its at /bootstrap and cant be below /dashboard ?
+    # cant work since its at /bootstrap and cant be below /gaia ?
     # app.config.update(BOOTSTRAP_SERVE_LOCAL=True)
     app.config.from_prefixed_env()
     # needs FLASK_DEBUG in the env, or flask --debug

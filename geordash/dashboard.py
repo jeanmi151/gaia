@@ -13,7 +13,7 @@ from geordash.utils import find_localmduuid, unmunge
 
 import json
 
-dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard", template_folder='templates/dashboard')
+dash_bp = Blueprint("dashboard", __name__, url_prefix="/gaia", template_folder='templates/dashboard')
 
 def get_rescontent_from_resid(restype, resid):
     r = get(request, f'rest/geostore/data/{resid}', False)
