@@ -1,5 +1,7 @@
+const baseurl = '/' + window.location.pathname.split('/')[1]
+
 const fetchForHome = () => {
-  fetch('/dashboard/api/geonetwork/metadatas.json')
+  fetch(baseurl + '/api/geonetwork/metadatas.json')
     .then(response => response.json())
     .then(mydata => {
         var $table = $('#table');
@@ -20,7 +22,7 @@ const fetchForHome = () => {
         });
     });
 
-  fetch('/dashboard/api/mapstore/maps.json')
+  fetch(baseurl + '/api/mapstore/maps.json')
     .then(response => response.json())
     .then(mydata => {
         var $table = $('#mapstable');
@@ -34,7 +36,7 @@ const fetchForHome = () => {
         $('#mapstitle').text(mydata['totalCount'] + ' maps');
         res.forEach(function (value) {
             id = value['id'];
-            value['id'] = '<a href="/dashboard/map/' + id + '">' + id + '</a>';
+            value['id'] = '<a href="' + baseurl + '/map/' + id + '">' + id + '</a>';
             value['viewlink']='<a href="/mapstore/#/viewer/' + id + '">voir</a>';
             xxdata.push(value);
         });
@@ -43,7 +45,7 @@ const fetchForHome = () => {
         });
     });
 
-  fetch('/dashboard/api/mapstore/contexts.json')
+  fetch(baseurl + '/api/mapstore/contexts.json')
     .then(response => response.json())
     .then(mydata => {
         var $table = $('#ctxtable');
@@ -57,7 +59,7 @@ const fetchForHome = () => {
         $('#ctxtitle').text(mydata['totalCount'] + ' contexts');
         res.forEach(function (value) {
             id = value['id'];
-            value['id'] = '<a href="/dashboard/context/' + id + '">' + id + '</a>';
+            value['id'] = '<a href="' + baseurl + '/context/' + id + '">' + id + '</a>';
             value['viewlink']='<a href="/mapstore/#/context/' + value['name'] + '">voir</a>';
             value['editlink']='<a href="/mapstore/#/context-creator/' + id + '">editer</a>';
             xxdata.push(value);
@@ -90,7 +92,7 @@ const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previousl
 }
 
 const ReloadCapabilities = (type, url) => {
-  fetch('/dashboard/tasks/forgetogc/'+ type + '/' + url)
+  fetch(baseurl + '/tasks/forgetogc/'+ type + '/' + url)
     .then(response => response.json())
     .then(res => {
         if (res['deleted'] > 0) {
@@ -156,7 +158,7 @@ const ArrayToHtmlList = (array) => {
 }
 
 const DeleteTask = (taskid) => {
-  fetch('/dashboard/tasks/forget/' + taskid)
+  fetch(baseurl + '/tasks/forget/' + taskid)
     .then(response => {
       if (response.status != 403) {
         $('#display-taskres-' + taskid).parent().remove();
@@ -165,7 +167,7 @@ const DeleteTask = (taskid) => {
 }
 
 const CheckRes = (type, resid, showdelete, targetdivid = '#pbtitle') => {
-  fetch('/dashboard/tasks/check/' + type + '/' + resid + '.json')
+  fetch(baseurl + '/tasks/check/' + type + '/' + resid + '.json')
     .then(response => response.json())
     .then(mydata => {
         $(targetdivid).text("En cours d'analyse");
@@ -178,7 +180,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
         const targetpbdivid = targetdivid.replace('#pbtitle', '#problems')
         const targetpreviousdivid = targetdivid.replace('#pbtitle', '#previouslist')
         const targetpbdetdivid = targetdivid.replace('#pbtitle', '#pbdetails')
-        fetch('/dashboard/tasks/result/' + taskid)
+        fetch(baseurl + '/tasks/result/' + taskid)
             .then(response => response.json())
             .then(data => {
 //                console.log(data)
