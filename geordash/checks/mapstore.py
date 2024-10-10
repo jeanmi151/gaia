@@ -100,7 +100,6 @@ def get_res(rescat, resid):
 
 @shared_task()
 def check_res(rescat, resid):
-    msc = app.extensions["msc"]
     m = get_res(rescat, resid)
     if not m:
         return {'problems':[{'type': 'NoSuchResource', 'restype': rescat, 'resid': resid }]}
