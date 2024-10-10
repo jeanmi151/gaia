@@ -1,7 +1,6 @@
 # todo/ideas
 - share database session between all worker runs
 - distinguish internal links from external links
-- add a button to force-reload a service capabilities doc
 - when displaying problems on a list, highlight in green/red entries that have no/some issues
 - a page by ogc service (eg localgs by default):
   - for localgs, listing workspaces entrypoints
