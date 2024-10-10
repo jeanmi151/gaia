@@ -218,7 +218,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                     $(targetdivid).text('Problems');
                     $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
                   } else {
-                    $(targetdivid).text('No problemo! in ' + type + ' owned by '+data["value"].owner);
+                    $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
                     $(targetpbdivid).empty();
                   }
                   const d = new Date(data["finished"] * 1000);
