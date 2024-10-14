@@ -63,11 +63,11 @@ $(document).ready(function(){
 {% endif %}
 <h2 id='contents'>Contents: {{ s.contents().items() | length }} layers</h2>
 {% if s.contents().items() | length > 0 %}
-<ul>
+<ol>
 {% for lname, l in s.contents().items() %}
 <li><a href='{{ url_for("dashboard.owslayer", stype=type, url=url, lname=lname) }}'>{{ l.title }} ({{ l.id }})</a></li>
 {% endfor %}
-</ul>
+</ol>
 {% endif %}
 <form id='check' action="javascript:CheckRes('owsservice/{{ type }}', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all layers now">
