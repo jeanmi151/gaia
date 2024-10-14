@@ -77,6 +77,8 @@ def cswentry(portal, uuid):
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
+            if u['url'] is None:
+                continue
             url = u['url'].rstrip('?')
             localdomain = "https://" + app.extensions["conf"].get("domainName")
             if url.startswith(localdomain):
