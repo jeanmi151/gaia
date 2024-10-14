@@ -3,7 +3,7 @@
 # vim: ts=4 sw=4 et
 
 from flask import Blueprint
-from flask import request, render_template, abort
+from flask import request, render_template, abort, url_for
 from flask import current_app as app
 
 from geordash.decorators import is_superuser
@@ -34,7 +34,16 @@ def get_rescontent_from_resid(restype, resid):
                 if l['type'] in ('wms', 'wfs', 'wmts'):
                     layers[l['id']] = l
         res['layers'] = layers
-        res['catalogs'] = catlist
+        res['catlist'] = list()
+        for k, c in catlist.items():
+            e = {
+                'key': k,
+                'title': c['title'],
+                'type': c['type'],
+                'url': c['url'],
+                'xurl': url_for('dashboard.ows', stype=c['type'], url=c['url'].replace('/','~'))
+            }
+            res['catlist'].append(e)
     return res
 
 @dash_bp.route("/")
