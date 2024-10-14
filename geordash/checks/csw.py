@@ -88,7 +88,10 @@ def check_record(url, uuid):
             if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')) and (u['url'] != None and u['url'].startswith('http')):
                 # check that the url exists
                 try:
-                    r = requests.head(u['url'], timeout = 5)
+                    timeout = 5
+                    if 'outputformat=shape-zip' in u['url'].lower():
+                        timeout = 60
+                    r = requests.head(u['url']), timeout = timeout)
                     if r.status_code != 200:
                         ret['problems'].append({'type': 'BrokenProtocolUrl', 'url': u['url'], 'protocol': u['protocol'], 'code': r.status_code})
                     else:
