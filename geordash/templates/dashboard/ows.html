@@ -48,6 +48,9 @@ $(document).ready(function(){
 <a id='reloadlink' href="javascript:ReloadCapabilities('{{ type }}','{{ url }}')" title='Reload capabilities from the remote service and refresh the page'><i class="bi bi-arrow-repeat"></i></a>
 {% endif %}
 </p>
+<h2 id='pbtitle'>Problems</h2>
+<div id='pbdetails'></div>
+<div id="problems"></div>
 {% if consumers is not none %}
 <h2 id='consumers'>Consommateurs</h2>
 <ul>
@@ -72,9 +75,6 @@ $(document).ready(function(){
 <form id='check' action="javascript:CheckRes('owsservice/{{ type }}', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all layers now">
 </form>
-<h2 id='pbtitle'>Problems</h2>
-<div id='pbdetails'></div>
-<div id="problems"></div>
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
