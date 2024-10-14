@@ -249,6 +249,10 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
     poll();
 }
 
+function urlFormatter(value, row) {
+  return '<a class="fa" href="' + row.xurl + '">'+ row.url +'</a>'
+}
+
 const SendToMapstore = (type, url, layername) => {
     const msurl="/mapstore/#/?actions=[{\"type\":\"CATALOG:ADD_LAYERS_FROM_CATALOGS\",\"layers\":[\"" + layername + "\"],\"sources\":[{\"type\":\"" + type + "\",\"url\":\"" + url + "\"}]}]";
     window.open(msurl, "_blank");
