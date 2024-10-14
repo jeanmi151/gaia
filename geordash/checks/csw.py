@@ -91,7 +91,7 @@ def check_record(url, uuid):
                     timeout = 5
                     if 'outputformat=shape-zip' in u['url'].lower():
                         timeout = 60
-                    r = requests.head(u['url']), timeout = timeout)
+                    r = requests.head(u['url'], timeout = timeout)
                     if r.status_code != 200:
                         ret['problems'].append({'type': 'BrokenProtocolUrl', 'url': u['url'], 'protocol': u['protocol'], 'code': r.status_code})
                     else:
