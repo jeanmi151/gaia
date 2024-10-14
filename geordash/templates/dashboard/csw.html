@@ -46,11 +46,11 @@ $(document).ready(function(){
 <p>{{ s.contents().items() | length }} métadonnées récupérées</p>
 <h2 id='records'>Contents</h2>
 {% if s.contents().items() | length > 0 %}
-<ul>
+<ol>
 {% for md in s.contents().values() | sort(attribute='title') %}
 <li><a href='{{ url_for("dashboard.cswentry", portal=portal, uuid=md.identifier) }}'>{{ md.title }} ({{ md.identifier }})</a></li>
 {% endfor %}
-</ul>
+</ol>
 {% endif %}
 <form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all metadatas now">
