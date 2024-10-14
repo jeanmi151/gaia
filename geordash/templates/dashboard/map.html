@@ -10,6 +10,7 @@
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.0/dist/bootstrap-table.min.css">
         {% endblock styles %}
 
         <title>Dashboard</title>
@@ -22,6 +23,7 @@
             <!-- Optional JavaScript -->
             {{ bootstrap.load_js() }}
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.0/dist/bootstrap-table.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 <script>
 let prev = {{ previous_jobs | tojson() }};
@@ -34,6 +36,17 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
 
 $(document).ready(function(){
   DisplayPrev('map', {{ mapid }}, prev, {{ showdelete|int }});
+{% if resources.catlist | length > 0 %}
+  $('#catalogstable').bootstrapTable({
+    data: {{ resources.catlist |tojson }},
+    columns: [
+      {'field': 'key', 'title': "Identifier"},
+      {'field': 'type', 'title': "Type"},
+      {'field': 'url', 'title': 'Url', 'formatter':'urlFormatter'},
+      {'field': 'title', 'title':'Titre' }
+    ]
+  });
+{% endif %}
 });
 </script>
         {% endblock scripts %}
@@ -61,6 +74,17 @@ dans
 <a href='{{ url_for('dashboard.ows', stype=l.type, url=l.url.replace('/', '~')) }}'>{{ l.url }}</a></li>
 {% endfor %}
 </ul>
+{% if resources.catlist | length > 0 %}
+et propose les sources de données suivantes:
+    <div id="toolbar"></div>
+    <table
+      id="catalogstable"
+      data-toggle="true"
+      data-toolbar="#toolbar"
+      data-search="true"
+      data-show-columns="true">
+    </table>
+{% endif %}
 </div>
 {% else %}
 <p>une erreur est survenue lors de la récupération des informations de la carte</p>
