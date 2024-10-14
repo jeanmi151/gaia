@@ -44,6 +44,9 @@ $(document).ready(function(){
 <p>titre: {{ s.s.identification.title }}<p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 <p>{{ s.contents().items() | length }} métadonnées récupérées</p>
+<h2 id='pbtitle'>Problems</h2>
+<div id='pbdetails'></div>
+<div id="problems"></div>
 <h2 id='records'>Contents</h2>
 {% if s.contents().items() | length > 0 %}
 <ol>
@@ -55,9 +58,6 @@ $(document).ready(function(){
 <form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all metadatas now">
 </form>
-<h2 id='pbtitle'>Problems</h2>
-<div id='pbdetails'></div>
-<div id="problems"></div>
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
