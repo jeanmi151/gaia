@@ -151,7 +151,7 @@ const GetPbStr = (args, p) => {
   }
 }
 const ArrayToHtmlList = (array) => {
-  const list = $('<ul>').append(
+  const list = $('<ol>').append(
     array.map(p => $("<li>").html(p))
   );
   return list;
