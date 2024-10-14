@@ -64,6 +64,8 @@ def check_record(url, uuid):
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
+            if u['url'] is None:
+                ret['problems'].append({'type': 'EmptyUrl', 'protocol': u['protocol']})
             url = u['url'].rstrip('?')
             localdomain = "https://" + app.extensions["conf"].get("domainName")
             if url.startswith(localdomain):
