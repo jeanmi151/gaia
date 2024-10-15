@@ -20,15 +20,26 @@ result_extended = True
 result_expires = None
 task_send_sent_event = True
 
+# sample schedule, adapt for your platform
 beat_schedule = {
   'check-ms-resources-every-night': {
     'task': 'geordash.checks.mapstore.check_resources',
     'schedule': crontab(minute=0, hour=0),
   },
-  'check-gs-layers-every-night': {
+  'check-gs-wms-layers-every-night': {
     'task': 'geordash.checks.ows.owsservice',
-    'args': ('wms','/wxs/rtge/ows'),
+    'args': ('wms','/geoserver/ows'),
     'schedule': crontab(minute=15, hour=0),
+  },
+  'check-gs-wfs-layers-every-night': {
+    'task': 'geordash.checks.ows.owsservice',
+    'args': ('wfs','/geoserver/ows'),
+    'schedule': crontab(minute=30, hour=0),
+  },
+  'check-gn-metadatas-every-night': {
+    'task': 'geordash.checks.csw.check_catalog',
+    'args': ('/geonetwork/srv/fre/csw'),
+    'schedule': crontab(minute=45, hour=0),
   },
 }
 #otherwise scheduled hours is taken as UTC
