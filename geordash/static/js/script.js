@@ -224,7 +224,11 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                         const pbta = $("<table>")
                         pbta.attr("data-show-columns", true)
                         pbta.attr("id", targetpbdivid + '-table')
-                        $(targetpbdivid).append(pbta)
+                        const exportlink = $("<a>");
+                        exportlink.attr("href",baseurl + '/tasks/result/' + taskid)
+                        exportlink.attr("title","Export as JSON")
+                        exportlink.html('<p class="bi bi-filetype-json">View/Export problem list as JSON</p>');
+                        $(targetpbdivid).append(exportlink, pbta)
                         pbta.bootstrapTable({
                             data: data["value"].problems,
                             search: true,
