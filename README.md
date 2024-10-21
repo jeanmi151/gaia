@@ -1,5 +1,13 @@
 # gaia (geOrchestra Automated Integrity Analysis) - a geOrchestra dashboard
 
+# Summary
+
+## the problem
+
+The SDI data admin's life looks like and enless quest for consistency. He/she has to deal with loosely linked and perpetually moving datas, metadatas, services and maps published on numerous platforms. However, all this information is based on standards. However, all this information is based on standards. Most of the tests that the admin does manually can be automated. And most of the information, even if it comes from different platforms, can be presented in a synthetic way to obtain an ongoing evaluation of the problems, and save a lot of time on corrections.
+
+## the response
+
 This project aims at providing a data quality insurance dashboard for [geOrchestra](https://georchestra.org), to make the data or map admin's life easier. Some of the GAIA benefits :
 
 **Automated inventory** : GAIA scans interactively and periodically and interactively the catalogs, services and maps, and displays all those contents in one place. You get a birdeye view on all contents.
@@ -10,7 +18,8 @@ This project aims at providing a data quality insurance dashboard for [geOrchest
 
 **API** : GAIA returns all results as JSON so you can use this data in your own tools
 
-Detailed features :
+## detailed features
+
 - clean and fine-grained URLs for all ressources
 - returns results in HTML pages or JSON
 - checks for common errors
@@ -19,11 +28,6 @@ Detailed features :
 - can use geOrchestra roles
 - performs scheduled scans
 - performs on demand scans
-
-it is a work in progress, being developed when spare time is available. for now
-developped in my own github account, but if enough features are developed and
-interest is shown, it'll move to the
-[geOrchestra](https://github.com/georchestra/) organization.
 
 ## dependencies
 
@@ -35,6 +39,15 @@ Here are the dependencies and why they are needed :
 - interaction with the WMS/WFS/WMTS/CSW services: [owslib](https://owslib.readthedocs.io/en/latest/)
 - serializing the capabilities of the services: [jsonpickle](https://jsonpickle.github.io/)
 - and finally caching them to avoid hammering the services again and again : [redis](https://redis.io/docs/latest/develop/connect/clients/python/redis-py/)
+
+## developpment status
+
+it is a work in progress, being developed when spare time is available. for now
+developped in my own github account, but if enough features are developed and
+interest is shown, it'll move to the
+[geOrchestra](https://github.com/georchestra/) organization.
+
+# installation
 
 ## debian installation
 
@@ -56,9 +69,7 @@ pip install -r requirements.txt
 ./run.sh
 ```
 
-
-
-
+# configuration
 
 ## geOrchestra integration
 
@@ -76,6 +87,28 @@ and visit https://<sdiurl>/gaia/, which should list for now:
 
 if your datadir isn't in `/etc/georchestra`, point the `georchestradatadir`
 environment variable to the path where your datadir is located.
+
+
+## cache
+
+for now a redis instance is used for celery's broker/result backend storage, to
+configure in [`config.py`](config.py.example) - celery can use rabbitmq for the
+broker, and in the end the geOrchestra PostgreSQL database will be used to
+store task results.
+
+it tries as much as possible to autoconfigure itself by reading configuration
+files from [geOrchestra's datadir](https://github.com/georchestra/datadir)
+
+## service
+
+needs two services running (TODO)
+- the flask webapp, accessed at `https://<idsurl>/gaia/`
+- the celery worker, for long-running checks
+
+for now during development those are started by [`run.sh`](run.sh), proper
+integration via gunicorn/systemd is the goal
+
+# Usage
 
 ## pages
 
@@ -129,21 +162,5 @@ lists:
 - links to the editor view in geonetwork
 - links to the OGC:W{M,F}S layers listed in the metadata
 
-## service
 
-needs two services running (TODO)
-- the flask webapp, accessed at `https://<idsurl>/gaia/`
-- the celery worker, for long-running checks
 
-for now during development those are started by [`run.sh`](run.sh), proper
-integration via gunicorn/systemd is the goal
-
-## configuration
-
-for now a redis instance is used for celery's broker/result backend storage, to
-configure in [`config.py`](config.py.example) - celery can use rabbitmq for the
-broker, and in the end the geOrchestra PostgreSQL database will be used to
-store task results.
-
-it tries as much as possible to autoconfigure itself by reading configuration
-files from [geOrchestra's datadir](https://github.com/georchestra/datadir)
