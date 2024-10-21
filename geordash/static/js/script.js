@@ -20,6 +20,9 @@ const fetchForHome = () => {
         $(function() {
             $table.bootstrapTable({data: xxdata});
         });
+    })
+    .catch(function(err) {
+      $('#md').remove()
     });
 
   fetch(baseurl + '/api/mapstore/maps.json')
@@ -43,6 +46,10 @@ const fetchForHome = () => {
         $(function() {
             $table.bootstrapTable({data: xxdata});
         });
+    })
+    .catch(function(err) {
+      $('#mapstable').remove();
+      $('#mapstitle').remove();
     });
 
   fetch(baseurl + '/api/mapstore/contexts.json')
@@ -67,7 +74,15 @@ const fetchForHome = () => {
         $(function() {
             $table.bootstrapTable({data: xxdata});
         });
+    })
+    .catch(function(err) {
+      $('#ctxtable').remove();
+      $('#ctxtitle').remove();
     });
+
+    if ($('#ctxtitle').length === 0 && $('#maptitle').length === 0 && $('#mdtitle').length === 0) {
+      $('#access').html('No resources are publicly available for you ?')
+    }
 }
 
 const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previouslist') => {
