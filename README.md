@@ -4,7 +4,7 @@
 
 ## the problem
 
-The SDI data admin's life looks like and enless quest for consistency. He/she has to deal with loosely linked and perpetually moving datas, metadatas, services and maps published on numerous platforms. However, all this information is based on standards. However, all this information is based on standards. Most of the tests that the admin does manually can be automated. And most of the information, even if it comes from different platforms, can be presented in a synthetic way to obtain an ongoing evaluation of the problems, and save a lot of time on corrections.
+The SDI data admin's life looks like and enless quest for consistency. He/she has to deal with loosely linked and perpetually moving datas, metadatas, services and maps published on numerous platforms. However, all this information is structured according to OGC standards. Thus most of the tests that the admin does manually can be automated. And most of the information, even if it comes from different platforms, can be presented in a synthetic way to obtain an ongoing evaluation of the problems, and save a lot of time on corrections.
 
 ## the response
 
@@ -78,7 +78,7 @@ that it knows the connected user and can display user-tailored information.
 
 add this line to `/etc/georchestra/security-proxy/target-mappings.properties` to declare GAIA in the geOrchestra security proxy :
 ```
-gaia=https://<hostname>:<port>/gaia/
+gaia=http://<hostname>:<port>/gaia/
 ```
 
 and visit https://<sdiurl>/gaia/, which should list for now:
