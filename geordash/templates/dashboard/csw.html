@@ -25,6 +25,9 @@ $(document).ready(function(){
 <h2 id='pbtitle'>Problems</h2>
 <div id='pbdetails'>No check have been run yet !</div>
 <div id="problems"></div>
+<form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
+<input type=submit value="check all metadatas now">
+</form>
 <h2 id='records'>Contents</h2>
 {% if s.contents().items() | length > 0 %}
 <ol>
@@ -33,9 +36,6 @@ $(document).ready(function(){
 {% endfor %}
 </ol>
 {% endif %}
-<form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
-<input type=submit value="check all metadatas now">
-</form>
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
