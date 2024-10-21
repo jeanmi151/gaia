@@ -2,10 +2,13 @@
 
 This project aims at providing a data quality insurance dashboard for [geOrchestra](https://georchestra.org), to make the data or map admin's life easier. Some of the GAIA benefits :
 
-Automated inventory : GAIA scans interactively and periodically and interactively the catalogs, services and maps, and displays all those contents in one place. You get a birdeye view on all contents.
-Integrity check : GAIA performs content analysis : missing or unreachable metadatas, bad OGC services, http errors, inconsistencies between metadadas and services ... reusing what was done in  [sdi-consistency-check](https://github.com/georchestra/sdi-consistence-check/).
-Admin helper : You want to fix an error. GAIA let you access instantly the admin page, modify settings and check again the ressource
-API : GAIA returns all results as JSON so you can use this data in your own tools
+**Automated inventory** : GAIA scans interactively and periodically and interactively the catalogs, services and maps, and displays all those contents in one place. You get a birdeye view on all contents.
+
+**Integrity check** : GAIA performs content analysis : missing or unreachable metadatas, bad OGC services, http errors, inconsistencies between metadadas and services ... reusing what was done in  [sdi-consistency-check](https://github.com/georchestra/sdi-consistence-check/).
+
+**Admin helper** : You want to fix an error. GAIA let you access instantly the admin page, modify settings and check again the ressource
+
+**API** : GAIA returns all results as JSON so you can use this data in your own tools
 
 Detailed features :
 - clean and fine-grained URLs for all ressources
