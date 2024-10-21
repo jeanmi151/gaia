@@ -10,6 +10,7 @@
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.0/dist/bootstrap-table.min.css">
         {% endblock styles %}
 
         <title>Dashboard</title>
@@ -22,6 +23,7 @@
             <!-- Optional JavaScript -->
             {{ bootstrap.load_js() }}
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.0/dist/bootstrap-table.min.js"></script>
             <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 <script>
 let prev = {{ previous_jobs | tojson() }};
