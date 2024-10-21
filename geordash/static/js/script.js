@@ -215,8 +215,28 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       data["value"].problems = probs
                   }
                   if (data["value"].problems.length > 0) {
-                    $(targetdivid).text('Problems');
-                    $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
+                    $(targetdivid).text(data["value"].problems.length + ' problems found');
+                    if (Array.isArray(data["value"])) {
+                        var argtitle = 'Layer'
+                        if (data['task'].includes('csw')) {
+                          argtitle = 'Metadata'
+                        }
+                        const pbta = $("<table>")
+                        pbta.attr("data-show-columns", true)
+                        pbta.attr("id", targetpbdivid + '-table')
+                        $(targetpbdivid).append(pbta)
+                        pbta.bootstrapTable({
+                            data: data["value"].problems,
+                            search: true,
+                            columns: [
+                              {'title': 'Index', 'formatter': 'runningFormatter'},
+                              {'field': 'lastarg', 'title': argtitle},
+                              {'field': 'problem', 'title': 'Problem'}
+                            ]
+                          });
+                    } else {
+                        $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
+                    }
                   } else {
                     $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
                     $(targetpbdivid).empty();
@@ -251,6 +271,9 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
 
 function urlFormatter(value, row) {
   return '<a class="fa" href="' + row.xurl + '">'+ row.url +'</a>'
+}
+function runningFormatter(value, row, index) {
+    return 1 + index;
 }
 
 const SendToMapstore = (type, url, layername) => {
