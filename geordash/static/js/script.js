@@ -204,7 +204,15 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       });
                       const probs = p.map(j => {
                         return j.problems.map(i => {
-                          return {'lastarg': j.args[j.args.length-1], 'problem': GetPbStr(i) }
+                          if (Array.isArray(j.args)) {
+                            if (data['task'].includes('check_resources')) {
+                              return {'lastarg': `${j.args[0]} ${j.args[1]}`, 'problem': GetPbStr(i) }
+                            } else {
+                              return {'lastarg': j.args[j.args.length-1], 'problem': GetPbStr(i) }
+                            }
+                          } else {
+                            return {'lastarg': j.args, 'problem': GetPbStr(i) }
+                          }
                         })
                       });
                       data["value"].problems = probs.flat(1)
@@ -220,6 +228,10 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                         var argtitle = 'Layer'
                         if (data['task'].includes('csw')) {
                           argtitle = 'Metadata'
+                        } else if (data['task'].includes('check_resources')) {
+                          argtitle = 'Map/Ctxid'
+                        } else if (data['task'].includes('check_configs')) {
+                          argtitle = 'Configfile'
                         }
                         const pbta = $("<table>")
                         pbta.attr("data-show-columns", true)
