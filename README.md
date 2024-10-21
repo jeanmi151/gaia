@@ -24,7 +24,7 @@ This project aims at providing a data quality insurance dashboard for [geOrchest
 - returns results in HTML pages or JSON
 - checks for common errors
 - give direct access to data/metadata/map previews
-- give direct access to data/etadata/map administration pages
+- give direct access to data/metadata/map administration pages
 - can use geOrchestra roles
 - performs scheduled scans
 - performs on demand scans
