@@ -1,9 +1,13 @@
 {% block scripts %}
+{% if not request.args.get('noheader') %}
   <script src='https://cdn.jsdelivr.net/gh/georchestra/header@dist/header.js'></script>
+{% endif %}
 {% endblock scripts %}
 
 {% block content %}
+{% if not request.args.get('noheader') %}
 <div id="go_head">
   <geor-header active-app='gaia' legacy-header='true' legacy-url='/header/' style='height:60px'></geor-header>
 </div>
+{% endif %}
 {% endblock content %}
