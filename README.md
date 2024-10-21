@@ -1,17 +1,21 @@
 # gaia (geOrchestra Automated Integrity Analysis) - a geOrchestra dashboard
 
-this project aims at providing a user-centric dashboard for [geOrchestra](https://georchestra.org):
-- for admins, showing inconsistencies/errors in the datasets/maps, reusing what
-  was done in [sdi-consistency-check](https://github.com/georchestra/sdi-consistence-check/)
-- for users, direct links to:
-  - what they can access
-  - what they can do (depending on their rights/roles)
-  - list their md/data
-  - list their org md
+This project aims at providing a data quality insurance dashboard for [geOrchestra](https://georchestra.org), to make the data or map admin's life easier. Some of the GAIA benefits :
 
-one of the goals is to provide an api returning JSON so that it can be reused in
-other components/webpages (such as the [ids
-homepage](https://github.com/georchestra/htdocs/))
+Automated inventory : GAIA scans interactively and periodically and interactively the catalogs, services and maps, and displays all those contents in one place. You get a birdeye view on all contents.
+Integrity check : GAIA performs content analysis : missing or unreachable metadatas, bad OGC services, http errors, inconsistencies between metadadas and services ... reusing what was done in  [sdi-consistency-check](https://github.com/georchestra/sdi-consistence-check/).
+Admin helper : You want to fix an error. GAIA let you access instantly the admin page, modify settings and check again the ressource
+API : GAIA returns all results as JSON so you can use this data in your own tools
+
+Detailed features :
+- clean and fine-grained URLs for all ressources
+- returns results in HTML pages or JSON
+- checks for common errors
+- give direct access to data/metadata/map previews
+- give direct access to data/etadata/map administration pages
+- can use geOrchestra roles
+- performs scheduled scans
+- performs on demand scans
 
 it is a work in progress, being developed when spare time is available. for now
 developped in my own github account, but if enough features are developed and
@@ -35,8 +39,7 @@ those dependencies are used for:
 - serializing the capabilities of the services: [jsonpickle](https://jsonpickle.github.io/)
 - and finally caching them: [redis](https://redis.io/docs/latest/develop/connect/clients/python/redis-py/)
 
-with this caching, we avoid hammering the remote OGC services continually asking
-them for a capabilities document that might be expensive to produce sometimes.
+GAIA uses cache heavily to avoid hammering OGC services.
 
 ## integration
 
