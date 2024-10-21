@@ -1,7 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% block head %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        {% block styles %}
+            <!-- Bootstrap CSS -->
+            {{ bootstrap.load_css() }}
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.0/dist/bootstrap-table.min.css">
+        {% endblock styles %}
+
+        <title>GAIA - a geOrchestra dashboard</title>
+        {% endblock head %}
+    </head>
+    <body>
 {% block scripts %}
 {% if not request.args.get('noheader') %}
-  <script src='https://cdn.jsdelivr.net/gh/georchestra/header@dist/header.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/georchestra/header@dist/header.js'></script>
 {% endif %}
+    {{ bootstrap.load_js() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.0/dist/bootstrap-table.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
