@@ -23,7 +23,7 @@ $(document).ready(function(){
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 <p>{{ s.contents().items() | length }} métadonnées récupérées</p>
 <h2 id='pbtitle'>Problems</h2>
-<div id='pbdetails'></div>
+<div id='pbdetails'>No check have been run yet !</div>
 <div id="problems"></div>
 <h2 id='records'>Contents</h2>
 {% if s.contents().items() | length > 0 %}
