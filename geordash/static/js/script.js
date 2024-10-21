@@ -102,20 +102,20 @@ const ReloadCapabilities = (type, url) => {
     })
 }
 
-const GetPbStr = (args, p) => {
+const GetPbStr = (p) => {
   if (p instanceof String) {
-    return `${args} has this issue: ${p}`
+    return p
   }
   switch(p.type) {
     /* from ows */
     case 'NoMetadataUrl':
-      return `Layer ${args[2]} has no metadataurl`
+      return `Layer has no metadataurl`
     case 'BrokenMetadataUrl':
-      return `Layer ${args[2]} has a broken metadataurl: ${p.url} returns ${p.code}`
+      return `Layer has a broken metadataurl: ${p.url} returns ${p.code}`
     case 'MissingMdUuid':
-      return `Layer ${args[2]} points at a metadauuid ${p.uuid} that was not found in local csw`
+      return `Layer points at a metadauuid ${p.uuid} that was not found in local csw`
     case 'NoSuchOwsOperation':
-      return `${args[0]} service at ${args[1]} doesnt support ${p.operation} operation`
+      return `service doesnt support ${p.operation} operation`
     case 'UnexpectedReturnedFormat':
       return `${p.operation} succeded but returned format ${p.returned} didn't match expected ${p.expected}`
     case 'UnexpectedContentLength':
@@ -125,14 +125,14 @@ const GetPbStr = (args, p) => {
     case 'ExpectedXML':
       return `${p.operation} succeeded but didnt return XML ? ${p.return}`
     case 'ServiceException':
-      return `failed ${p.operation} on ${p.layername} in ${p.stype} at ${p.url}, got ${p.e}: ${p.estr}`
+      return `Failed ${p.operation} on layer '${p.layername}' in ${p.stype} at ${p.url}, got ${p.e}: ${p.estr}`
     case 'ForbiddenAccess':
-      return `got a 403 for ${p.operation} on ${p.layername} in ${p.stype} at ${p.url}`
+      return `Got a 403 for ${p.operation} on layer '${p.layername}' in ${p.stype} at ${p.url}`
     /* from mapstore */
     case 'NoSuchLayer':
-      return `layer ${p.lname} doesnt exist in ${p.stype} service at ${p.url}`
+      return `Layer '${p.lname}' doesnt exist in ${p.stype} service at ${p.url}`
     case 'OGCException':
-      return `no ${p.stype} service at ${p.url}, got ${p.exception}: ${p.exceptionstr}`
+      return `No ${p.stype} service at ${p.url}, got ${p.exception}: ${p.exceptionstr}`
     case 'BrokenDatasetUrl':
       return `Non-working dataset url: ${p.url} returns ${p.code}`
     case 'ConnectionFailure':
@@ -143,11 +143,11 @@ const GetPbStr = (args, p) => {
     case 'EmptyUrl':
       return `Missing URL for ${p.protocol} entry`
     case 'NoSuchMetadata':
-      return `metadata with uuid ${p.uuid} doesnt exist in CSW service at ${p.url}`
+      return `Metadata with uuid ${p.uuid} doesnt exist in CSW service at ${p.url}`
     case 'MdHasNoLinks':
-      return `no links to OGC layers or download links ?`
+      return `No links to OGC layers or download links ?`
     default:
-      return `Unhandled error code ${p.type} for problem ${p} with args ${args}`
+      return `Unhandled error code ${p.type} for problem ${p}`
   }
 }
 const ArrayToHtmlList = (array) => {
@@ -204,13 +204,13 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       });
                       const probs = p.map(j => {
                         return j.problems.map(i => {
-                          return GetPbStr(j.args, i)
+                          return {'lastarg': j.args[j.args.length-1], 'problem': GetPbStr(i) }
                         })
                       });
                       data["value"].problems = probs.flat(1)
                   } else {
                       const probs = data["value"].problems.map(i => {
-                        return GetPbStr(data['args'], i)
+                        return GetPbStr(i)
                       })
                       data["value"].problems = probs
                   }
