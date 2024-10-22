@@ -1,0 +1,39 @@
+{% include 'header.tmpl' %}
+
+        {% block scripts %}
+<script>
+$(document).ready(function(){
+{% if portals | length > 0 %}
+  $('#portalstable').bootstrapTable({
+    data: {{ portals |tojson }},
+    columns: [
+      {'field': 'url', 'title': "Identifier", 'formatter': 'urlFormatter'},
+      {'field': 'listableInHeaderSelector', 'title': "Visible"},
+      {'field': 'name', 'title':'Titre' },
+      {'field': 'filter', 'title': "Filtre"}
+    ]
+  });
+{% else %}
+  $('#portalstable').remove()
+  $('#portalheader').html("Aucun sous-portail configuré, <a href='{{ url_for('dashboard.csw', portal='srv') }}'>aller sur le catalogue global</a>")
+{% endif %}
+});
+</script>
+        {% endblock %}
+        <!-- Your page content -->
+        {% block content %}
+   <div class="container">
+<h1>Geonetwork</h1>
+<div id='portalheader'>
+Portails configurés dans le catalogue:
+</div>
+    <table
+      id="portalstable"
+      data-toggle="true"
+      data-search="true"
+      data-show-columns="true">
+   </table>
+   </div>
+        {% endblock %}
+</body>
+</html>
