@@ -10,7 +10,7 @@ import json
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
-def get(request, url, accept_json = True):
+def mapstore_get(request, url, accept_json = True):
     headers = { 'sec-proxy': 'true' }
     if accept_json:
         headers['Accept'] = 'application/json'
@@ -23,14 +23,14 @@ def get(request, url, accept_json = True):
 
 @api_bp.route("/mapstore/maps.json")
 def maps():
-    maps = get(request, 'rest/geostore/extjs/search/category/MAP/***/thumbnail,details,featured?includeAttributes=true')
+    maps = mapstore_get(request, 'rest/geostore/extjs/search/category/MAP/***/thumbnail,details,featured?includeAttributes=true')
     if maps.status_code != 200:
         return str(maps.status_code)
     return maps.json()
 
 @api_bp.route("/mapstore/contexts.json")
 def contexts():
-    maps = get(request, 'rest/geostore/extjs/search/category/CONTEXT/***/thumbnail,details,featured?includeAttributes=true')
+    maps = mapstore_get(request, 'rest/geostore/extjs/search/category/CONTEXT/***/thumbnail,details,featured?includeAttributes=true')
     if maps.status_code != 200:
         return str(maps.status_code)
     return maps.json()

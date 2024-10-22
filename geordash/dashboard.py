@@ -8,7 +8,7 @@ from flask import current_app as app
 
 from geordash.decorators import is_superuser
 from geordash.checks.mapstore import get_resources_using_ows, get_name_from_ctxid, get_res
-from geordash.api import get, gninternalid
+from geordash.api import mapstore_get, gninternalid
 from geordash.utils import find_localmduuid, unmunge
 
 import json
@@ -16,7 +16,7 @@ import json
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/gaia", template_folder='templates/dashboard')
 
 def get_rescontent_from_resid(restype, resid):
-    r = get(request, f'rest/geostore/data/{resid}', False)
+    r = mapstore_get(request, f'rest/geostore/data/{resid}', False)
     res = dict()
     if r.status_code == 200:
         msmap = json.loads(r.content)
