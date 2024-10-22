@@ -22,7 +22,7 @@ def index() -> str:
 def geonetwork():
     localgn = app.extensions["conf"].get('localgn', 'urls')
     portals = geonetwork_subportals()
-    if type(portals) != dict:
+    if type(portals) != list:
         return make_response(jsonify({'error': f'an error occured when fetching subportals: got {portals}'}, 404))
     for p in portals:
         p['url'] = '/' + localgn + '/' + p['uuid'] + '/fre/csw'
