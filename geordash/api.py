@@ -51,6 +51,48 @@ def gninternalid(uuid):
         return None
     return rep['hits']['hits'][0]['_source']['id']
 
+
+"""
+returns preauth cookies for subsequent queries
+"""
+def geonetwork_preauth(gnurl):
+    headers = {'Accept': 'application/json'}
+    username = request.headers.get('Sec-Username','anonymous')
+    if username != 'anonymous':
+        headers['sec-username'] = username
+    preauth = requests.get(gnurl + "srv/api/me", headers=headers)
+    if preauth.status_code == 204:
+      if 'XSRF-TOKEN' in preauth.cookies:
+        headers['X-XSRF-TOKEN'] = preauth.cookies['XSRF-TOKEN']
+        headers['sec-proxy'] = 'true'
+        me = requests.get(gnurl + "srv/api/me",
+            cookies = preauth.cookies,
+            headers = headers)
+        if me.status_code != 200:
+            return me.text
+      else:
+        return f'No XSRF-TOKEN in {preauth.cookies} ?'
+    else:
+        return preauth.status_code
+    return (headers, preauth.cookies, me)
+
+@api_bp.route("/geonetwork/subportals.json")
+def geonetwork_subportals():
+    gnurl = app.extensions["conf"].get(app.extensions["conf"].get('localgn', 'urls'), 'secproxytargets')
+    r = geonetwork_preauth(gnurl)
+    if type(r) != tuple:
+        return r
+
+    headers = r[0]
+    cookies = r[1]
+    me = r[2]
+    portals = requests.get(gnurl + 'srv/api/sources/subportal',
+        cookies = cookies,
+        headers = headers)
+    if portals.status_code != 200:
+        return portals.text
+    return portals.json()
+
 @api_bp.route("/geonetwork/metadatas.json")
 def metadatas():
     # bail out early if user is not auth
