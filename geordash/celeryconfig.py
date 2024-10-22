@@ -38,7 +38,7 @@ beat_schedule = {
   },
   'check-gn-metadatas-every-night': {
     'task': 'geordash.checks.csw.check_catalog',
-    'args': ('/geonetwork/srv/fre/csw'),
+    'args': ['/geonetwork/srv/fre/csw'],
     'schedule': crontab(minute=45, hour=0),
   },
 }
