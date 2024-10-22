@@ -301,7 +301,11 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
 }
 
 function urlFormatter(value, row) {
-  return '<a class="fa" href="' + row.xurl + '">'+ row.url +'</a>'
+  if (row.xurl !== undefined) {
+    return '<a class="fa" href="' + row.xurl + '">'+ row.url +'</a>'
+  } else {
+    return row.url
+  }
 }
 function runningFormatter(value, row, index) {
     return 1 + index;
