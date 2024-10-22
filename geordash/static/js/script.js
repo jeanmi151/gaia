@@ -221,12 +221,26 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                         return j.problems.map(i => {
                           if (Array.isArray(j.args)) {
                             if (data['task'].includes('check_resources')) {
-                              return {'lastarg': `${j.args[0]} ${j.args[1]}`, 'problem': GetPbStr(i) }
+                              // mapstore resources
+                              if (j.args[0] == 'MAP') {
+                                xurl = baseurl + '/map/' + j.args[1]
+                              } else {
+                                xurl = baseurl + '/context/' + j.args[1]
+                              }
+                              return {'url': `${j.args[0]} ${j.args[1]}`, 'xurl': xurl, 'problem': GetPbStr(i) }
                             } else {
-                              return {'lastarg': j.args[j.args.length-1], 'problem': GetPbStr(i) }
+                              // csw
+                              if (data['task'].includes('csw') && j.args.length == 2) {
+                                xurl = baseurl + '/csw/' + j.args[0].split('/')[2] + '/' + j.args[1]
+                              } else {
+                              // ogc
+                                xurl = baseurl + '/ows/' + j.args[0] + '/' + j.args[1].replaceAll('/','~') + '/' + j.args[2]
+                              }
+                              return {'url': j.args[j.args.length-1], 'xurl': xurl, 'problem': GetPbStr(i) }
                             }
                           } else {
-                            return {'lastarg': j.args, 'problem': GetPbStr(i) }
+                            // mapstore configs
+                            return {'url': j.args, 'problem': GetPbStr(i) }
                           }
                         })
                       });
@@ -261,7 +275,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                             search: true,
                             columns: [
                               {'title': 'Index', 'formatter': 'runningFormatter'},
-                              {'field': 'lastarg', 'title': argtitle},
+                              {'field': 'url', 'title': argtitle, 'formatter': 'urlFormatter'},
                               {'field': 'problem', 'title': 'Problem'}
                             ]
                           });
