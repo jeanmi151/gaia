@@ -80,18 +80,16 @@ const fetchForHome = () => {
       $('#ctxtitle').remove();
     });
 
-    if ($('#ctxtitle').length === 0 && $('#maptitle').length === 0 && $('#mdtitle').length === 0) {
-      $('#access').html('No resources are publicly available for you ?')
-    }
 }
 
 const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previouslist') => {
     if (taskids === null) { return ; }
     const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
+    const targettitledivid = targetdivid.replace('#previouslist', '#pbtitle')
     const arr = sorted.map(t => {
         const link = $("<a>");
         link.attr("id", 'display-taskres-' + t['id'])
-        link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + t['id'] + "'," + showdelete + ");");
+        link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + t['id'] + "'," + showdelete + ",'" + targettitledivid + "');");
         link.attr("title","Show result for task " + t['id']);
         link.text("check at " + t['finished']);
         if (showdelete) {
@@ -294,7 +292,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                   if ($(targetpreviousdivid).find("#display-taskres-"+taskid).length == 0) {
                     const link = $("<a>");
                     link.attr("id", 'display-taskres-' + taskid)
-                    link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + data["taskid"] + "',"+ showdelete +");");
+                    link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + data['taskid'] + "'," + showdelete + ",'" + targetdivid + "');");
                     link.attr("title","Show result for task " + data["taskid"]);
                     link.text("check at " + d);
                     if (showdelete) {
