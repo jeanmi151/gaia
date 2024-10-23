@@ -122,6 +122,9 @@ class RedisClient:
             except json.JSONDecodeError as e:
                 self.logger.error(f"discarding {ftid}, not json ?")
                 return None
+            except TypeError as e:
+                self.logger.error(f"discarding {ftid}, {str(e)}")
+                return None
             args = task["args"][:-1]
             if task["name"].endswith('owslayer'):
                 taskname = 'geordash.checks.ows.owsservice'
