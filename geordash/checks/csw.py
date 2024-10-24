@@ -49,7 +49,7 @@ def check_record(url, uuid):
     ret['problems'] = list()
     service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
-        ret['problems'].append({'type':'OGCException', 'url': url, 'type': 'csw', 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
+        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
         return ret
 
     csw = service.s
@@ -73,7 +73,7 @@ def check_record(url, uuid):
             lname = u['name']
             service = app.extensions["owscache"].get(stype, url)
             if service.s is None:
-                ret['problems'].append({'type':'OGCException', 'url': url, 'type': stype, 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
+                ret['problems'].append({'type':'OGCException', 'url': url, 'stype': stype, 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
             else:
                 if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
                     ws = url.split('/')[-2]
