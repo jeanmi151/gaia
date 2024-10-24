@@ -205,7 +205,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                   } else {
                     $(targetdivid).text('Waiting');
                   }
-                  setTimeout(poll, 500)
+                  setTimeout(poll, 2000)
                 } else if (!data["successful"]) {
                   $(targetdivid).text("Protch !");
                   $(targetpbdivid).text('Something crashed, check browser console');
