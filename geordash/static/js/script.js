@@ -260,15 +260,26 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                         } else if (data['task'].includes('check_configs')) {
                           argtitle = 'Configfile'
                         }
-                        const pbta = $("<table>")
-                        pbta.attr("data-show-columns", true)
-                        pbta.attr("id", targetpbdivid + '-table')
-                        const exportlink = $("<a>");
-                        exportlink.attr("href",baseurl + '/tasks/result/' + taskid)
-                        exportlink.attr("title","Export as JSON")
-                        exportlink.html('<p class="bi bi-filetype-json">View/Export problem list as JSON</p>');
-                        $(targetpbdivid).append(exportlink, pbta)
-                        pbta.bootstrapTable({
+                        var prevexp = $(targetpbdivid + '-export')
+                        if (prevexp.length > 0) {
+                          prevexp.attr("href",baseurl + '/tasks/result/' + taskid)
+                        } else {
+                          const exportlink = $("<a>");
+                          exportlink.attr("href",baseurl + '/tasks/result/' + taskid)
+                          exportlink.attr("title","Export as JSON")
+                          exportlink.attr("id",targetpbdivid.substring(1) + '-export')
+                          exportlink.html('<p class="bi bi-filetype-json">View/Export problem list as JSON</p>');
+                          $(targetpbdivid).append(exportlink)
+                        }
+                        var prevtable = $(targetpbdivid + '-table')
+                        if (prevtable.length > 0) {
+                          prevtable.bootstrapTable("load", data["value"].problems)
+                        } else {
+                          const pbta = $("<table>")
+                          pbta.attr("data-show-columns", true)
+                          pbta.attr("id", targetpbdivid.substring(1) + '-table')
+                          $(targetpbdivid).append(pbta)
+                          pbta.bootstrapTable({
                             data: data["value"].problems,
                             search: true,
                             columns: [
@@ -277,6 +288,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                               {'field': 'problem', 'title': 'Problem'}
                             ]
                           });
+                        }
                     } else {
                         $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
                     }
