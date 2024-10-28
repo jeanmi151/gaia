@@ -44,6 +44,9 @@ def get_rescontent_from_resid(restype, resid):
                 'xurl': url_for('dashboard.ows', stype=c['type'], url=c['url'].replace('/','~'))
             }
             res['catlist'].append(e)
+    else:
+        app.logger.error(f"failed getting resource {resid} from geostore, got code {r.status_code}, backend said {r.text}")
+        return r
     return res
 
 @dash_bp.route("/")
@@ -129,11 +132,17 @@ def map(mapid):
     if not get_res('MAP', mapid):
         return abort(404)
     all_jobs_for_mapid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["MAP", mapid])
-    return render_template('map.html', mapid=mapid, resources=get_rescontent_from_resid("MAP", mapid), previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    resc=get_rescontent_from_resid("MAP", mapid)
+    if type(resc) != dict:
+        return f"failed getting map resource {mapid} from geostore, got code {resc.status_code}, backend said {resc.text}"
+    return render_template('map.html', mapid=mapid, resources=resc, previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
     if not get_res('CONTEXT', ctxid):
         return abort(404)
     all_jobs_for_ctxid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["CONTEXT", ctxid])
-    return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), resources=get_rescontent_from_resid("CONTEXT", ctxid), previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    resc=get_rescontent_from_resid("CONTEXT", ctxid)
+    if type(resc) != dict:
+        return f"failed getting ctx resource {ctxid} from geostore, got code {resc.status_code}, backend said {resc.text}"
+    return render_template('ctx.html', ctxid=ctxid, ctxname=get_name_from_ctxid(ctxid), resources=resc, previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
