@@ -56,7 +56,7 @@ def result(id: str) -> dict[str, object]:
             for r in result.results:
                 try:
                     value.append({'args': r.args, 'problems': r.get()['problems']})
-                except Exception as a:
+                except Exception as e:
                     app.logger.error(f"failed getting results from celery on task {r.id} with {r.args}, got {str(e)}")
     ready = result.ready()
     return {
