@@ -54,7 +54,10 @@ def result(id: str) -> dict[str, object]:
         if result.ready():
             value = list()
             for r in result.results:
-                value.append({'args': r.args, 'problems': r.get()['problems']})
+                try:
+                    value.append({'args': r.args, 'problems': r.get()['problems']})
+                except Exception as a:
+                    app.logger.error(f"failed getting results from celery on task {r.id} with {r.args}, got {str(e)}")
     ready = result.ready()
     return {
         "taskid": result.id,
