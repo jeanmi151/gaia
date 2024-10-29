@@ -136,6 +136,7 @@ def check_owslayer(stype, url, lname):
 
 @tasks_bp.route("/check/owsservice/<string:stype>/<string:url>.json")
 def check_owsservice(stype, url):
+    app.logger.info(f"check_owsservice triggered by webui, checking owsservice in {stype} {url}")
     if stype not in ('wms', 'wmts', 'wfs'):
         return abort(412)
     url = unmunge(url)
@@ -146,6 +147,7 @@ def check_owsservice(stype, url):
     if not groupresult:
         return abort(404)
     if groupresult.id:
+        app.logger.debug(f"returning grouptask id {groupresult.id} for owsservice")
         app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.ows.owsservice', [stype, url], groupresult.id)
     return {"result_id": groupresult.id}
 
@@ -160,6 +162,7 @@ def check_cswrecord(url, uuid):
 
 @tasks_bp.route("/check/cswservice/<string:url>.json")
 def check_cswservice(url):
+    app.logger.info(f"check_cswservice triggered by webui, checking cswservice in {url}")
     url = unmunge(url)
     service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
@@ -168,5 +171,6 @@ def check_cswservice(url):
     if not groupresult:
         return abort(404)
     if groupresult.id:
+        app.logger.debug(f"returning grouptask id {groupresult.id} for cswservice")
         app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.csw.check_catalog', [url], groupresult.id)
     return {"result_id": groupresult.id}
