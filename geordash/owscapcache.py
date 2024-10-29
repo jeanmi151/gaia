@@ -168,7 +168,12 @@ class OwsCapCache:
                     return self.services[service_type][url]
                 get_logger("OwsCapCache").debug(f"returning {service_type} getcapabilities from process in-memory cache for {url}, ts={self.services[service_type][url].timestamp}")
                 return self.services[service_type][url]
-            return self.fetch(service_type, url)
+            else:
+                if force_fetch:
+                    get_logger("OwsCapCache").info(f"force-fetching {service_type} getcapabilities from {url}")
+                elif self.services[service_type][url].timestamp + self.cache_lifetime > time():
+                    get_logger("OwsCapCache").info(f"cached entry for {service_type} {url} expired (ts={self.services[service_type][url].timestamp}), refetching")
+                return self.fetch(service_type, url, True)
 
     def forget(self, stype, url):
         if not url.startswith("http"):
