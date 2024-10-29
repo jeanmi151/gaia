@@ -22,8 +22,7 @@ import json
 import traceback
 import requests
 
-from celery.utils.log import get_task_logger
-
+from geordash.logwrap import get_logger
 
 is_dataset = PropertyIsEqualTo("Type", "dataset")
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
@@ -67,11 +66,6 @@ force-fetch on demand.
 class OwsCapCache:
     def __init__(self, conf, app):
         self.services = dict()
-        # gross, gotta find a better way to know we're within a flask or celery context
-        if '/usr/bin/flask' in sys.argv:
-            self.logger = app.logger
-        else:
-            self.logger = get_task_logger("OwsCapCache")
         self.cache_lifetime = 12 * 60 * 60
         try:
             from config import url
@@ -92,11 +86,11 @@ class OwsCapCache:
             ce = jsonpickle.decode(json.loads(re.decode('utf-8')))
             # if found, only return fetched value from redis if ts is valid
             if type(ce) != CachedEntry:
-                self.logger.error(f"cached entry behind {rkey} isnt a CachedEntry but a {type(ce)}?")
+                get_logger("OwsCapCache").error(f"cached entry behind {rkey} isnt a CachedEntry but a {type(ce)}?")
             elif ce.timestamp + self.cache_lifetime > time():
-                self.logger.debug(f"returning {service_type} entry from redis cache for key {rkey}, ts={ce.timestamp}")
+                get_logger("OwsCapCache").debug(f"returning {service_type} entry from redis cache for key {rkey}, ts={ce.timestamp}")
                 return ce
-        self.logger.info("fetching {} getcapabilities for {}".format(service_type, url))
+        get_logger("OwsCapCache").info("fetching {} getcapabilities for {}".format(service_type, url))
         entry = CachedEntry(service_type, url)
         try:
             # XX consider passing parse_remote_metadata ?
@@ -106,11 +100,11 @@ class OwsCapCache:
                 except (AttributeError, ServiceException) as e:
                     # XXX hack parses the 403 page returned by the s-p ?
                     if type(e) == ServiceException and type(e.args) == tuple and "interdit" in e.args[0]:
-                        self.logger.warning("{} needs auth ?".format(url))
+                        get_logger("OwsCapCache").warning("{} needs auth ?".format(url))
                     else:
                         err = traceback.format_exception(e, limit=-1)
-                        self.logger.error(f"failed loading {service_type} 1.3.0, exception catched: {err[-1]}")
-                        self.logger.info("retrying with version=1.1.1")
+                        get_logger("OwsCapCache").error(f"failed loading {service_type} 1.3.0, exception catched: {err[-1]}")
+                        get_logger("OwsCapCache").info("retrying with version=1.1.1")
                         entry.s = WebMapService(url, version="1.1.1")
             elif service_type == "wfs":
                 entry.s = WebFeatureService(url, version="1.1.0")
@@ -121,10 +115,10 @@ class OwsCapCache:
         except ServiceException as e:
             # XXX hack parses the 403 page returned by the s-p ?
             if type(e.args) == tuple and "interdit" in e.args[0]:
-                self.logger.warning("{} needs auth ?".format(url))
+                get_logger("OwsCapCache").warning("{} needs auth ?".format(url))
             else:
-                self.logger.error(f"failed loading {service_type} from {url}")
-                self.logger.error(e)
+                get_logger("OwsCapCache").error(f"failed loading {service_type} from {url}")
+                get_logger("OwsCapCache").error(e)
             entry.exception = e
             # cache the failure
             entry.s = None
@@ -132,15 +126,15 @@ class OwsCapCache:
         except Exception as e:
             err = traceback.format_exception(e, limit=-1)
             if type(e) == requests.exceptions.ConnectionError and 'Name or service not known' in err[-1]:
-                self.logger.error(f"DNS not known for {url}")
+                get_logger("OwsCapCache").error(f"DNS not known for {url}")
             elif type(e) == AttributeError and "'NoneType' object has no attribute 'find'" in err[-1]:
-                self.logger.error(f"Likely not XML in capabilities at {url}")
+                get_logger("OwsCapCache").error(f"Likely not XML in capabilities at {url}")
             elif 'SSLError' in err[-1]:
-                self.logger.error(f"SSLError for {url}")
+                get_logger("OwsCapCache").error(f"SSLError for {url}")
             elif 'HTTPError' in err[-1] and '404' in err[-1]:
-                self.logger.error(f"404 for {url}")
-            self.logger.error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
-            self.logger.error(err)
+                get_logger("OwsCapCache").error(f"404 for {url}")
+            get_logger("OwsCapCache").error(f"failed loading {service_type} from {url}, exception catched: {type(e)}")
+            get_logger("OwsCapCache").error(err)
             entry.s = None
             # cache the failure
             entry.exception = e
@@ -152,7 +146,7 @@ class OwsCapCache:
         else:
             json_entry = json.dumps(jsonpickle.encode(entry))
         self.rediscli.set(rkey, json_entry)
-        self.logger.debug(f"persisted {rkey} in redis, ts={entry.timestamp}")
+        get_logger("OwsCapCache").debug(f"persisted {rkey} in redis, ts={entry.timestamp}")
         return entry
 
     def get(self, service_type, url, force_fetch=False):
@@ -170,9 +164,9 @@ class OwsCapCache:
                 and not force_fetch
             ):
                 if self.services[service_type][url].s == None:
-                    self.logger.warning(f"already got a {type(self.services[service_type][url].exception)} for {service_type} {url} in cache, returning cached failure")
+                    get_logger("OwsCapCache").warning(f"already got a {type(self.services[service_type][url].exception)} for {service_type} {url} in cache, returning cached failure")
                     return self.services[service_type][url]
-                self.logger.debug(f"returning {service_type} getcapabilities from process in-memory cache for {url}, ts={self.services[service_type][url].timestamp}")
+                get_logger("OwsCapCache").debug(f"returning {service_type} getcapabilities from process in-memory cache for {url}, ts={self.services[service_type][url].timestamp}")
                 return self.services[service_type][url]
             return self.fetch(service_type, url)
 
@@ -180,15 +174,15 @@ class OwsCapCache:
         if not url.startswith("http"):
             url = "https://" + self.conf.get("domainName") + url
         if stype in self.services and url in self.services[stype]:
-            self.logger.debug(f"deleting {url} from {stype} in-memory cache, ts was {self.services[stype][url].timestamp}")
+            get_logger("OwsCapCache").debug(f"deleting {url} from {stype} in-memory cache, ts was {self.services[stype][url].timestamp}")
             del self.services[stype][url]
         rkey = f"{stype}-{url.replace('/','~')}"
         re = self.rediscli.get(rkey)
         if re:
-            self.logger.debug(f"deleting {rkey} from capabilities cache")
+            get_logger("OwsCapCache").debug(f"deleting {rkey} from capabilities cache")
             return self.rediscli.delete(rkey)
         else:
-            self.logger.debug(f"{rkey} not found in capabilities cache ?")
+            get_logger("OwsCapCache").debug(f"{rkey} not found in capabilities cache ?")
             return 0
 
 if __name__ == "__main__":
