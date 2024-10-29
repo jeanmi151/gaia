@@ -34,7 +34,7 @@ def check_catalog(url):
     return groupresult
 
 @shared_task()
-def check_record(url, uuid, single=False):
+def check_record(url, uuid):
     """
     Given an csw record check:
     - all the ogc links point to existing ogc services/layers
@@ -46,7 +46,7 @@ def check_record(url, uuid, single=False):
     get_logger("CheckCsw").info(f"checking uuid {uuid} in csw {url}")
     ret = dict()
     ret['problems'] = list()
-    service = app.extensions["owscache"].get('csw', url, single)
+    service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
         ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
         return ret
