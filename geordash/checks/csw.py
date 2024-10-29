@@ -59,6 +59,8 @@ def check_record(url, uuid):
 
     # since we've just done a getrecordbyid we have the full view
     r = csw.records[uuid]
+    # persist latest metadata view in ows cache
+    service.records[uuid] = r
     hasvalidlink = False
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
