@@ -156,7 +156,7 @@ class OwsCapCache:
         if service_type not in self.services:
             self.services[service_type] = dict()
         if url not in self.services[service_type]:
-            return self.fetch(service_type, url)
+            return self.fetch(service_type, url, force_fetch)
         else:
             if (
                 self.services[service_type][url].timestamp + self.cache_lifetime
