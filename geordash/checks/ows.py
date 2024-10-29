@@ -75,7 +75,7 @@ def owsservice(stype, url):
     return groupresult
 
 @shared_task()
-def owslayer(stype, url, layername):
+def owslayer(stype, url, layername, single=False):
     """
     Given an ows layer check that:
     - it refers to existing metadata ids
@@ -89,7 +89,7 @@ def owslayer(stype, url, layername):
     ret = dict()
     ret['problems'] = list()
     url = unmunge(url)
-    service = app.extensions["owscache"].get(stype, url)
+    service = app.extensions["owscache"].get(stype, url, single)
     if service.s is None:
         return False
     l = service.contents()[layername]
