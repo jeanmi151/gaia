@@ -76,7 +76,7 @@ class OwsCapCache:
         self.rediscli = Redis.from_url(url)
         self.conf = conf
 
-    def fetch(self, service_type, url):
+    def fetch(self, service_type, url, force_fetch=False):
         if service_type not in ("wms", "wmts", "wfs", "csw"):
             return None
         # check first in redis
@@ -87,7 +87,7 @@ class OwsCapCache:
             # if found, only return fetched value from redis if ts is valid
             if type(ce) != CachedEntry:
                 get_logger("OwsCapCache").error(f"cached entry behind {rkey} isnt a CachedEntry but a {type(ce)}?")
-            elif ce.timestamp + self.cache_lifetime > time():
+            elif ce.timestamp + self.cache_lifetime > time() and not force_fetch:
                 get_logger("OwsCapCache").debug(f"returning {service_type} entry from redis cache for key {rkey}, ts={ce.timestamp}")
                 return ce
         get_logger("OwsCapCache").info("fetching {} getcapabilities for {}".format(service_type, url))
