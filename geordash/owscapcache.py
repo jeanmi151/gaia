@@ -146,7 +146,8 @@ class OwsCapCache:
         else:
             json_entry = json.dumps(jsonpickle.encode(entry))
         self.rediscli.set(rkey, json_entry)
-        get_logger("OwsCapCache").debug(f"persisted {rkey} in redis, ts={entry.timestamp}")
+        self.rediscli.expire(rkey, self.cache_lifetime)
+        get_logger("OwsCapCache").debug(f"persisted {rkey} in redis with ttl {self.cache_lifetime}, ts={entry.timestamp}")
         return entry
 
     def get(self, service_type, url, force_fetch=False):
