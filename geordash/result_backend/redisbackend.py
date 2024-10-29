@@ -4,25 +4,20 @@
 
 import redis
 import json
-from celery.utils.log import get_task_logger
+from geordash.logwrap import get_logger
 import sys
 from datetime import datetime
 
 class RedisClient:
     def __init__(self, url, app):
         self.r = redis.Redis.from_url(url)
-        # gross, gotta find a better way to know we're within a flask or celery context
-        if '/usr/bin/flask' in sys.argv:
-            self.logger = app.logger
-        else:
-            self.logger = get_task_logger("RedisClient")
         self.task_by_taskname = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):
             v = self.get(k.decode())
             try:
                 task = json.loads(v)
             except json.JSONDecodeError as e:
-                self.logger.error(f"discarding {k}, not json ? {e}")
+                get_logger("RedisClient").error(f"discarding {k}, not json ? {e}")
                 continue
             name = task["name"]
             args = task["args"]
@@ -36,12 +31,12 @@ class RedisClient:
     def get_taskset_details(self, key):
         v = self.get(key)
         if v is None:
-            self.logger.error(f"found nothing for a taskset with {key}, shouldnt happen")
+            get_logger("RedisClient").error(f"found nothing for a taskset with {key}, shouldnt happen")
             return (None, None, None)
         try:
             task = json.loads(v)
         except json.JSONDecodeError as e:
-            self.logger.error(f"discarding {key}, not json ? {e}")
+            get_logger("RedisClient").error(f"discarding {key}, not json ? {e}")
         name = None
         args = None
         date_done = None
@@ -53,13 +48,13 @@ class RedisClient:
             try:
                 task = json.loads(tj)
             except json.JSONDecodeError as e:
-                self.logger.error(f"discarding {tid}, not json ? {e}")
+                get_logger("RedisClient").error(f"discarding {tid}, not json ? {e}")
                 continue
             if name is None:
                 name = task["name"]
             else:
                 if task["name"] != name:
-                    self.logger.error(f"{name} mismatched task name for {tid}")
+                    get_logger("RedisClient").error(f"{name} mismatched task name for {tid}")
             if args is None:
                 args = task["args"][:-1]
             # find the last finishing job
@@ -67,7 +62,7 @@ class RedisClient:
                 subtask_done = datetime.fromisoformat(task["date_done"])
             else:
                 subtask_done = task["date_done"]
-                self.logger.debug(f"sd={subtask_done}, type={type(subtask_done)}")
+                get_logger("RedisClient").debug(f"sd={subtask_done}, type={type(subtask_done)}")
             if date_done is None:
                 date_done = subtask_done
             elif subtask_done is not None and subtask_done > date_done:
@@ -103,7 +98,7 @@ class RedisClient:
                 return self.r.get(nk)
 
     def forget(self, taskid):
-        self.logger.debug(f"forgetting {taskid}")
+        get_logger("RedisClient").debug(f"forgetting {taskid}")
         v = self.get(taskid)
         if v is None:
             return None
@@ -120,10 +115,10 @@ class RedisClient:
             try:
                 task = json.loads(tj)
             except json.JSONDecodeError as e:
-                self.logger.error(f"discarding {ftid}, not json ?")
+                get_logger("RedisClient").error(f"discarding {ftid}, not json ?")
                 return None
             except TypeError as e:
-                self.logger.error(f"discarding {ftid}, {str(e)}")
+                get_logger("RedisClient").error(f"discarding {ftid}, {str(e)}")
                 return None
             args = task["args"][:-1]
             if task["name"].endswith('owslayer'):
