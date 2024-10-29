@@ -25,6 +25,7 @@ def mapstore_get(request, url, accept_json = True):
 def maps():
     maps = mapstore_get(request, 'rest/geostore/extjs/search/category/MAP/***/thumbnail,details,featured?includeAttributes=true')
     if maps.status_code != 200:
+        app.logger.error(f"failed getting MAPs from geostore, got {maps.status_code}: {maps.text}")
         return str(maps.status_code)
     return maps.json()
 
@@ -32,6 +33,7 @@ def maps():
 def contexts():
     maps = mapstore_get(request, 'rest/geostore/extjs/search/category/CONTEXT/***/thumbnail,details,featured?includeAttributes=true')
     if maps.status_code != 200:
+        app.logger.error(f"failed getting CONTEXTs from geostore, got {maps.status_code}: {maps.text}")
         return str(maps.status_code)
     return maps.json()
 
