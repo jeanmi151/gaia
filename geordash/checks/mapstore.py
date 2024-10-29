@@ -21,7 +21,8 @@ from celery import shared_task
 from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
-tasklogger = get_task_logger("CheckMapstore")
+from geordash.logwrap import get_logger
+
 
 # solves conflicts in relationship naming ?
 def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
@@ -94,7 +95,7 @@ def get_res(rescat, resid):
     try:
         r = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
     except NoResultFound as e:
-        tasklogger.error(f"no such {rescat} with id {resid}")
+        get_logger("CheckMapstore").error(f"no such {rescat} with id {resid}")
         return None
     return r
 
@@ -103,7 +104,7 @@ def check_res(rescat, resid):
     m = get_res(rescat, resid)
     if not m:
         return {'problems':[{'type': 'NoSuchResource', 'restype': rescat, 'resid': resid }]}
-    tasklogger.info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
+    get_logger("CheckMapstore").info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
     # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
     ret = dict()
 
@@ -164,12 +165,12 @@ def check_layers(layers, rescat, resid):
     for l in layers:
         match l['type']:
             case 'wms'|'wfs'|'wmts':
-                tasklogger.info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
+                get_logger("CheckMapstore").info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                 s = app.extensions["owscache"].get(l['type'], l['url'])
                 if s.s is None:
                     ret.append({'type':'OGCException', 'url': l['url'], 'stype': l['type'], 'exception': str(type(s.exception)), 'exceptionstr': str(s.exception)})
                 else:
-                    tasklogger.debug('checking for layer presence in ows entry with ts {}'.format(s.timestamp))
+                    get_logger("CheckMapstore").debug('checking for layer presence in ows entry with ts {}'.format(s.timestamp))
                     if l['name'] not in s.contents():
                         ret.append({'type':'NoSuchLayer', 'url': l['url'], 'stype': l['type'], 'lname': l['name']})
             case '3dtiles' | 'cog':
@@ -184,13 +185,13 @@ def check_layers(layers, rescat, resid):
             case 'osm':
                 pass
             case _:
-                tasklogger.debug(l)
+                get_logger("CheckMapstore").debug(l)
     return ret
 
 def check_catalogs(catalogs):
     ret = list()
     for k,c in catalogs.items():
-        tasklogger.debug(f"checking catalog entry {k} type {c['type']} at {c['url']}")
+        get_logger("CheckMapstore").debug(f"checking catalog entry {k} type {c['type']} at {c['url']}")
         match c['type']:
             case 'wms'|'wfs'|'wmts'|'csw':
                 s = app.extensions["owscache"].get(c['type'], c['url'])
