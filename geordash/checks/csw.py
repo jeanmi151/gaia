@@ -7,8 +7,7 @@ import requests
 from flask import current_app as app
 from celery import shared_task
 from celery import group
-from celery.utils.log import get_task_logger
-tasklogger = get_task_logger("CheckCsw")
+from geordash.logwrap import get_logger
 
 @shared_task()
 def check_catalog(url):
@@ -44,7 +43,7 @@ def check_record(url, uuid):
     :param uuid: the record uuid
     :return: the list of errors
     """
-    tasklogger.info(f"checking uuid {uuid} in csw {url}")
+    get_logger("CheckCsw").info(f"checking uuid {uuid} in csw {url}")
     ret = dict()
     ret['problems'] = list()
     service = app.extensions["owscache"].get('csw', url)
@@ -78,12 +77,12 @@ def check_record(url, uuid):
                 if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
                     ws = url.split('/')[-2]
                     lname = f"{ws}:{lname}"
-                    tasklogger.debug(f"modified lname for {lname}")
+                    get_logger("CheckCsw").debug(f"modified lname for {lname}")
                 if lname not in service.contents():
                     ret['problems'].append({'type':'NoSuchLayer', 'url': url, 'stype': stype, 'lname': lname})
                 else:
                     hasvalidlink = True
-                    tasklogger.debug(f"layer {lname} exists in {stype} service at {url}")
+                    get_logger("CheckCsw").debug(f"layer {lname} exists in {stype} service at {url}")
         else:
             if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')) and (u['url'] != None and u['url'].startswith('http')):
                 # check that the url exists
@@ -96,13 +95,13 @@ def check_record(url, uuid):
                         ret['problems'].append({'type': 'BrokenProtocolUrl', 'url': u['url'], 'protocol': u['protocol'], 'code': r.status_code})
                     else:
                         hasvalidlink = True
-                    tasklogger.debug(f"{u['url']} -> {r.status_code}")
+                    get_logger("CheckCsw").debug(f"{u['url']} -> {r.status_code}")
                 except Exception as e:
                     ret['problems'].append({'type': 'ConnectionFailure', 'url': u['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
             elif u['protocol'] != None and u['url'] == None:
                     ret['problems'].append({'type': 'EmptyUrl', 'protocol': u['protocol']})
             else:
-                tasklogger.debug(f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}")
+                get_logger("CheckCsw").debug(f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}")
     if not hasvalidlink:
         ret['problems'].append({'type': 'MdHasNoLinks'})
     return ret
