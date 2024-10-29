@@ -1,0 +1,8 @@
+CELERY_APP=make_celery
+CELERY_OPTS="-P solo -B -E"
+CELERY_LOGLEVEL=INFO
+FLASK_APP=geordash
+FLASK_OPTS="-h 0.0.0.0 -p 5002"
+GUNICORN_APP='"geordash:create_app()"'
+GUNICORN_OPTS="-w 4 -b 0.0.0.0:5002 --access-logfile=-"
+GUNICORN_LOGLEVEL=INFO

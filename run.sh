@@ -1,2 +1,4 @@
-celery -A make_celery worker -P solo -B -E --loglevel INFO &
-flask -A geordash --debug run -h 0.0.0.0 -p 5002
+#!/bin/sh
+. ./env
+celery -A $CELERY_APP worker --loglevel $CELERY_LOGLEVEL $CELERY_OPTS &
+flask -A $FLASK_APP --debug run $FLASK_OPTS
