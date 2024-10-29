@@ -50,11 +50,11 @@ class CachedEntry:
                     maxrecords=100
                 )
                 self.records |= self.s.records
-#                print(f"start = {startpos}, res={self.s.results}, returned {len(self.s.records)}, mds={len(self.records)}")
+                get_logger("OwsCapCache").debug(f"start = {startpos}, res={self.s.results}, returned {len(self.s.records)}, mds={len(self.records)}")
                 startpos = self.s.results['nextrecord'] # len(mds) + 1
                 if startpos > self.s.results['matches'] or startpos == 0:
                     break
-#            print(f"cached {len(self.records)} csw records for {self.url}")
+            get_logger("OwsCapCache").debug(f"cached {len(self.records)} csw records for {self.url}")
         return self.records
 
 """ poorman's in-memory capabilities cache
