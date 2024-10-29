@@ -63,7 +63,7 @@ def reduced_bbox(bbox):
 
 @shared_task()
 def owsservice(stype, url):
-    service = app.extensions["owscache"].get(stype, url)
+    service = app.extensions["owscache"].get(stype, url, True)
     if service.s is None:
         return False
     taskslist = list()
