@@ -131,7 +131,7 @@ def check_owslayer(stype, url, lname):
         lname = f"{ws}:{lname}"
     if lname not in service.contents():
         return abort(404)
-    result = geordash.checks.ows.owslayer.delay(stype, url, lname)
+    result = geordash.checks.ows.owslayer.delay(stype, url, lname, True)
     return {"result_id": result.id}
 
 @tasks_bp.route("/check/owsservice/<string:stype>/<string:url>.json")
