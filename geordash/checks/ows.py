@@ -8,10 +8,10 @@ from celery import shared_task
 from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
-tasklogger = get_task_logger("CheckOws")
 
 from flask import current_app as app
 from geordash.utils import find_localmduuid, unmunge
+from geordash.logwrap import get_logger
 
 import xml.etree.ElementTree as ET
 from owslib.util import ServiceException
@@ -85,7 +85,7 @@ def owslayer(stype, url, layername):
     :param layername: the layer name in the service object
     :return: the list of errors
     """
-    tasklogger.info(f"checking layer {layername} in {stype} {url}")
+    get_logger("CheckOws").info(f"checking layer {layername} in {stype} {url}")
     ret = dict()
     ret['problems'] = list()
     url = unmunge(url)
@@ -100,7 +100,7 @@ def owslayer(stype, url, layername):
             r = requests.head(mdurl)
             if r.status_code != 200:
                 ret['problems'].append({'type': 'BrokenMetadataUrl', 'url': mdurl, 'code': r.status_code})
-            tasklogger.debug(f"{mdurl} -> {r.status_code}")
+            get_logger("CheckOws").debug(f"{mdurl} -> {r.status_code}")
         if len(l.metadataUrls) == 0:
             ret['problems'].append({'type': 'NoMetadataUrl'})
 
@@ -113,14 +113,14 @@ def owslayer(stype, url, layername):
         try:
             csw.getrecordbyid(list(localmduuids))
         except Exception as e:
-            tasklogger.error(f"exception {str(e)} on getrecordbyid({list(localmduuids)})")
+            get_logger("CheckOws").error(f"exception {str(e)} on getrecordbyid({list(localmduuids)})")
         else:
-            tasklogger.debug(csw.records)
+            get_logger("CheckOws").debug(csw.records)
             for uuid in localmduuids:
                 if uuid not in csw.records:
                     ret['problems'].append({'type': 'MissingMdUuid', 'uuid': uuid})
                 else:
-                    tasklogger.debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
+                    get_logger("CheckOws").debug(f"md with uuid {uuid} exists, title {csw.records[uuid].title}")
 
     operation = ""
     try:
@@ -171,10 +171,10 @@ def owslayer(stype, url, layername):
         if type(e.args) == tuple and "interdit" in e.args[0]:
             ret['problems'].append({'type': 'ForbiddenAccess', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url })
         elif 'pg_hba.conf' in str(e):
-            tasklogger.warning(f"{operation} failed on layer {layername} with {str(e)} exception, details not leaked in the job results")
+            get_logger("CheckOws").warning(f"{operation} failed on layer {layername} with {str(e)} exception, details not leaked in the job results")
             ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': "Connection issue to postgis, check credentials" })
         else:
             ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': str(e) })
     else:
-       tasklogger.debug(f"{operation} on {layername} in {stype} at {url} succeeded")
+       get_logger("CheckOws").debug(f"{operation} on {layername} in {stype} at {url} succeeded")
     return ret
