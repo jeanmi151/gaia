@@ -31,7 +31,7 @@ This project aims at providing a data quality insurance dashboard for [geOrchest
 
 ## dependencies
 
-Here are the dependencies and why they are needed : 
+Here are the dependencies and why they are needed :
 
 - the web interface : [flask 2.2](https://flask.palletsprojects.com/en/2.2.x/) and [flask-bootstrap](https://bootstrap-flask.readthedocs.io/en/stable/)
 - the job queue to run the checks in background tasks : [celery 5.2](https://docs.celeryq.dev/en/v5.2.6/)
@@ -54,7 +54,8 @@ interest is shown, it'll move to the
 GAIA is being written using the versions of python/flask/celery provided by debian 12, it should only require 'recent' versions of those:
 
 ```
-apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy python3-psycopg2 python3-owslib python3-jsonpickle python3-redis
+apt install python3-flask-bootstrap python3-flask python3-celery python3-sqlalchemy \
+    python3-psycopg2 python3-owslib python3-jsonpickle python3-redis gunicorn
 ```
 
 ## virtualenv installation
