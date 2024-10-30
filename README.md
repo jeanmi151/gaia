@@ -69,6 +69,17 @@ pip install -r requirements.txt
 ./run.sh
 ```
 
+## system installation
+
+run `install.sh`, which will:
+- create a `gaia` unix group
+- create `celery` and `gunicorn` unix users belonging to `gaia` group
+- install two systemd units, properly setting the path to where the code was deployed
+
+once installed, gaia needs two systemd services running:
+- `gaia-gunicorn` for the web ui, accessed at `https://<idsurl>/gaia/`
+- `gaia-celery` for the celery worker, used for long-running checks
+
 # configuration
 
 ## geOrchestra integration
@@ -99,14 +110,15 @@ store task results.
 it tries as much as possible to autoconfigure itself by reading configuration
 files from [geOrchestra's datadir](https://github.com/georchestra/datadir)
 
-## service
 
-needs two services running (TODO)
-- the flask webapp, accessed at `https://<idsurl>/gaia/`
-- the celery worker, for long-running checks
+## services configuration
 
-for now during development those are started by [`run.sh`](run.sh), proper
-integration via gunicorn/systemd is the goal
+the configuration can be done:
+- in (`gunicorn.conf.py`)[gunicorn.conf.py] for flask/gunicorn options
+- in (`celeryconfig.py`)[geordash/celeryconfig.py] for celery configuration/options
+
+the (`env`)[env] file also contains options used to start celery, and during
+development both services can be started in foreground by `run.sh`
 
 # Usage
 
