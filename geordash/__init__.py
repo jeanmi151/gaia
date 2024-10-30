@@ -5,7 +5,7 @@
 from celery import Celery
 from celery import Task
 from flask import Flask
-from flask import render_template
+from flask import render_template, logging as flog
 from flask_bootstrap import Bootstrap5
 from geordash.events import CeleryEventsHandler
 from geordash.owscapcache import OwsCapCache
@@ -15,6 +15,7 @@ from geordash.checks.mapstore import MapstoreChecker
 from config import url as redisurl
 import threading
 import logging
+from os import getenv
 
 from datetime import datetime, date, time
 def format_datetime(value, format="%d %b %Y %I:%M %p"):
@@ -49,6 +50,8 @@ def create_app() -> Flask:
     dashboard.dash_bp.register_blueprint(api.api_bp)
     dashboard.dash_bp.register_blueprint(admin.admin_bp)
     app.register_blueprint(dashboard.dash_bp)
+    if getenv('INVOCATION_ID') != None:
+        flog.default_handler.setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
     app.logger.setLevel(logging.DEBUG)
     return app
 
