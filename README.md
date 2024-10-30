@@ -118,7 +118,7 @@ the configuration can be done:
 - in [`gunicorn.conf.py`](gunicorn.conf.py) for flask/gunicorn options
 - in [`celeryconfig.py`](geordash/celeryconfig.py) for celery configuration/options
 
-the [`env`](env) file also contains options used to start celery, and during
+the [`env`](env.example) file should also contain options used to start celery, and during
 development both services can be started in foreground by `run.sh`
 
 # Usage
