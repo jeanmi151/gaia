@@ -1,0 +1,15 @@
+[Unit]
+Description=Gaia Celery Service
+After=network.target
+
+[Service]
+Type=simple
+User=celery
+Group=gaia
+EnvironmentFile=WORKDIR/env
+WorkingDirectory=WORKDIR
+ExecStart=/bin/sh -c 'celery -A $CELERY_APP worker --loglevel $CELERY_LOGLEVEL $CELERY_OPTS'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

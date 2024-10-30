@@ -1,0 +1,14 @@
+[Unit]
+Description=Gaia Web Interface Service
+After=network.target
+
+[Service]
+Type=simple
+User=gunicorn
+Group=gaia
+WorkingDirectory=WORKDIR
+ExecStart=gunicorn
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
