@@ -64,6 +64,9 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app = Celery(app.name, task_cls=FlaskTask)
     celery_app.config_from_object('geordash.celeryconfig')
     celery_app.set_default()
+    if getenv('INVOCATION_ID') != None:
+        celery_app.conf.worker_log_format = "%(levelname)s: %(message)s"
+        celery_app.conf.worker_task_log_format = "%(task_name)s[%(task_id)s] - %(levelname)s: %(message)s"
     app.extensions["celery"] = celery_app
     events_handler = CeleryEventsHandler(app)
     evht = threading.Thread(name='evh',target=events_handler.start_listening, daemon=True)
