@@ -6,6 +6,7 @@ After=network.target
 Type=simple
 User=gunicorn
 Group=gaia
+EnvironmentFile=WORKDIR/env
 WorkingDirectory=WORKDIR
 ExecStart=gunicorn
 Restart=always
