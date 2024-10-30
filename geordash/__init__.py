@@ -5,7 +5,6 @@
 from celery import Celery
 from celery import Task
 from flask import Flask
-from flask import render_template, logging as flog
 from flask_bootstrap import Bootstrap5
 from geordash.events import CeleryEventsHandler
 from geordash.owscapcache import OwsCapCache
@@ -51,8 +50,12 @@ def create_app() -> Flask:
     dashboard.dash_bp.register_blueprint(admin.admin_bp)
     app.register_blueprint(dashboard.dash_bp)
     if getenv('INVOCATION_ID') != None:
-        flog.default_handler.setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
-    app.logger.setLevel(logging.DEBUG)
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.handlers[0].setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
+        app.logger.setLevel(gunicorn_logger.level)
+    else:
+        app.logger.setLevel(logging.DEBUG)
     return app
 
 def celery_init_app(app: Flask) -> Celery:
