@@ -40,8 +40,8 @@ $(document).ready(function(){
 <div id='pbdetails'></div>
 <div id="problems"></div>
 <h2 id='usetitle'>Contents</h2>
-{% if resources.layers.items() | length > 0 %}
 <div id="uses">
+{% if resources.layers | length > 0 %}
 la carte du contexte utilise les ressources suivantes:
 <ul>
 {% for k,l in resources.layers.items() %}
@@ -52,8 +52,11 @@ dans
 <a href='{{ url_for('dashboard.ows', stype=l.type, url=l.url.replace('/', '~')) }}'>{{ l.url }}</a></li>
 {% endfor %}
 </ul>
+{% else %}
+<p>la carte n'utilise aucune couche WMS/WFS/WMTS/n'a que des fonds de carte configurés ?</p>
+{% endif %}
 {% if resources.catlist | length > 0 %}
-et propose les sources de données suivantes:
+la carte propose les sources de données suivantes:
     <div id="toolbar"></div>
     <table
       id="catalogstable"
@@ -62,11 +65,10 @@ et propose les sources de données suivantes:
       data-search="true"
       data-show-columns="true">
     </table>
+{% else %}
+<p>Aucune source de données n'est configurée dans la carte?</a>
 {% endif %}
 </div>
-{% else %}
-<p>une erreur est survenue lors de la récupération des informations du contexte, ou la carte n'utilise aucune couche d'overlay</p>
-{% endif %}
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
