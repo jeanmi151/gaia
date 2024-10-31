@@ -129,7 +129,8 @@ def owslayer(stype, url, lname):
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
-    if not get_res('MAP', mapid):
+    m = get_res('MAP', mapid)
+    if not m:
         return abort(404)
     all_jobs_for_mapid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["MAP", mapid])
     resc=get_rescontent_from_resid("MAP", mapid)
@@ -139,7 +140,8 @@ def map(mapid):
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
-    if not get_res('CONTEXT', ctxid):
+    c = get_res('CONTEXT', ctxid)
+    if not c:
         return abort(404)
     all_jobs_for_ctxid = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_res', ["CONTEXT", ctxid])
     resc=get_rescontent_from_resid("CONTEXT", ctxid)
