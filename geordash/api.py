@@ -59,6 +59,10 @@ def get_res_details(request, res):
     for a in res.gs_attribute:
         if a.name in ('owner', 'context', 'details', 'thumbnail'):
             ret['attribute'][a.name] = a.attribute_text
+            if a.name == 'details' and a.attribute_text != "NODATA":
+                r = mapstore_get(request, a.attribute_text, False)
+                if r.status_code == 200:
+                    ret['attribute'][a.name] = r.text
     for s in res.gs_security:
         # in the ms2-geor project, an entry with username is the owner
         if s.username is not None:
