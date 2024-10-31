@@ -7,7 +7,7 @@ from flask import request, render_template, abort, url_for
 from flask import current_app as app
 
 from geordash.decorators import is_superuser
-from geordash.checks.mapstore import get_resources_using_ows, get_name_from_ctxid, get_res
+from geordash.checks.mapstore import get_resources_using_ows, get_res
 from geordash.api import mapstore_get, gninternalid, get_res_details
 from geordash.utils import find_localmduuid, unmunge
 
@@ -147,4 +147,4 @@ def ctx(ctxid):
     resc=get_rescontent_from_resid("CONTEXT", ctxid)
     if type(resc) != dict:
         return f"failed getting ctx resource {ctxid} from geostore, got code {resc.status_code}, backend said {resc.text}"
-    return render_template('ctx.html', ctxid=ctxid, details=get_res_details(request, c), ctxname=get_name_from_ctxid(ctxid), resources=resc, previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ctx.html', ctxid=ctxid, details=get_res_details(request, c), resources=resc, previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
