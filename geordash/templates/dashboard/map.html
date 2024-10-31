@@ -30,8 +30,11 @@ $(document).ready(function(){
         {% block content %}
 <div class="container">
 <p id='details'>Details pour la carte {{ mapid }}, ayant pour titre {{ details.title }}</p>
-{% if showdelete %}
 <ul>
+{% if details.description %}
+<li>Description: {{ details.description }}</li>
+{% endif %}
+{% if showdelete %}
 <li>Propriétaire: {{ details.owner }}</li>
 {% if 'details' in details.attribute %}
 <li>Présentation: '{{ details.attribute['details']}}'</li>
