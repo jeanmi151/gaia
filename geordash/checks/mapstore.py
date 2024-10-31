@@ -104,24 +104,8 @@ def check_res(rescat, resid):
     m = get_res(rescat, resid)
     if not m:
         return {'problems':[{'type': 'NoSuchResource', 'restype': rescat, 'resid': resid }]}
-    get_logger("CheckMapstore").info("{} avec id {} a pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
-    # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
+    get_logger("CheckMapstore").info("Checking {} avec id {} ayant pour titre {}".format('la carte' if rescat == 'MAP' else 'le contexte', m.id, m.name))
     ret = dict()
-
-    for a in m.gs_attribute:
-        if a.name in ('owner', 'context', 'details', 'thumbnail'):
-            if 'attribute' not in ret:
-                ret['attribute'] = dict()
-            ret['attribute'][a.name] = a.attribute_text
-    for s in m.gs_security:
-        # in the ms2-geor project, an entry with username is the owner
-        if s.username is not None:
-            ret['owner'] = s.username
-        if s.groupname is not None:
-            if 'groups' not in ret:
-                ret['groups'] = dict()
-            ret['groups'][s.groupname] = { 'canread': s.canread, 'canwrite': s.canwrite }
-
     # uses automapped attribute from relationship instead of a query
     data = json.loads(m.gs_stored_data[0].stored_data)
     ret['problems'] = list()

@@ -53,6 +53,19 @@ def gninternalid(uuid):
         return None
     return rep['hits']['hits'][0]['_source']['id']
 
+def get_res_details(request, res):
+    # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
+    ret = {'attribute': dict(), 'owner': None, 'groups': dict(), 'title': res.name}
+    for a in res.gs_attribute:
+        if a.name in ('owner', 'context', 'details', 'thumbnail'):
+            ret['attribute'][a.name] = a.attribute_text
+    for s in res.gs_security:
+        # in the ms2-geor project, an entry with username is the owner
+        if s.username is not None:
+            ret['owner'] = s.username
+        if s.groupname is not None:
+            ret['groups'][s.groupname] = { 'canread': s.canread, 'canwrite': s.canwrite }
+    return ret
 
 """
 returns preauth cookies for subsequent queries
