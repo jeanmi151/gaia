@@ -3,6 +3,7 @@
 - distinguish internal links from external links
 - when displaying problems on a list, highlight in green/red entries that have no/some issues
 - better homepage for non-connected users, and users being superuser listing gs/gn resources on the admin page
+- check 3dtiles/COG layers
 - a page by ogc service (eg localgs by default):
   - for localgs, listing workspaces entrypoints
 - a page by layer:
