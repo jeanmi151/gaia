@@ -29,7 +29,34 @@ $(document).ready(function(){
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p id='details'>Details pour le contexte {{ ctxid }}</p>
+<p id='details'>Details pour le contexte {{ ctxid }}, ayant pour titre {{ details.title }}</p>
+{% if showdelete %}
+<ul>
+<li>Propriétaire: {{ details.owner }}</li>
+{% if 'details' in details.attribute %}
+<li>Présentation: '{{ details.attribute['details']}}'</li>
+{% endif %}
+{% if details.groups | length > 0 %}
+<li>Régles d'accès:</li>
+<ul>
+{% for r,a in details.groups.items() %}
+<li>
+{% if r == 'everyone' %}
+N'importe qui:
+{% else %}
+Membres du role {{ r }}:
+{% endif %}
+peut visualiser: {{ a.canread }} peut modifier: {{ a.canwrite }}</li>
+{% endfor %}
+{% if 'everyone' not in details.groups.keys() %}
+<li>Pas de règle pour 'everyone', le contexte n'est pas public</li>
+{% endif %}
+</ul>
+{% else %}
+<li>Aucune règle d'accès, le contexte est visible uniquement par le propriétaire ou un administrateur</li>
+{% endif %}
+</ul>
+{% endif %}
 {% if ctxname is not none %}
 <a href='/mapstore/#/context/{{ ctxname }}'>voir le contexte</a>
 {% endif %}
