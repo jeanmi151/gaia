@@ -57,9 +57,7 @@ peut visualiser: {{ a.canread }} peut modifier: {{ a.canwrite }}</li>
 {% endif %}
 </ul>
 {% endif %}
-{% if ctxname is not none %}
-<a href='/mapstore/#/context/{{ ctxname }}'>voir le contexte</a>
-{% endif %}
+<a href='/mapstore/#/context/{{ details.title }}'>voir le contexte</a>
 <form id='check' action="javascript:CheckRes('context', {{ ctxid }}, {{ showdelete|int }});">
 <input type=submit value="check now">
 </form>
