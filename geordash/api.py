@@ -55,7 +55,7 @@ def gninternalid(uuid):
 
 def get_res_details(request, res):
     # gs_attribute is a list coming from the relationship between gs_resource and gs_attribute
-    ret = {'attribute': dict(), 'owner': None, 'groups': dict(), 'title': res.name}
+    ret = {'attribute': dict(), 'owner': None, 'groups': dict(), 'title': res.name, 'description': res.description}
     for a in res.gs_attribute:
         if a.name in ('owner', 'context', 'details', 'thumbnail'):
             ret['attribute'][a.name] = a.attribute_text
