@@ -192,13 +192,6 @@ def check_catalogs(catalogs):
                 pass
     return ret
 
-def get_name_from_ctxid(ctxid):
-    msc = app.extensions["msc"]
-    r = get_res('CONTEXT', ctxid)
-    if r:
-        return r.name
-    return None
-
 def get_resources_using_ows(owstype, url, layer=None):
     """ returns a set of ms resources (tuples with resource type & id)
     using a given ows layer from a given ows service type at a given url
