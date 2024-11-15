@@ -51,6 +51,8 @@ def create_app() -> Flask:
     app.register_blueprint(dashboard.dash_bp)
     if getenv('INVOCATION_ID') != None:
         gunicorn_logger = logging.getLogger('gunicorn.error')
+        if len(gunicorn_logger.handlers) == 0:
+            return app
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.handlers[0].setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
         app.logger.setLevel(gunicorn_logger.level)
