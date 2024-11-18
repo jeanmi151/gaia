@@ -138,13 +138,13 @@ def check_res(rescat, resid):
     return ret
 
 @shared_task
-def check_resources():
+def check_resources(categories = ['MAP', 'CONTEXT']):
     """
     called by beat scheduler, or check_mapstore_resources() route in views
     """
     msc = app.extensions["msc"]
     taskslist = list()
-    for rescat in ('MAP', 'CONTEXT'):
+    for rescat in categories:
         res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
         for r in res:
             taskslist.append(check_res.s(rescat, r.id))
