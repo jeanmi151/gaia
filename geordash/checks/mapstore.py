@@ -48,7 +48,7 @@ class MapstoreChecker():
             database=conf.get('pgsqlDatabase')
         )
 
-        engine = create_engine(url)
+        engine = create_engine(url)#, echo=True, echo_pool="debug")
 
 # these three lines perform the "database reflection" to analyze tables and relationships
         m = MetaData(schema=conf.get('pgsqlGeoStoreSchema','mapstoregeostore'))
@@ -100,7 +100,7 @@ def check_configs():
 def get_res(rescat, resid):
     msc = app.extensions["msc"]
     try:
-        r = msc.session.query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
+        r = msc.session().query(msc.Resource).filter(and_(msc.Resource.category_id == msc.cat[rescat], msc.Resource.id == resid)).one()
     except NoResultFound as e:
         get_logger("CheckMapstore").error(f"no such {rescat} with id {resid}")
         return None
@@ -109,7 +109,7 @@ def get_res(rescat, resid):
 def get_all_res(rescat):
     msc = app.extensions["msc"]
     try:
-        r = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
+        r = msc.session().query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
     except NoResultFound as e:
         get_logger("CheckMapstore").error(f"no {rescat} in database")
         return None
@@ -152,7 +152,7 @@ def check_resources(categories = ['MAP', 'CONTEXT']):
     msc = app.extensions["msc"]
     taskslist = list()
     for rescat in categories:
-        res = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
+        res = msc.session().query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
         for r in res:
             taskslist.append(check_res.s(rescat, r.id))
     grouptask = group(taskslist)
@@ -222,7 +222,7 @@ def get_resources_using_ows(owstype, url, layer=None):
         url = url.replace('~','/')
     layermap = dict()
     servicemap = dict()
-    resources = msc.session.query(msc.Resource).filter(or_(msc.Resource.category_id == msc.cat['MAP'], msc.Resource.category_id == msc.cat['CONTEXT'])).all()
+    resources = msc.session().query(msc.Resource).filter(or_(msc.Resource.category_id == msc.cat['MAP'], msc.Resource.category_id == msc.cat['CONTEXT'])).all()
     for r in resources:
         layers = None
         data = json.loads(r.gs_stored_data[0].stored_data)
