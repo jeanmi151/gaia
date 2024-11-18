@@ -1,0 +1,54 @@
+{% include 'header.tmpl' %}
+
+        {% block scripts %}
+<script>
+let prev = {{ previous_resources_jobs | tojson() }};
+if (prev) {
+  const last = prev.reduce((a, b) => {
+    return new Date(a['finished']) > new Date(b['finished']) ? a : b;
+  });
+  PollTaskRes('mapstore', 'contexts', last['id'], {{ showdelete|int }}, '#pbtitle');
+}
+
+$(document).ready(function(){
+  DisplayPrev('mapstore', 'contexts', prev, {{ showdelete|int }}, '#previouslist');
+{% if res | length > 0 %}
+  $('#ctxstable').bootstrapTable({
+    data: {{ res | tojson }},
+    columns: [
+      {'field': 'url', 'title': "Identifier", 'formatter': 'urlFormatter'},
+      {'field': 'title', 'title':'Titre' },
+      {'field': 'owner', 'title': "Créateur"},
+      {'field': 'acl', 'title': "Droits d'accès"},
+      {'field': 'viewurl', 'title': 'View'}
+    ]
+  });
+{% endif %}
+});
+</script>
+        {% endblock %}
+        <!-- Your page content -->
+        {% block content %}
+   <div class="container">
+<p id='details'>Details pour toutes les contextes mapstore</p>
+<div>
+<h2>Check mapstore contexts</h2>
+<p>check all mapstore contexts.</p>
+<form id='check' action="javascript:CheckRes('mapstore', 'contexts', {{ showdelete|int}} );">
+<input type=submit value="check all mapstore contexts now">
+</form>
+<h4 id='pbtitle'>Problems</h4>
+<div id='pbdetails'></div>
+<div id="problems"></div>
+<h4 id='previous'>Previous</h4>
+<p id='previouslist'></p>
+</div>
+<h2 id='ctxstitle'>Contexts</h2>
+<table id="ctxstable"
+  data-toggle="true"
+  data-search="true"
+  data-show-columns="true">
+</table>
+        {% endblock %}
+</body>
+</html>
