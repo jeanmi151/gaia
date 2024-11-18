@@ -99,6 +99,15 @@ def get_res(rescat, resid):
         return None
     return r
 
+def get_all_res(rescat):
+    msc = app.extensions["msc"]
+    try:
+        r = msc.session.query(msc.Resource).filter(msc.Resource.category_id == msc.cat[rescat]).all()
+    except NoResultFound as e:
+        get_logger("CheckMapstore").error(f"no {rescat} in database")
+        return None
+    return r
+
 @shared_task()
 def check_res(rescat, resid):
     m = get_res(rescat, resid)
