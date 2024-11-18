@@ -5,7 +5,7 @@
 from sqlalchemy import create_engine, MetaData, inspect, select, or_, and_
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound,OperationalError
 from sqlalchemy.orm import sessionmaker
 import json
 import requests
@@ -59,14 +59,21 @@ class MapstoreChecker():
         self.Resource = Base.classes.gs_resource
         Category = Base.classes.gs_category
 
-        Session = sessionmaker(bind=engine)
-        self.session = Session()
+        self.sessionm = sessionmaker(bind=engine)
+        self.sessiono = self.sessionm()
 
-        categories = self.session.query(Category).all()
+        categories = self.session().query(Category).all()
         self.cat = dict()
         for c in categories:
             self.cat[c.name] = c.id
 
+    def session(self):
+        try:
+            self.sessiono.execute(select(1))
+        except OperationalError:
+            get_logger("CheckMapstore").info("reconnecting to db")
+            self.sessiono = self.sessionm()
+        return self.sessiono
 
 
 @shared_task()
