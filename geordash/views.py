@@ -110,6 +110,20 @@ def check_ctx(ctxid):
     result = check_res.delay('CONTEXT',ctxid)
     return {"result_id": result.id}
 
+@tasks_bp.route("/check/mapstore/maps.json")
+def check_mapstore_maps():
+    groupresult = check_resources(['MAP'])
+    if groupresult.id:
+        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', ['MAP'], groupresult.id)
+    return {"result_id": groupresult.id}
+
+@tasks_bp.route("/check/mapstore/contexts.json")
+def check_mapstore_contexts():
+    groupresult = check_resources(['CONTEXT'])
+    if groupresult.id:
+        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', ['CONTEXT'], groupresult.id)
+    return {"result_id": groupresult.id}
+
 @tasks_bp.route("/check/mapstore/resources.json")
 def check_mapstore_resources():
     groupresult = check_resources()
