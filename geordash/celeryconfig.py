@@ -17,6 +17,8 @@ task_track_started = True
 database_engine_options = {'echo': True}
 # store task name etc in the backend https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-extended
 result_extended = True
+# defaults to 1d, cf https://docs.celeryq.dev/en/latest/userguide/configuration.html#std:setting-result_expires
+# change if you dont want to keep results forever/delete them manually
 result_expires = None
 task_send_sent_event = True
 
