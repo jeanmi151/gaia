@@ -11,13 +11,10 @@ from geordash.decorators import is_superuser
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin", template_folder='templates')
 
-@admin_bp.route("/")
-def index() -> str:
+@admin_bp.route("/mapstore/configs")
+def mapstore_configs() -> str:
     all_jobs_for_msconfigs = app.extensions['rcli'].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_configs',[])
-    all_jobs_for_msresources = app.extensions['rcli'].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_resources',[])
-    # cf https://github.com/pallets/flask/issues/1361
-    # and https://flask.palletsprojects.com/en/3.0.x/blueprints/#templates
-    return render_template("admin/index.html", previous_configs_jobs=all_jobs_for_msconfigs, previous_resources_jobs=all_jobs_for_msresources, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template("admin/mapstore/configs.html", previous_configs_jobs=all_jobs_for_msconfigs, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @admin_bp.route("/geonetwork")
 def geonetwork():
