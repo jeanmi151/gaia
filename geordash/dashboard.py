@@ -77,7 +77,7 @@ def cswentry(portal, uuid):
         return abort(404)
     owslinks = list()
     r = service.contents()[uuid]
-    gnid = gninternalid(uuid)
+    gnid = gninternalid(request, uuid)
     for u in r.uris:
         if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
             stype = u['protocol'].split(':')[1].lower()
