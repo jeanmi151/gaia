@@ -13,6 +13,11 @@ const fetchForHome = () => {
         }
         $('#mdtitle').text(mydata.length + ' metadatas');
         mydata.forEach(function (value) {
+            if (value['public']) {
+              value['uuid'] = '<a href="' + baseurl + '/csw/srv/' +value['_id'] + '">' + value['_id'] + '</a>';
+            } else {
+              value['uuid'] = value['_id'];
+            }
             value['dhlink']='<a href="/datahub/dataset/' + value['_id'] + '">voir</a>';
             value['editlink']='<a href="/geocat/srv/fre/catalog.edit#/metadata/' + value['gnid'] +'?redirectUrl=catalog.edit">editer</a>';
             xxdata.push(value);
