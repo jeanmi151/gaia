@@ -7,6 +7,7 @@ import requests
 from flask import current_app as app
 from celery import shared_task
 from celery import group
+from owslib.ows import ExceptionReport
 from geordash.logwrap import get_logger
 
 @shared_task()
@@ -52,7 +53,12 @@ def check_record(url, uuid):
         return ret
 
     csw = service.s
-    csw.getrecordbyid([uuid])
+    try:
+        csw.getrecordbyid([uuid])
+    except ExceptionReport as e:
+        # most probably owslib.ows.ExceptionReport: 'OperationNotAllowedEx : Operation not allowed'
+        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': str(type(e)), 'exceptionstr': str(e)})
+        return ret
     if len(csw.records) != 1:
         ret['problems'].append({'type': 'NoSuchMetadata', 'uuid': uuid, 'url': url})
         return ret
