@@ -13,6 +13,9 @@ from geordash.utils import find_localmduuid, unmunge
 
 import json
 
+#import http.client as http_client
+#http_client.HTTPConnection.debuglevel = 1
+
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/gaia", template_folder='templates/dashboard')
 
 def get_rescontent_from_resid(restype, resid):
