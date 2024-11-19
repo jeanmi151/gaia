@@ -37,7 +37,12 @@ def contexts():
         return str(maps.status_code)
     return maps.json()
 
-def gninternalid(uuid):
+def gninternalid(request, uuid):
+    headers = {'sec-proxy': 'true', 'Content-Type': 'application/json', 'Accept': 'application/json'}
+    if 'sec-username' in request.headers:
+        headers['sec-username'] = request.headers.get('Sec-Username')
+    if 'sec-roles' in request.headers:
+        headers['sec-roles'] = request.headers.get('Sec-Roles')
     gnurl = app.extensions["conf"].get(app.extensions["conf"].get('localgn', 'urls'), 'secproxytargets')
     query = { "size": 1,
               "_source": {"includes": ["id"]},
@@ -45,7 +50,7 @@ def gninternalid(uuid):
     }
     md = requests.post(gnurl + "srv/api/search/records/_search",
         json = query,
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'})
+        headers = headers)
     if md.status_code != 200:
       return md.text
     rep = md.json()
