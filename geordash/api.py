@@ -142,7 +142,7 @@ def metadatas():
                 rep = md.json()
                 retval = list()
                 for h in rep['hits']['hits']:
-                    retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'title':h['_source']['resourceTitleObject']['default'] });
+                    retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'public': h['isPublishedToAll'], 'title':h['_source']['resourceTitleObject']['default'] });
                 return jsonify(retval)
     else:
         return preauth.status_code
