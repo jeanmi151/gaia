@@ -1,4 +1,5 @@
 config.py
+celeryconfig.py
 env
 __pycache__
 workdir
