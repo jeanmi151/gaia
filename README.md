@@ -137,10 +137,23 @@ url in your browser.
 lists:
 - metadatas belonging to the connected user
 - maps and contexts he is allowed to visit
+- additionals links to admin pages for users having ROLE_SUPERUSER
 
-### `/admin/`
-- lists all maps and contexts current problems
-- allows to manually trigger a check for the integrity of all maps/contexts
+### `/admin/mapstore/configs`
+- lists current problems on mapstore configuration files in the datadir (`new.json`, `config.json`, `localConfig.json`)
+
+### `/admin/mapstore/maps`
+- lists all maps in a table, with their owner/ACL information
+- lists current problems on the maps
+- allows to manually trigger a check for the integrity of all maps
+
+### `/admin/mapstore/contexts`
+- lists all contexts in a table, with their owner/ACL information
+- lists current problems on the contexts
+- allows to manually trigger a check for the integrity of all contexts
+
+### `/admin/geonetwork`
+- lists currently configured portals in geonetwork
 
 ### `/map/<mapid>`
 - displays map details & current problems
