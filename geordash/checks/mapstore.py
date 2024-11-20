@@ -149,6 +149,8 @@ def check_resources(categories = ['MAP', 'CONTEXT']):
     """
     called by beat scheduler, or check_mapstore_resources() route in views
     """
+    if type(categories) != list:
+        categories = [categories]
     msc = app.extensions["msc"]
     taskslist = list()
     for rescat in categories:
