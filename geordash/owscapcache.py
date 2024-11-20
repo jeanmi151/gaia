@@ -92,6 +92,7 @@ class OwsCapCache:
             elif ce.timestamp + self.cache_lifetime > time() and not force_fetch:
                 ttl = self.rediscli.ttl(rkey)
                 get_logger("OwsCapCache").debug(f"returning {service_type} entry from redis cache for key {rkey}, ts={ce.timestamp} (and redis ttl {ttl})")
+                self.services[service_type][url] = ce
                 return ce
         get_logger("OwsCapCache").info("fetching {} getcapabilities for {}".format(service_type, url))
         entry = CachedEntry(service_type, url)
