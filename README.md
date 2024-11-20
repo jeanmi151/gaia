@@ -114,9 +114,9 @@ files from [geOrchestra's datadir](https://github.com/georchestra/datadir)
 
 ## services configuration
 
-the configuration can be done:
-- in [`gunicorn.conf.py`](gunicorn.conf.py) for flask/gunicorn options
-- in [`celeryconfig.py`](geordash/celeryconfig.py) for celery configuration/options
+the configuration has to be done:
+- in [`gunicorn.conf.py`](gunicorn.conf.py.example) for gunicorn options
+- in [`celeryconfig.py`](geordash/celeryconfig.py.example) for celery configuration/options
 
 the [`env`](env.example) file should also contain options used to start celery, and during
 development both services can be started in foreground by `run.sh`
