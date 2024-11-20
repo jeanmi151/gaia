@@ -54,7 +54,9 @@ class CachedEntry:
                 startpos = self.s.results['nextrecord'] # len(mds) + 1
                 if startpos > self.s.results['matches'] or startpos == 0:
                     break
-            get_logger("OwsCapCache").debug(f"cached {len(self.records)} csw records for {self.url}")
+            get_logger("OwsCapCache").info(f"cached {len(self.records)} csw records for {self.url}")
+        else:
+            get_logger("OwsCapCache").info(f"returning {len(self.records)} cached csw records for {self.url}")
         return self.records
 
 """ poorman's in-memory capabilities cache
