@@ -7,16 +7,18 @@ from flask import request, render_template, url_for, make_response, jsonify
 from flask import current_app as app
 from geordash.api import geonetwork_subportals, get_res_details
 from geordash.checks.mapstore import get_all_res
-from geordash.decorators import is_superuser
+from geordash.decorators import is_superuser, check_role
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin", template_folder='templates')
 
 @admin_bp.route("/mapstore/configs")
+@check_role(role='MAPSTORE_ADMIN')
 def mapstore_configs() -> str:
     all_jobs_for_msconfigs = app.extensions['rcli'].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_configs',[])
     return render_template("admin/mapstore/configs.html", previous_configs_jobs=all_jobs_for_msconfigs, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @admin_bp.route("/geonetwork")
+@check_role(role='GN_ADMIN')
 def geonetwork():
     localgn = app.extensions["conf"].get('localgn', 'urls')
     portals = geonetwork_subportals()
@@ -28,6 +30,7 @@ def geonetwork():
     return render_template("admin/geonetwork.html", bootstrap=app.extensions["bootstrap"], portals=portals)
 
 @admin_bp.route("/mapstore/maps")
+@check_role(role='MAPSTORE_ADMIN')
 def mapstore_maps():
     maps = get_all_res('MAP')
     res = list()
@@ -50,6 +53,7 @@ def mapstore_maps():
     return render_template("admin/mapstore/maps.html", bootstrap=app.extensions["bootstrap"], previous_resources_jobs=all_jobs_for_ms_maps, res=res, showdelete=is_superuser())
 
 @admin_bp.route("/mapstore/contexts")
+@check_role(role='MAPSTORE_ADMIN')
 def mapstore_contexts():
     contexts = get_all_res('CONTEXT')
     res = list()
