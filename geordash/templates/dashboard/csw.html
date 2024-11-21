@@ -22,7 +22,7 @@ $(document).ready(function(){
 <p>titre: {{ s.s.identification.title }}<p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 <p>{{ s.contents().items() | length }} métadonnées <strong>publiques</strong> récupérées</p>
-<p>Note: les métadonnées non publiques, de service et externes/moissonnées ne sont pas incluses</p>
+<p>Note: les métadonnées non publiques et externes/moissonnées ne sont pas incluses</p>
 <h2 id='pbtitle'>Problems</h2>
 <div id='pbdetails'>No check have been run yet !</div>
 <div id="problems"></div>
