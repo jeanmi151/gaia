@@ -13,7 +13,7 @@ const fetchForHome = () => {
         }
         $('#mdtitle').text(mydata.length + ' metadatas');
         mydata.forEach(function (value) {
-            if (value['public']) {
+            if (value['gaialink']) {
               value['uuid'] = '<a href="' + baseurl + '/csw/srv/' +value['_id'] + '">' + value['_id'] + '</a>';
             } else {
               value['uuid'] = value['_id'];

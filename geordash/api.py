@@ -135,7 +135,7 @@ def metadatas():
         else:
             if 'id' in me.json():
                 query = { "size": 30,
-                            "_source": {"includes": ["id", "documentStandard", "resourceTitleObject" ]},
+                            "_source": {"includes": ["id", "documentStandard", "resourceTitleObject", "isHarvested"]},
                             "query": { "bool": { "must": [ { "query_string" : { "query": "owner: {}".format(me.json()['id']) } }, { "terms": { "isTemplate": [ "y", "n" ] } }]}}
                 }
                 md = requests.post(gnurl + "srv/api/search/records/_search",
@@ -147,7 +147,7 @@ def metadatas():
                 rep = md.json()
                 retval = list()
                 for h in rep['hits']['hits']:
-                    retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'public': h['isPublishedToAll'], 'title':h['_source']['resourceTitleObject']['default'] });
+                    retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'gaialink': h['isPublishedToAll'] and h['_source']['isHarvested'] != "true", 'title':h['_source']['resourceTitleObject']['default'] });
                 return jsonify(retval)
     else:
         return preauth.status_code
