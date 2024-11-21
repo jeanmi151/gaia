@@ -44,7 +44,7 @@ class CachedEntry:
             startpos = 0
             while True:
                 self.s.getrecords2(
-                    constraints=[And([non_harvested] + [is_dataset])],
+                    constraints=[non_harvested],
                     esn='full',
                     startposition=startpos,
                     maxrecords=100
