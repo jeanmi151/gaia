@@ -21,6 +21,14 @@ $(document).ready(function(){
 <p id='details'>Details pour la md '{{ r.identifier }}' dans <a href='{{ url_for('dashboard.csw', portal=portal) }}'>{{ s.s.url }}</a></p>
 <p>titre: {{ r.title }}<p>
 <p>résumé: {{ r.abstract }}</p>
+<p>date: {{ r.date }}</p>
+<p>source: {{ r.source }}</p>
+{% if r.subjects | length > 0 %}
+<p>
+keywords:<ul>
+{% for s in r.subjects %}<li>{{ s }}</li>{% endfor %}
+</ul></p>
+{% endif %}
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
 <p><a href='/datahub/dataset/{{ r.identifier }}'>voir dans datahub</a></p>
 <p><a href='/{{ localgn }}/srv/fre/catalog.search#/metadata/{{ r.identifier }}'>voir dans geonetwork</a></p>
