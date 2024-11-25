@@ -83,7 +83,7 @@ def check_record(url, uuid):
             if service.s is None:
                 ret['problems'].append({'type':'OGCException', 'url': url, 'stype': stype, 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
             else:
-                if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
+                if stype == 'wfs' and lname and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
                     ws = url.split('/')[-2]
                     lname = f"{ws}:{lname}"
                     get_logger("CheckCsw").debug(f"modified lname for {lname}")
