@@ -37,7 +37,7 @@ $(document).ready(function(){
 {% if showdelete %}
 <li>Propriétaire: {{ details.owner }}</li>
 {% if 'details' in details.attribute %}
-<li>Présentation: '{{ details.attribute['details']}}'</li>
+<li>Présentation: '{{ details.attribute['details'] | safe }}'</li>
 {% endif %}
 {% if details.groups | length > 0 %}
 <li>Régles d'accès:</li>
