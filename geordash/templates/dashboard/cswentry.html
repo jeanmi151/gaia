@@ -38,7 +38,11 @@ keywords:<ul>
 <h2>references</h2>
 <ul>
 {%   for o in owslinks %}
+{%     if o.layername %}
 <li><a href='{{ url_for('dashboard.owslayer', stype=o.type, url=o.url.replace('/','~').split('?')[0], lname=o.layername) }}'>couche {{ o.type }} {{ o.layername }} dans {{ o.url }}</a> ({{ o.descr }})</li>
+{%     else %}
+<li>service <a href='{{ url_for('dashboard.ows', stype=o.type, url=o.url.replace('/','~').split('?')[0]) }}'>{{ o.url }}</a> sans nom de couche ?</li>
+{%     endif %}
 {%   endfor %}
 </ul>
 {% endif %}
