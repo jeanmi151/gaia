@@ -30,7 +30,7 @@ beat_schedule = {
   },
 #  'check-ms-ctxs-every-night': {
 #    'task': 'geordash.checks.mapstore.check_resources',
-#    'args': ('CONTEXT'),
+#    'args': ['CONTEXT'],
 #    'schedule': crontab(minute=10, hour=0),
 #  },
   'check-gs-wms-layers-every-night': {
