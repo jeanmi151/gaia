@@ -41,3 +41,12 @@ def unmunge(url):
     if url.startswith(localdomain):
         url = url.removeprefix(localdomain)
     return url
+
+def objtype(o):
+    """
+    returns a string of the forme module.name for the given object
+    better than str(type(o)) which returns "<class 'module.name'>"
+    (which doesn't render properly as HTML..)
+    """
+    k = o.__class__
+    return ".".join([k.__module__, k.__name__])
