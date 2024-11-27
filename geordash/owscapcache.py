@@ -105,6 +105,7 @@ class OwsCapCache:
                     # XXX hack parses the 403 page returned by the s-p ?
                     if type(e) == ServiceException and type(e.args) == tuple and "interdit" in e.args[0]:
                         get_logger("OwsCapCache").warning("{} needs auth ?".format(url))
+                        entry.exception = ServiceException("Needs authentication")
                     else:
                         err = traceback.format_exception(e, limit=-1)
                         get_logger("OwsCapCache").error(f"failed loading {service_type} 1.3.0, exception catched: {err[-1]}")
