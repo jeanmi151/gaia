@@ -9,6 +9,7 @@ from celery import shared_task
 from celery import group
 from owslib.ows import ExceptionReport
 from geordash.logwrap import get_logger
+from geordash.utils import objtype
 
 @shared_task()
 def check_catalog(url):
@@ -49,7 +50,7 @@ def check_record(url, uuid):
     ret['problems'] = list()
     service = app.extensions["owscache"].get('csw', url)
     if service.s is None:
-        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
+        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': objtype(service.exception), 'exceptionstr': str(service.exception)})
         return ret
 
     csw = service.s
@@ -57,7 +58,7 @@ def check_record(url, uuid):
         csw.getrecordbyid([uuid])
     except ExceptionReport as e:
         # most probably owslib.ows.ExceptionReport: 'OperationNotAllowedEx : Operation not allowed'
-        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': str(type(e)), 'exceptionstr': str(e)})
+        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': objtype(e), 'exceptionstr': str(e)})
         return ret
     if len(csw.records) != 1:
         ret['problems'].append({'type': 'NoSuchMetadata', 'uuid': uuid, 'url': url})
@@ -81,7 +82,7 @@ def check_record(url, uuid):
             lname = u['name']
             service = app.extensions["owscache"].get(stype, url)
             if service.s is None:
-                ret['problems'].append({'type':'OGCException', 'url': url, 'stype': stype, 'exception': str(type(service.exception)), 'exceptionstr': str(service.exception)})
+                ret['problems'].append({'type':'OGCException', 'url': url, 'stype': stype, 'exception': objtype(service.exception), 'exceptionstr': str(service.exception)})
             else:
                 if stype == 'wfs' and lname and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
                     ws = url.split('/')[-2]
@@ -106,7 +107,7 @@ def check_record(url, uuid):
                         hasvalidlink = True
                     get_logger("CheckCsw").debug(f"{u['url']} -> {r.status_code}")
                 except Exception as e:
-                    ret['problems'].append({'type': 'ConnectionFailure', 'url': u['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
+                    ret['problems'].append({'type': 'ConnectionFailure', 'url': u['url'], 'exception': objtype(e), 'exceptionstr': str(e)})
             elif u['protocol'] != None and u['url'] == None:
                     ret['problems'].append({'type': 'EmptyUrl', 'protocol': u['protocol']})
             else:
