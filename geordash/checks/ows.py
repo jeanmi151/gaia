@@ -10,7 +10,7 @@ from celery import group
 from celery.utils.log import get_task_logger
 
 from flask import current_app as app
-from geordash.utils import find_localmduuid, unmunge
+from geordash.utils import find_localmduuid, unmunge, objtype
 from geordash.logwrap import get_logger
 
 import xml.etree.ElementTree as ET
@@ -172,9 +172,9 @@ def owslayer(stype, url, layername, single=False):
             ret['problems'].append({'type': 'ForbiddenAccess', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url })
         elif 'pg_hba.conf' in str(e):
             get_logger("CheckOws").warning(f"{operation} failed on layer {layername} with {str(e)} exception, details not leaked in the job results")
-            ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': "Connection issue to postgis, check credentials" })
+            ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': objtype(e), 'estr': "Connection issue to postgis, check credentials" })
         else:
-            ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': str(type(e)), 'estr': str(e) })
+            ret['problems'].append({'type': 'ServiceException', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url, 'e': objtype(e), 'estr': str(e) })
     else:
        get_logger("CheckOws").debug(f"{operation} on {layername} in {stype} at {url} succeeded")
     return ret
