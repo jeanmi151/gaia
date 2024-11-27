@@ -22,6 +22,7 @@ from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
 from geordash.logwrap import get_logger
+from geordash.utils import objtype
 
 
 # solves conflicts in relationship naming ?
@@ -170,7 +171,7 @@ def check_layers(layers, rescat, resid):
                 get_logger("CheckMapstore").info('uses {} layer name {} from {} (id={})'.format(l['type'], l['name'], l['url'], l['id']))
                 s = app.extensions["owscache"].get(l['type'], l['url'])
                 if s.s is None:
-                    ret.append({'type':'OGCException', 'url': l['url'], 'stype': l['type'], 'exception': str(type(s.exception)), 'exceptionstr': str(s.exception)})
+                    ret.append({'type':'OGCException', 'url': l['url'], 'stype': l['type'], 'exception': objtype(s.exception), 'exceptionstr': str(s.exception)})
                 else:
                     get_logger("CheckMapstore").debug('checking for layer presence in ows entry with ts {}'.format(s.timestamp))
                     if l['name'] not in s.contents():
@@ -181,7 +182,7 @@ def check_layers(layers, rescat, resid):
                     if response.status_code != 200:
                         ret.append({'type': 'BrokenDatasetUrl', 'url': l['url'], 'code': response.status_code})
                 except Exception as e:
-                    ret.append({'type': 'ConnectionFailure', 'url': l['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
+                    ret.append({'type': 'ConnectionFailure', 'url': l['url'], 'exception': objtype(e), 'exceptionstr': str(e)})
             case 'empty':
                 pass
             case 'osm':
@@ -198,14 +199,14 @@ def check_catalogs(catalogs):
             case 'wms'|'wfs'|'wmts'|'csw':
                 s = app.extensions["owscache"].get(c['type'], c['url'])
                 if s.s is None:
-                    ret.append({'type':'OGCException', 'url': c['url'], 'stype': c['type'], 'exception': str(type(s.exception)), 'exceptionstr': str(s.exception)})
+                    ret.append({'type':'OGCException', 'url': c['url'], 'stype': c['type'], 'exception': objtype(s.exception), 'exceptionstr': str(s.exception)})
             case '3dtiles' | 'cog':
                 try:
                     response = requests.head(c['url'], allow_redirects=True)
                     if response.status_code != 200:
                         ret.append({'type': 'BrokenDatasetUrl', 'url': c['url'], 'code': response.status_code})
                 except Exception as e:
-                    ret.append({'type': 'ConnectionFailure', 'url': c['url'], 'exception': str(type(e)), 'exceptionstr': str(e)})
+                    ret.append({'type': 'ConnectionFailure', 'url': c['url'], 'exception': objtype(e), 'exceptionstr': str(e)})
             case _:
                 pass
     return ret
