@@ -235,7 +235,7 @@ def get_resources_using_ows(owstype, url, layer=None):
         else:
             # context without map ?
             if "map" not in data["mapConfig"]:
-                return None
+                continue
             layers = data["mapConfig"]["map"]["layers"]
             rcat = 'CONTEXT'
         for l in layers:
