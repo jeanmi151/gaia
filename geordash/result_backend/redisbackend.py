@@ -140,10 +140,15 @@ class RedisClient:
         if taskname in self.task_by_taskname:
             if tuple(args) in self.task_by_taskname[taskname]:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
+                found_taskids = list()
+                dropped_taskids = list()
                 for taskid in taskids:
+                    v = self.get(taskid)
+                    if v == None:
+                        dropped_taskids.append(taskid)
+                        continue
                     # refresh finished ts from backend if not set
                     if taskids[taskid]["finished"] is None:
-                        v = self.get(taskid)
                         taskb = json.loads(v)
                         date_done = None
                         if 'date_done' in taskb and taskb["date_done"] is not None:
@@ -152,9 +157,12 @@ class RedisClient:
                             (x, y, date_done) = self.get_taskset_details("celery-taskset-meta-" + taskid)
                         if date_done is not None:
                             taskids[taskid] = { "finished": date_done }
-                # flatten the dict, sorting is done client-side
-                r = [ {'id': tid, 'finished': taskids[tid]['finished'] } for tid in taskids ]
-                return r
+                    found_taskids.append({'id': taskid, 'finished': taskids[taskid]["finished"] })
+
+                # remove taskids from the in-memory list
+                for t in dropped_taskids:
+                    del taskids[t]
+                return found_taskids
         return None
 
     def add_taskid_for_taskname_and_args(self, taskname, args, taskid, finished=None):
