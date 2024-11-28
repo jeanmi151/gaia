@@ -29,6 +29,12 @@ def format_datetime(value, format="%d %b %Y %I:%M %p"):
 
 def create_app() -> Flask:
     app = Flask(__name__, static_url_path='/gaia/static')
+
+    @app.context_processor
+    def inject_globals():
+        instancename = app.extensions["conf"].get('instancename')
+        return { 'instancename': instancename }
+
     app.jinja_env.filters['datetimeformat'] = format_datetime
     # cant work since its at /bootstrap and cant be below /gaia ?
     # app.config.update(BOOTSTRAP_SERVE_LOCAL=True)
