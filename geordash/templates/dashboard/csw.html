@@ -13,6 +13,16 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
 
 $(document).ready(function(){
   DisplayPrev('cswservice', '{{ url }}', prev, {{ showdelete|int }});
+{% if cswrecords | length > 0 %}
+  $('#cswrecordstable').bootstrapTable({
+    data: {{ cswrecords | tojson }},
+    columns: [
+      {'title': 'Index', 'formatter': 'runningFormatter'},
+      {'title': 'Uuid', 'field': 'url', 'sortable': true, 'formatter': 'urlFormatter'},
+      {'title': 'Titre', 'field': 'title', 'sortable': true }
+    ]
+  });
+{% endif %}
 });
 </script>
         {% endblock scripts %}
@@ -30,14 +40,12 @@ $(document).ready(function(){
 <form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all metadatas now">
 </form>
-<h2 id='records'>Contents</h2>
-{% if s.contents().items() | length > 0 %}
-<ol>
-{% for md in s.contents().values() | sort(attribute='title') %}
-<li><a href='{{ url_for("dashboard.cswentry", portal=portal, uuid=md.identifier) }}'>{{ md.title }} ({{ md.identifier }})</a></li>
-{% endfor %}
-</ol>
-{% endif %}
+<h2 id='records'>Contents: {{ cswrecord | length }} records</h2>
+<table id="cswrecordstable"
+  data-toggle="true"
+  data-sort-name="title"
+  data-search="true">
+</table>
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
