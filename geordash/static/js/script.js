@@ -281,7 +281,6 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                           prevtable.bootstrapTable("load", data["value"].problems)
                         } else {
                           const pbta = $("<table>")
-                          pbta.attr("data-show-columns", true)
                           pbta.attr("id", targetpbdivid.substring(1) + '-table')
                           $(targetpbdivid).append(pbta)
                           pbta.bootstrapTable({
