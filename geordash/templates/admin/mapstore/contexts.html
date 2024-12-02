@@ -17,9 +17,9 @@ $(document).ready(function(){
   $('#ctxstable').bootstrapTable({
     data: {{ res | tojson }},
     columns: [
-      {'field': 'url', 'title': "Identifier", 'formatter': 'urlFormatter'},
-      {'field': 'title', 'title':'Titre' },
-      {'field': 'owner', 'title': "Créateur"},
+      {'field': 'url', 'sortable': true, 'title': "Identifier", 'formatter': 'urlFormatter'},
+      {'field': 'title', 'sortable': true, 'title':'Titre' },
+      {'field': 'owner', 'sortable': true, 'title': "Créateur"},
       {'field': 'acl', 'title': "Droits d'accès"},
       {'field': 'viewurl', 'title': 'View'}
     ]
