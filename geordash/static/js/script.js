@@ -288,8 +288,8 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                             search: true,
                             columns: [
                               {'title': 'Index', 'formatter': 'runningFormatter'},
-                              {'field': 'url', 'title': argtitle, 'formatter': 'urlFormatter'},
-                              {'field': 'problem', 'title': 'Problem'}
+                              {'field': 'url', 'title': argtitle, 'sortable': true, 'formatter': 'urlFormatter'},
+                              {'field': 'problem', 'title': 'Problem', 'sortable': true}
                             ]
                           });
                         }
