@@ -17,10 +17,10 @@ $(document).ready(function(){
   $('#catalogstable').bootstrapTable({
     data: {{ resources.catlist |tojson }},
     columns: [
-      {'field': 'key', 'title': "Identifier"},
-      {'field': 'type', 'title': "Type"},
-      {'field': 'url', 'title': 'Url', 'formatter':'urlFormatter'},
-      {'field': 'title', 'title':'Titre' }
+      {'field': 'key', 'title': "Identifier", 'sortable': true},
+      {'field': 'type', 'title': "Type", 'sortable': true},
+      {'field': 'url', 'title': 'Url', 'sortable': true, 'formatter':'urlFormatter'},
+      {'field': 'title', 'title':'Titre', 'sortable': true}
     ]
   });
 {% endif %}
