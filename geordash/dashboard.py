@@ -65,8 +65,11 @@ def csw(portal):
     service = app.extensions["owscache"].get('csw', cswurl)
     if service.s is None:
         return abort(404)
+    cswrecords = list()
+    for uuid, record in service.contents().items():
+        cswrecords.append({'title': record.title, 'url': record.identifier, 'xurl': url_for('dashboard.cswentry', portal=portal, uuid=uuid)})
     all_jobs_for_csw = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.csw.check_catalog',[cswurl])
-    return render_template('csw.html', s=service, portal=portal, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('csw.html', s=service, portal=portal, cswrecords=cswrecords, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
