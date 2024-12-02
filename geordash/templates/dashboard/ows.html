@@ -13,6 +13,16 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
 
 $(document).ready(function(){
   DisplayPrev('owsservice/{{ type }}', '{{ url }}', prev, {{ showdelete|int }});
+{% if layers | length > 0 %}
+  $('#owslayerstable').bootstrapTable({
+    data: {{ layers | tojson }},
+    columns: [
+      {'title': 'Index', 'formatter': 'runningFormatter'},
+      {'title': 'Name', 'field': 'url', 'sortable': true, 'formatter': 'urlFormatter'},
+      {'title': 'Titre', 'field': 'title', 'sortable': true }
+    ]
+  });
+{% endif %}
 });
 </script>
         {% endblock scripts %}
@@ -46,14 +56,12 @@ $(document).ready(function(){
 </ul>
 </p>
 {% endif %}
-<h2 id='contents'>Contents: {{ s.contents().items() | length }} layers</h2>
-{% if s.contents().items() | length > 0 %}
-<ol>
-{% for lname, l in s.contents().items() %}
-<li><a href='{{ url_for("dashboard.owslayer", stype=type, url=url, lname=lname) }}'>{{ l.title }} ({{ l.id }})</a></li>
-{% endfor %}
-</ol>
-{% endif %}
+<h2 id='contents'>Contents: {{ layers | length }} layers</h2>
+<table id="owslayerstable"
+  data-toggle="true"
+  data-sort-name="url"
+  data-search="true">
+</table>
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
