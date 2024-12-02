@@ -101,13 +101,17 @@ def cswentry(portal, uuid):
 def ows(stype, url):
     if stype not in ('wms', 'wmts', 'wfs'):
         return abort(412)
+    murl = url
     url = unmunge(url)
     service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
     used_by = get_resources_using_ows(stype, url)
+    layers = list()
+    for lname, l in service.contents().items():
+        layers.append({'title': l.title, 'url': lname, 'xurl': url_for('dashboard.owslayer', stype=stype, url=murl, lname=lname)})
     all_jobs_for_ows = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.ows.owsservice',[stype, url])
-    return render_template('ows.html', s=service, type=stype, url=url.replace('/', '~'), consumers=used_by, previous_jobs=all_jobs_for_ows, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ows.html', s=service, layers=layers, type=stype, url=url.replace('/', '~'), consumers=used_by, previous_jobs=all_jobs_for_ows, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>/<string:lname>")
 def owslayer(stype, url, lname):
