@@ -159,7 +159,12 @@ def metadatas():
                     rep = md.json()
                 retval = list()
                 for h in rep['hits']['hits']:
-                    retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'gaialink': h['isPublishedToAll'] and h['_source']['isHarvested'] != "true", 'title':h['_source']['resourceTitleObject']['default'] });
+                    try:
+                        title = h['_source']['resourceTitleObject']['default']
+                    except KeyError as e:
+                        app.logger.error(f"no title in md {h['_id']} ? no key {str(e)}")
+                        title = "No title in index ?"
+                    retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'gaialink': h['isPublishedToAll'] and h['_source']['isHarvested'] != "true", 'title': title })
                 return jsonify(retval)
     else:
         return preauth.status_code
