@@ -146,6 +146,17 @@ def metadatas():
                 if md.status_code != 200:
                     return md.text
                 rep = md.json()
+                nrec = rep['hits']['total']['value']
+                app.logger.debug(f"got {nrec} records where {username} is editor")
+                if nrec > def_es_querysize:
+                    query["size"] = nrec + 2
+                    md = requests.post(gnurl + "srv/api/search/records/_search",
+                        json = query,
+                        cookies = preauth.cookies,
+                        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'sec-proxy': 'true', 'sec-username': username, 'X-XSRF-TOKEN': preauth.cookies['XSRF-TOKEN']})
+                    if md.status_code != 200:
+                        return md.text
+                    rep = md.json()
                 retval = list()
                 for h in rep['hits']['hits']:
                     retval.append({ '_id':h['_id'], 'gnid': h['_source']['id'], 'gaialink': h['isPublishedToAll'] and h['_source']['isHarvested'] != "true", 'title':h['_source']['resourceTitleObject']['default'] });
