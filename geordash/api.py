@@ -123,6 +123,7 @@ def metadatas():
     username = request.headers.get('Sec-Username','anonymous')
     if username == 'anonymous':
         return abort(403)
+    def_es_querysize = 60
     gnurl = app.extensions["conf"].get(app.extensions["conf"].get('localgn', 'urls'), 'secproxytargets')
     preauth = requests.get(gnurl + "srv/api/me", headers={'Accept': 'application/json'})
     if preauth.status_code == 204:
@@ -134,7 +135,7 @@ def metadatas():
             return me.text
         else:
             if 'id' in me.json():
-                query = { "size": 30,
+                query = { "size": def_es_querysize,
                             "_source": {"includes": ["id", "documentStandard", "resourceTitleObject", "isHarvested", "resourceType" ]},
                             "query": { "bool": { "must": [ { "query_string" : { "query": "owner: {}".format(me.json()['id']) } }, { "terms": { "isTemplate": [ "y", "n" ] } }]}}
                 }
