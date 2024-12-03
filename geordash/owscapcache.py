@@ -103,7 +103,7 @@ class OwsCapCache:
                     entry.s = WebMapService(url, version="1.3.0")
                 except (AttributeError, ServiceException) as e:
                     # XXX hack parses the 403 page returned by the s-p ?
-                    if type(e) == ServiceException and type(e.args) == tuple and ("interdit" in e.args[0] or "401 Authorization Required" in e.args[0]):
+                    if type(e) == ServiceException and type(e.args) == tuple and ("interdit" in e.args[0] or "401 Authorization Required" in e.args[0] or "HTTP Status 401 – Unauthorized" in e.args[0]):
                         get_logger("OwsCapCache").warning("{} needs auth ?".format(url))
                         entry.exception = ServiceException("Needs authentication")
                     else:
@@ -119,7 +119,7 @@ class OwsCapCache:
                 entry.s = WebMapTileService(url)
         except ServiceException as e:
             # XXX hack parses the 403 page returned by the s-p ?
-            if type(e.args) == tuple and ("interdit" in e.args[0] or "401 Authorization Required" in e.args[0]):
+            if type(e.args) == tuple and ("interdit" in e.args[0] or "401 Authorization Required" in e.args[0] or "HTTP Status 401 – Unauthorized" in e.args[0]):
                 get_logger("OwsCapCache").warning("{} needs auth ?".format(url))
                 entry.exception = ServiceException("Needs authentication")
             else:
