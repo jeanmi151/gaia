@@ -168,7 +168,7 @@ def owslayer(stype, url, layername, single=False):
                 ret['problems'].append({'type': 'UnexpectedContentLength', 'operation': operation, 'length': headers['content-length']})
 
     except ServiceException as e:
-        if type(e.args) == tuple and ("interdit" in e.args[0] or "401 Authorization Required" in e.args[0]):
+        if type(e.args) == tuple and ("interdit" in e.args[0] or "401 Authorization Required" in e.args[0] or "HTTP Status 401 – Unauthorized" in e.args[0]):
             ret['problems'].append({'type': 'ForbiddenAccess', 'operation': operation, 'layername': layername, 'stype': stype, 'url': url })
         elif 'pg_hba.conf' in str(e):
             get_logger("CheckOws").warning(f"{operation} failed on layer {layername} with {str(e)} exception, details not leaked in the job results")
