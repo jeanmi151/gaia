@@ -40,7 +40,7 @@ $(document).ready(function(){
 <form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
 <input type=submit value="check all metadatas now">
 </form>
-<h2 id='records'>Contents: {{ cswrecord | length }} records</h2>
+<h2 id='records'>Contents: {{ cswrecords | length }} records</h2>
 <table id="cswrecordstable"
   data-toggle="true"
   data-sort-name="title"
