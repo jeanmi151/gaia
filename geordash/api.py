@@ -135,7 +135,7 @@ def metadatas():
         else:
             if 'id' in me.json():
                 query = { "size": 30,
-                            "_source": {"includes": ["id", "documentStandard", "resourceTitleObject", "isHarvested"]},
+                            "_source": {"includes": ["id", "documentStandard", "resourceTitleObject", "isHarvested", "resourceType" ]},
                             "query": { "bool": { "must": [ { "query_string" : { "query": "owner: {}".format(me.json()['id']) } }, { "terms": { "isTemplate": [ "y", "n" ] } }]}}
                 }
                 md = requests.post(gnurl + "srv/api/search/records/_search",
