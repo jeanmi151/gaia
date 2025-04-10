@@ -68,7 +68,7 @@ def csw(portal):
     for uuid, record in service.contents().items():
         cswrecords.append({'title': record.title, 'url': record.identifier, 'xurl': url_for('dashboard.cswentry', portal=portal, uuid=uuid)})
     all_jobs_for_csw = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.csw.check_catalog',[cswurl])
-    return render_template('csw.html', s=service, portal=portal, cswrecords=cswrecords, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw)
+    return render_template('csw.html', s=service, portal=portal, cswrecords=cswrecords, url=cswurl.replace('/', '~'), previous_jobs=all_jobs_for_csw)
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
@@ -94,7 +94,7 @@ def cswentry(portal, uuid):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
     all_jobs_for_cswrecord = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.csw.check_record',[cswurl, uuid])
-    return render_template('cswentry.html', localgn=localgn, s=service, portal=portal, url=cswurl.replace('/', '~'), r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord)
+    return render_template('cswentry.html', localgn=localgn, s=service, portal=portal, url=cswurl.replace('/', '~'), r=r, gnid=gnid, owslinks=owslinks, previous_jobs=all_jobs_for_cswrecord)
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
