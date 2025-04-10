@@ -11,6 +11,7 @@ from geordash.owscapcache import OwsCapCache
 from geordash.georchestraconfig import GeorchestraConfig
 from geordash.result_backend.redisbackend import RedisClient
 from geordash.checks.mapstore import MapstoreChecker
+from geordash.decorators import is_superuser
 from config import url as redisurl
 import threading
 import logging
@@ -34,6 +35,7 @@ def create_app() -> Flask:
     def inject_globals():
         instancename = app.extensions["conf"].get('instancename')
         return { 'instancename': instancename,
+                'superuser': is_superuser(),
                 'bootstrap': app.extensions["bootstrap"],
                 'localgsbaseurl': app.extensions["conf"].get('localgs', 'urls'),
                 'headerScript': app.extensions["conf"].get('headerScript'),
