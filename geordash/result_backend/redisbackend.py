@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 class RedisClient:
-    def __init__(self, url, app):
+    def __init__(self, url):
         self.r = redis.Redis.from_url(url)
         self.task_by_taskname = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):

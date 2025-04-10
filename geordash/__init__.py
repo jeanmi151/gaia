@@ -60,7 +60,7 @@ def create_app() -> Flask:
     app.extensions["conf"] = conf
     app.extensions["owscache"] = OwsCapCache(conf, app)
     app.extensions["msc"] = MapstoreChecker(conf)
-    app.extensions["rcli"] = RedisClient(redisurl, app)
+    app.extensions["rcli"] = RedisClient(redisurl)
     from . import views, api, admin, dashboard
 
     dashboard.dash_bp.register_blueprint(views.tasks_bp)
