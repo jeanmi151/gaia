@@ -8,10 +8,10 @@ if (prev) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('mapstore', 'configs', last['id'], {{ showdelete|int }}, '#pbtitle');
+  PollTaskRes('mapstore', 'configs', last['id'], {{ superuser|int }}, '#pbtitle');
 }
 $(document).ready(function(){
-  DisplayPrev('mapstore', 'configs', prev, {{ showdelete|int }}, '#previouslist');
+  DisplayPrev('mapstore', 'configs', prev, {{ superuser|int }}, '#previouslist');
 });
 </script>
         {% endblock %}
@@ -20,7 +20,7 @@ $(document).ready(function(){
    <div class="container">
 <div>
 <h2>Check mapstore configs</h2>
-<form id='check' action="javascript:CheckRes('mapstore', 'configs', {{ showdelete|int }} );">
+<form id='check' action="javascript:CheckRes('mapstore', 'configs', {{ superuser|int }} );">
 <input type=submit value="check all mapstore configs now">
 </form>
 <h4 id='pbtitle'>Problems</h4>

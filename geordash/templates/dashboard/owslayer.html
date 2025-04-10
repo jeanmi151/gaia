@@ -8,11 +8,11 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id'], {{ showdelete|int }});
+  PollTaskRes('ows/{{ type }}/{{ url }}', '{{ lname }}', last['id'], {{ superuser|int }});
 }
 
 $(document).ready(function(){
-  DisplayPrev('ows/{{ type }}/{{ url }}', '{{ lname }}', prev, {{ showdelete|int }});
+  DisplayPrev('ows/{{ type }}/{{ url }}', '{{ lname }}', prev, {{ superuser|int }});
 });
 </script>
         {% endblock scripts %}
@@ -40,7 +40,7 @@ $(document).ready(function(){
 </ul>
 {% endif %}
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}
-{% if showdelete %}
+{% if superuser %}
 <a id='reloadlink' href="javascript:ReloadCapabilities('{{ type }}','{{ url }}')" title='Reload capabilities from the remote service and refresh the page'><i class="bi bi-arrow-repeat"></i></a>
 {% endif %}
 <p>Retourner sur le <a href='{{ url_for('dashboard.ows', stype=type, url=url) }}'>contenu du service {{ s.s.url }}</a></p>
@@ -97,7 +97,7 @@ utilisée par:
 </ul>
 </p>
 {% endif %}
-<form id='check' action="javascript:CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}', {{ showdelete|int }});">
+<form id='check' action="javascript:CheckRes('ows/{{ type }}/{{ url }}', '{{ lname }}', {{ superuser|int }});">
 <input type=submit value="check now">
 </form>
 <h2 id='pbtitle'>Problems</h2>

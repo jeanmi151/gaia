@@ -8,11 +8,11 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('owsservice/{{ type }}', '{{ url }}', last['id'], {{ showdelete|int }});
+  PollTaskRes('owsservice/{{ type }}', '{{ url }}', last['id'], {{ superuser|int }});
 }
 
 $(document).ready(function(){
-  DisplayPrev('owsservice/{{ type }}', '{{ url }}', prev, {{ showdelete|int }});
+  DisplayPrev('owsservice/{{ type }}', '{{ url }}', prev, {{ superuser|int }});
 {% if layers | length > 0 %}
   $('#owslayerstable').bootstrapTable({
     data: {{ layers | tojson }},
@@ -33,14 +33,14 @@ $(document).ready(function(){
 <p>titre: {{ s.s.identification.title }}<p>
 <p>résumé: {{ s.s.identification.abstract }}</p>
 <p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}
-{% if showdelete %}
+{% if superuser %}
 <a id='reloadlink' href="javascript:ReloadCapabilities('{{ type }}','{{ url }}')" title='Reload capabilities from the remote service and refresh the page'><i class="bi bi-arrow-repeat"></i></a>
 {% endif %}
 </p>
 <h2 id='pbtitle'>Problems</h2>
 <div id='pbdetails'>No check have been run yet !</div>
 <div id="problems"></div>
-<form id='check' action="javascript:CheckRes('owsservice/{{ type }}', '{{ url }}', {{ showdelete|int }});">
+<form id='check' action="javascript:CheckRes('owsservice/{{ type }}', '{{ url }}', {{ superuser|int }});">
 <input type=submit value="check all layers now">
 </form>
 {% if consumers is not none %}

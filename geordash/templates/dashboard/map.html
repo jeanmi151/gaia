@@ -8,11 +8,11 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('map', {{ mapid }}, last['id'], {{ showdelete|int }});
+  PollTaskRes('map', {{ mapid }}, last['id'], {{ superuser|int }});
 }
 
 $(document).ready(function(){
-  DisplayPrev('map', {{ mapid }}, prev, {{ showdelete|int }});
+  DisplayPrev('map', {{ mapid }}, prev, {{ superuser|int }});
 {% if resources.catlist | length > 0 %}
   $('#catalogstable').bootstrapTable({
     data: {{ resources.catlist |tojson }},
@@ -35,7 +35,7 @@ $(document).ready(function(){
 {% if details.description %}
 <li>Description: {{ details.description }}</li>
 {% endif %}
-{% if showdelete %}
+{% if superuser %}
 <li>Propriétaire: {{ details.owner }}</li>
 {% if 'details' in details.attribute %}
 <li>Présentation: '{{ details.attribute['details'] | safe }}'</li>
@@ -62,7 +62,7 @@ peut visualiser: {{ a.canread }} peut modifier: {{ a.canwrite }}</li>
 </ul>
 {% endif %}
 <a href='/mapstore/#/viewer/{{ mapid }}'>voir la carte</a>
-<form id='check' action="javascript:CheckRes('map', {{ mapid }},  {{ showdelete|int }});">
+<form id='check' action="javascript:CheckRes('map', {{ mapid }},  {{ superuser|int }});">
 <input type=submit value="check now">
 </form>
 <h2 id='pbtitle'>Problems</h2>

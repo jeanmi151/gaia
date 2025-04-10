@@ -8,11 +8,11 @@ if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('cswservice', '{{ url }}', last['id'], {{ showdelete|int }});
+  PollTaskRes('cswservice', '{{ url }}', last['id'], {{ superuser|int }});
 }
 
 $(document).ready(function(){
-  DisplayPrev('cswservice', '{{ url }}', prev, {{ showdelete|int }});
+  DisplayPrev('cswservice', '{{ url }}', prev, {{ superuser|int }});
 {% if cswrecords | length > 0 %}
   $('#cswrecordstable').bootstrapTable({
     data: {{ cswrecords | tojson }},
@@ -37,7 +37,7 @@ $(document).ready(function(){
 <h2 id='pbtitle'>Problems</h2>
 <div id='pbdetails'>No check have been run yet !</div>
 <div id="problems"></div>
-<form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ showdelete|int }});">
+<form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ superuser|int }});">
 <input type=submit value="check all metadatas now">
 </form>
 <h2 id='records'>Contents: {{ cswrecords | length }} records</h2>

@@ -8,11 +8,11 @@ if (prev) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
   });
-  PollTaskRes('mapstore', 'maps', last['id'], {{ showdelete|int }}, '#pbtitle');
+  PollTaskRes('mapstore', 'maps', last['id'], {{ superuser|int }}, '#pbtitle');
 }
 
 $(document).ready(function(){
-  DisplayPrev('mapstore', 'maps', prev, {{ showdelete|int }}, '#previouslist');
+  DisplayPrev('mapstore', 'maps', prev, {{ superuser|int }}, '#previouslist');
 {% if res | length > 0 %}
   $('#mapstable').bootstrapTable({
     data: {{ res | tojson }},
@@ -35,7 +35,7 @@ $(document).ready(function(){
 <div>
 <h2>Check mapstore maps</h2>
 <p>check all mapstore maps.</p>
-<form id='check' action="javascript:CheckRes('mapstore', 'maps', {{ showdelete|int}} );">
+<form id='check' action="javascript:CheckRes('mapstore', 'maps', {{ superuser|int}} );">
 <input type=submit value="check all mapstore maps now">
 </form>
 <h4 id='pbtitle'>Problems</h4>
