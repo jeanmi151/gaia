@@ -27,6 +27,16 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock scripts %}
 
+{% macro render_dropdown_item(endpoint, text, _badge='', _badge_classes='badge text-bg-light') %}
+    {% set active = True if request.endpoint and request.endpoint == endpoint else False %}
+    <li>
+    <a class="dropdown-item{% if active %} active" aria-current="page{% endif %}"
+       href="{{ url_for(endpoint, **kwargs) }}">
+        {{ text }} {% if _badge %}<span class="{{ _badge_classes }}">{{ _badge }}</span>{% endif %}
+    </a>
+    </li>
+{% endmacro %}
+
 {% block content %}
 {% if not request.args.get('noheader') %}
 <div id="go_head">
