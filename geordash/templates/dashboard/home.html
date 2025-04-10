@@ -13,7 +13,7 @@
 welcome to <a href='https://github.com/landryb/gaia/'>gaia (geOrchestra Automated Integrity Analysis) - a geOrchestra dashboard</a> !
 </p>
 {% if 'sec-username' in request.headers %}
-You're authenticated as {{ reqhead['sec-username'] }}
+You're authenticated as {{ request.headers['sec-username'] }}
 {% else %}
 You're not authenticated
 {% endif %}
@@ -64,8 +64,8 @@ You're not authenticated
 <li><a href='{{ url_for('dashboard.admin.mapstore_configs') }}'>mapstore configs checks</a></li>
 <li><a href='{{ url_for('dashboard.admin.mapstore_maps') }}'>mapstore maps</a></li>
 <li><a href='{{ url_for('dashboard.admin.mapstore_contexts') }}'>mapstore contexts</a></li>
-<li><a href='{{ url_for('dashboard.ows', stype='wms', url=gsurl.replace('/','~'))}}'>all geoserver WMS layers</a></li>
-<li><a href='{{ url_for('dashboard.ows', stype='wfs', url=gsurl.replace('/','~'))}}'>all geoserver WFS layers</a></li>
+<li><a href='{{ url_for('dashboard.ows', stype='wms', url=localgsbaseurl + '~ows')}}'>all geoserver WMS layers</a></li>
+<li><a href='{{ url_for('dashboard.ows', stype='wfs', url=localgsbaseurl + '~ows')}}'>all geoserver WFS layers</a></li>
 <li><a href='{{ url_for('dashboard.admin.geonetwork')}}'>geonetwork subportals</a></li>
 <li><a href='{{ url_for('dashboard.csw', portal='srv')}}'>all local metadatas in geonetwork</a></li>
 </ul>

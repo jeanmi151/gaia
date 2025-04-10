@@ -35,6 +35,7 @@ def create_app() -> Flask:
         instancename = app.extensions["conf"].get('instancename')
         return { 'instancename': instancename,
                 'bootstrap': app.extensions["bootstrap"],
+                'localgsbaseurl': app.extensions["conf"].get('localgs', 'urls'),
                 'headerScript': app.extensions["conf"].get('headerScript'),
                 'headerHeight': app.extensions["conf"].get('headerHeight'),
                 'headerUrl': app.extensions["conf"].get('headerUrl'),

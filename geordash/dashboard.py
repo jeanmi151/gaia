@@ -54,8 +54,7 @@ def get_rescontent_from_resid(restype, resid):
 
 @dash_bp.route("/")
 def home():
-    gsurl = '/' + app.extensions["conf"].get('localgs', 'urls') + '/ows'
-    return render_template('home.html', reqhead=request.headers, gsurl=gsurl)
+    return render_template('home.html')
 
 @dash_bp.route("/csw/<string:portal>")
 def csw(portal):
