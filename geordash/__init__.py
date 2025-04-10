@@ -34,6 +34,7 @@ def create_app() -> Flask:
     def inject_globals():
         instancename = app.extensions["conf"].get('instancename')
         return { 'instancename': instancename,
+                'bootstrap': app.extensions["bootstrap"],
                 'headerScript': app.extensions["conf"].get('headerScript'),
                 'headerHeight': app.extensions["conf"].get('headerHeight'),
                 'headerUrl': app.extensions["conf"].get('headerUrl'),

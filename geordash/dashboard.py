@@ -55,7 +55,7 @@ def get_rescontent_from_resid(restype, resid):
 @dash_bp.route("/")
 def home():
     gsurl = '/' + app.extensions["conf"].get('localgs', 'urls') + '/ows'
-    return render_template('home.html', reqhead=request.headers, bootstrap=app.extensions["bootstrap"], gsurl=gsurl)
+    return render_template('home.html', reqhead=request.headers, gsurl=gsurl)
 
 @dash_bp.route("/csw/<string:portal>")
 def csw(portal):
@@ -69,7 +69,7 @@ def csw(portal):
     for uuid, record in service.contents().items():
         cswrecords.append({'title': record.title, 'url': record.identifier, 'xurl': url_for('dashboard.cswentry', portal=portal, uuid=uuid)})
     all_jobs_for_csw = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.csw.check_catalog',[cswurl])
-    return render_template('csw.html', s=service, portal=portal, cswrecords=cswrecords, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('csw.html', s=service, portal=portal, cswrecords=cswrecords, url=cswurl.replace('/', '~'), reqhead=request.headers, previous_jobs=all_jobs_for_csw, showdelete=is_superuser())
 
 @dash_bp.route("/csw/<string:portal>/<string:uuid>")
 def cswentry(portal, uuid):
@@ -95,7 +95,7 @@ def cswentry(portal, uuid):
                 url = url.removeprefix(localdomain)
             owslinks.append({'type': stype, 'url': url, 'layername': u['name'], 'descr': u['description']})
     all_jobs_for_cswrecord = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.csw.check_record',[cswurl, uuid])
-    return render_template('cswentry.html', localgn=localgn, s=service, portal=portal, url=cswurl.replace('/', '~'), r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('cswentry.html', localgn=localgn, s=service, portal=portal, url=cswurl.replace('/', '~'), r=r, gnid=gnid, owslinks=owslinks, reqhead=request.headers, previous_jobs=all_jobs_for_cswrecord, showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>")
 def ows(stype, url):
@@ -111,7 +111,7 @@ def ows(stype, url):
     for lname, l in service.contents().items():
         layers.append({'title': l.title, 'url': lname, 'xurl': url_for('dashboard.owslayer', stype=stype, url=murl, lname=lname)})
     all_jobs_for_ows = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.ows.owsservice',[stype, url])
-    return render_template('ows.html', s=service, layers=layers, type=stype, url=url.replace('/', '~'), consumers=used_by, previous_jobs=all_jobs_for_ows, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ows.html', s=service, layers=layers, type=stype, url=url.replace('/', '~'), consumers=used_by, previous_jobs=all_jobs_for_ows, showdelete=is_superuser())
 
 @dash_bp.route("/ows/<string:stype>/<string:url>/<string:lname>")
 def owslayer(stype, url, lname):
@@ -135,7 +135,7 @@ def owslayer(stype, url, lname):
         params += f"srs={bbox[4]}&layers={lname}&bbox={bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}&height=576&width=768"
     used_by = get_resources_using_ows(stype, url, lname)
     all_jobs_for_owslayer = app.extensions["rcli"].get_taskids_by_taskname_and_args('geordash.checks.ows.owslayer',[stype, url, lname])
-    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, localmduuids=localmduuids, previous_jobs=all_jobs_for_owslayer, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('owslayer.html', s=service, type=stype, url=url.replace('/','~'), lname=lname, consumers=used_by, previewqparams=params, localmduuids=localmduuids, previous_jobs=all_jobs_for_owslayer, showdelete=is_superuser())
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
@@ -146,7 +146,7 @@ def map(mapid):
     resc=get_rescontent_from_resid("MAP", mapid)
     if type(resc) != dict:
         return f"failed getting map resource {mapid} from geostore, got code {resc.status_code}, backend said {resc.text}"
-    return render_template('map.html', mapid=mapid, details=get_res_details(request, m), resources=resc, previous_jobs=all_jobs_for_mapid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('map.html', mapid=mapid, details=get_res_details(request, m), resources=resc, previous_jobs=all_jobs_for_mapid, showdelete=is_superuser())
 
 @dash_bp.route("/context/<int:ctxid>")
 def ctx(ctxid):
@@ -157,4 +157,4 @@ def ctx(ctxid):
     resc=get_rescontent_from_resid("CONTEXT", ctxid)
     if type(resc) != dict:
         return f"failed getting ctx resource {ctxid} from geostore, got code {resc.status_code}, backend said {resc.text}"
-    return render_template('ctx.html', ctxid=ctxid, details=get_res_details(request, c), resources=resc, previous_jobs=all_jobs_for_ctxid, bootstrap=app.extensions["bootstrap"], showdelete=is_superuser())
+    return render_template('ctx.html', ctxid=ctxid, details=get_res_details(request, c), resources=resc, previous_jobs=all_jobs_for_ctxid, showdelete=is_superuser())
