@@ -4,7 +4,14 @@
 
 import redis
 import json
-from geordash.logwrap import get_logger
+try:
+    from geordash.logwrap import get_logger
+except:
+    # to run this module standalone for testing
+    import logging
+    def get_logger():
+        return logging.getLogger()
+
 import sys
 from datetime import datetime
 
