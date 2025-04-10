@@ -36,12 +36,12 @@ const fetchForHome = () => {
         var $table = $('#mapstable');
         var xxdata = [];
         res = mydata['results'];
-        if(mydata['totalCount'] == 0) {
+        if(mydata['results'].length == 0) {
             $table.remove();
             $('#mapstitle').remove();
             return;
         }
-        $('#mapstitle').text(mydata['totalCount'] + ' maps');
+        $('#mapstitle').text(mydata['results'].length + ' maps');
         res.forEach(function (value) {
             id = value['id'];
             value['id'] = '<a href="' + baseurl + '/map/' + id + '">' + id + '</a>';
@@ -63,12 +63,12 @@ const fetchForHome = () => {
         var $table = $('#ctxtable');
         var xxdata = [];
         res = mydata['results'];
-        if(mydata['totalCount'] == 0) {
+        if(mydata['results'].length == 0) {
             $table.remove();
             $('#ctxtitle').remove();
             return;
         }
-        $('#ctxtitle').text(mydata['totalCount'] + ' contexts');
+        $('#ctxtitle').text(mydata['results'].length + ' contexts');
         res.forEach(function (value) {
             id = value['id'];
             value['id'] = '<a href="' + baseurl + '/context/' + id + '">' + id + '</a>';
