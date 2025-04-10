@@ -15,7 +15,7 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin", template_folder='te
 @check_role(role='MAPSTORE_ADMIN')
 def mapstore_configs() -> str:
     all_jobs_for_msconfigs = app.extensions['rcli'].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_configs',[])
-    return render_template("admin/mapstore/configs.html", previous_configs_jobs=all_jobs_for_msconfigs, showdelete=is_superuser())
+    return render_template("admin/mapstore/configs.html", previous_configs_jobs=all_jobs_for_msconfigs)
 
 @admin_bp.route("/geonetwork")
 @check_role(role='GN_ADMIN')
@@ -50,7 +50,7 @@ def mapstore_maps():
             'xurl': url_for('dashboard.map', mapid=m.id ),
             'viewurl': f'<a class="fa" href="/mapstore/#/viewer/{m.id}">view map {m.id}</a>'})
     all_jobs_for_ms_maps = app.extensions['rcli'].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_resources',['MAP'])
-    return render_template("admin/mapstore/maps.html", previous_resources_jobs=all_jobs_for_ms_maps, res=res, showdelete=is_superuser())
+    return render_template("admin/mapstore/maps.html", previous_resources_jobs=all_jobs_for_ms_maps, res=res)
 
 @admin_bp.route("/mapstore/contexts")
 @check_role(role='MAPSTORE_ADMIN')
@@ -73,4 +73,4 @@ def mapstore_contexts():
             'xurl': url_for('dashboard.ctx', ctxid=c.id ),
             'viewurl': f'<a class="fa" href="/mapstore/#/context/{c.name}">view context {c.name}</a>'})
     all_jobs_for_ms_ctxs = app.extensions['rcli'].get_taskids_by_taskname_and_args('geordash.checks.mapstore.check_resources',['CONTEXT'])
-    return render_template("admin/mapstore/contexts.html", previous_resources_jobs=all_jobs_for_ms_ctxs, res=res, showdelete=is_superuser())
+    return render_template("admin/mapstore/contexts.html", previous_resources_jobs=all_jobs_for_ms_ctxs, res=res)
