@@ -41,8 +41,7 @@ const fetchMyMd = (localgnbaseurl) => {
         var $table = $('#table');
         var xxdata = [];
         if(mydata.length == 0) {
-            $table.remove();
-            $('#mdtitle').remove();
+            $('#md').html("<span class='text-warning'>vous n'avez aucune métadonnée ?</span>")
             return;
         }
         $('#mdtitle').text(mydata.length + ' metadatas');
@@ -73,8 +72,7 @@ const fetchMyMaps = () => {
         var xxdata = [];
         res = mydata['results'];
         if(mydata['results'].length == 0) {
-            $table.remove();
-            $('#mapstitle').remove();
+            $('#maps').html("<span class='text-warning'>Aucune carte ?</span>")
             return;
         }
         $('#mapstitle').text(mydata['results'].length + ' maps');
@@ -99,11 +97,10 @@ const fetchMyMaps = () => {
         var xxdata = [];
         res = mydata['results'];
         if(mydata['results'].length == 0) {
-            $table.remove();
-            $('#ctxtitle').remove();
+            $('#ctx').html("<span class='text-warning'>Aucune application ?</span>")
             return;
         }
-        $('#ctxtitle').text(mydata['results'].length + ' contexts');
+        $('#ctxtitle').text(mydata['results'].length + ' applications');
         res.forEach(function (value) {
             id = value['id'];
             value['id'] = '<a href="' + baseurl + '/context/' + id + '">' + id + '</a>';
