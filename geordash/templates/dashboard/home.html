@@ -58,18 +58,6 @@ You're not authenticated
   </thead>
 </table>
 </div>
-{% if 'sec-roles' in request.headers and 'SUPERUSER' in request.headers['sec-roles'] %}
-<p>As a user having SUPERUSER role, you also have access to the following resources:<p>
-<ul>
-<li><a href='{{ url_for('dashboard.admin.mapstore_configs') }}'>mapstore configs checks</a></li>
-<li><a href='{{ url_for('dashboard.admin.mapstore_maps') }}'>mapstore maps</a></li>
-<li><a href='{{ url_for('dashboard.admin.mapstore_contexts') }}'>mapstore contexts</a></li>
-<li><a href='{{ url_for('dashboard.ows', stype='wms', url=localgsbaseurl + '~ows')}}'>all geoserver WMS layers</a></li>
-<li><a href='{{ url_for('dashboard.ows', stype='wfs', url=localgsbaseurl + '~ows')}}'>all geoserver WFS layers</a></li>
-<li><a href='{{ url_for('dashboard.admin.geonetwork')}}'>geonetwork subportals</a></li>
-<li><a href='{{ url_for('dashboard.csw', portal='srv')}}'>all local metadatas in geonetwork</a></li>
-</ul>
-{% endif %}
 </div>
 {% endblock %}
     </body>
