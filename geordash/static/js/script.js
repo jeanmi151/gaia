@@ -354,6 +354,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                           pbta.bootstrapTable({
                             data: data["value"].problems,
                             search: true,
+                            pagination: true,
                             columns: [
                               {'title': 'Index', 'formatter': 'runningFormatter'},
                               {'field': 'url', 'title': argtitle, 'sortable': true, 'formatter': 'urlFormatter'},
