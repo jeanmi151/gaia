@@ -13,6 +13,10 @@ const fetchForHome = (widgets) => {
           $(o["prefix"] + '-abstract').html("<span class='text-warning'>no " + o["taskname"] + " job found with args " + o["taskargs"].join(",") + ", something went wrong ?</span>")
           return;
         }
+        if (mydata['value'] === null && mydata['ready'] === false) {
+          $(o["prefix"] + '-abstract').html("<span class='text-primary'>job is currently running, " + mydata['completed'] + " objects checked</span>")
+          return;
+        }
         let str = "<span class='text-success'>" + mydata['value'].length + ' entries</span><br/>';
         let errors = 0;
         let objWithErrors = 0;
