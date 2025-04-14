@@ -87,6 +87,37 @@ const fetchForHome = () => {
 
 }
 
+const fetchMapsAndCtxCount = (mymaplink) => {
+  fetch(baseurl + '/api/mapstore/maps.json')
+    .then(response => response.json())
+    .then(mydata => {
+        res = mydata['results'];
+        if(res.length == 0) {
+            $('#ms-map-abstract').html("<span class='text-warning'>Aucune carte ?</span>")
+        } else {
+            $('#ms-map-abstract').html("<span class='text-success'>Vous avez accès à <a href='" + mymaplink + "'>" + res.length + " cartes</a></span>")
+        }
+        $('#ms-map-lastupdated').remove()
+    })
+    .catch(function(err) {
+      $('#ms-map-abstract').html("<span class='bg-danger text-white'>something went wrong fetching maps</span>")
+    });
+  fetch(baseurl + '/api/mapstore/contexts.json')
+    .then(response => response.json())
+    .then(mydata => {
+        res = mydata['results'];
+        if(mydata['results'].length == 0) {
+            $('#ms-ctx-abstract').html("<span class='text-warning'>Aucune application ?</span>")
+        } else {
+            $('#ms-ctx-abstract').html("<span class='text-success'>Vous avez accès à <a href='" + mymaplink + "'>" + res.length + " applications</a></span>")
+        }
+        $('#ms-ctx-lastupdated').remove()
+    })
+    .catch(function(err) {
+      $('#ms-ctx-abstract').html("<span class='bg-danger text-white'>something went wrong fetching contexts</span>")
+    });
+}
+
 const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previouslist') => {
     if (taskids === null) { return ; }
     const sorted = taskids.sort((a,b)=>new Date(b['finished']) - new Date(a['finished']));
