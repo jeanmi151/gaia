@@ -70,47 +70,6 @@ welcome to <a href='https://github.com/landryb/gaia/'>gaia (geOrchestra Automate
   </div>
  </div>
 </div>
-<div id='access'>You have access to the following resources</div>
-{% if 'sec-roles' in request.headers and 'GN_EDITOR' in request.headers['sec-roles'] %}
-<div id='md'>
-<h2 id='mdtitle'>Metadatas</h2>
-<p>You are the editor for following metadatas</p>
-<table id="table" class="table">
-  <thead>
-    <tr>
-      <th data-field="uuid" data-sortable='true'>UUID</th>
-      <th data-field="title" data-sortable='true'>Title</th>
-      <th data-field="dhlink">DH</th>
-      <th data-field="editlink">Edit</th>
-    </tr>
-  </thead>
-</table>
-</div>
-{% endif %}
-<div id='mapstore'>
-<h2 id='mapstitle'>Maps</h2>
-<table id="mapstable" class="table">
-  <thead>
-    <tr>
-      <th data-field="id">ID</th>
-      <th data-field="name">Title</th>
-      <th data-field="viewlink">View</th>
-    </tr>
-  </thead>
-</table>
-
-<h2 id='ctxtitle'>Contexts</h2>
-<table id="ctxtable" class="table">
-  <thead>
-    <tr>
-      <th data-field="id">ID</th>
-      <th data-field="name">Title</th>
-      <th data-field="viewlink">Voir</th>
-      <th data-field="editlink">Edit</th>
-    </tr>
-  </thead>
-</table>
-</div>
 </div>
 {% endblock %}
     </body>
