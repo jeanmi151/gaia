@@ -5,6 +5,10 @@ const fetchForHome = (widgets) => {
     fetch(baseurl + '/tasks/lastresultbytask/' + o["taskname"] + "?taskargs=" + o["taskargs"].join(","))
       .then(response => response.json())
       .then(mydata => {
+        if (Number.isInteger(mydata["finished"])) {
+          const d = new Date(mydata["finished"] * 1000);
+          $(o["prefix"] + '-lastupdated').html("Information valid as of "+ d.toLocaleString("fr-FR") + '<br/>(taskid: '+ mydata['taskid'] + ')')
+        }
         if (mydata === "notask") {
           $(o["prefix"] + '-abstract').html("<span class='text-warning'>no " + o["taskname"] + " job found with args " + o["taskargs"].join(",") + ", something went wrong ?</span>")
           return;
@@ -25,8 +29,6 @@ const fetchForHome = (widgets) => {
           str += "<span class='text-success'> no errors !</span>";
         }
         $(o["prefix"] + '-abstract').html(str);
-        const d = new Date(mydata["finished"] * 1000);
-        $(o["prefix"] + '-lastupdated').html("Information valid as of "+ d.toLocaleString("fr-FR") + '<br/>(taskid: '+ mydata['taskid'] + ')')
     })
     .catch(function(err) {
       $(o["prefix"] + '-abstract').html("<span class='bg-danger text-white'>something went wrong</span>")
