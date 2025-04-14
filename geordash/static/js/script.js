@@ -61,7 +61,7 @@ const fetchMyMd = (localgnbaseurl) => {
         });
     })
     .catch(function(err) {
-      $('#md').remove()
+      $('#md').html("<span class='bg-danger text-white'>something went wrong fetching your metadatas</span>")
     });
 }
 
@@ -89,8 +89,7 @@ const fetchMyMaps = () => {
         });
     })
     .catch(function(err) {
-      $('#mapstable').remove();
-      $('#mapstitle').remove();
+      $('#maps').html("<span class='bg-danger text-white'>something went wrong fetching maps</span>")
     });
 
   fetch(baseurl + '/api/mapstore/contexts.json')
@@ -117,8 +116,7 @@ const fetchMyMaps = () => {
         });
     })
     .catch(function(err) {
-      $('#ctxtable').remove();
-      $('#ctxtitle').remove();
+      $('#ctx').html("<span class='bg-danger text-white'>something went wrong fetching contexts</span>")
     });
 
 }
