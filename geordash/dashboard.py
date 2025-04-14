@@ -6,7 +6,7 @@ from flask import Blueprint
 from flask import request, render_template, abort, url_for
 from flask import current_app as app
 
-from geordash.decorators import is_superuser
+from geordash.decorators import is_superuser, check_role
 from geordash.checks.mapstore import get_resources_using_ows, get_res
 from geordash.api import mapstore_get, gninternalid, get_res_details
 from geordash.utils import find_localmduuid, unmunge
