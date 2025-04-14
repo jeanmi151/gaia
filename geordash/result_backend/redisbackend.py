@@ -196,9 +196,9 @@ if __name__ == '__main__':
     print(rc.task_by_taskname["geordash.checks.mapstore.check_res"].keys())
     print(rc.task_by_taskname["geordash.checks.mapstore.check_res"][("CONTEXT", 38)])
     print(tuple(["CONTEXT", 38]) in rc.task_by_taskname["geordash.checks.mapstore.check_res"])
-    print(len(rc.get("celery-task-meta-0cbc9aee-a2ea-4933-99b9-f448fb127044")))
-    print(len(rc.get("0cbc9aee-a2ea-4933-99b9-f448fb127044")))
-    print(len(rc.get("celery-task-meta-489dfd21-ad1a-4317-97da-af33d4111099")))
+    print(len(rc.get("celery-task-meta-c2bd9571-0ff0-4272-b882-f813c35a2d44")))
+    print(len(rc.get("c2bd9571-0ff0-4272-b882-f813c35a2d44")))
+    print(len(rc.get("celery-taskset-meta-9678631a-7fb6-42e0-83a9-1b9a9558949f")))
     tasks = rc.get_taskids_by_taskname_and_args("geordash.checks.mapstore.check_res", ["MAP", 1])
     print(tasks)
     for f in tasks:
@@ -206,3 +206,5 @@ if __name__ == '__main__':
         print(f['finished'])
         j = json.loads(rc.get(f['id']))
         print(j["result"]["problems"])
+    print(rc.get_taskids_by_taskname_and_args("geordash.checks.ows.owsservice", ["wfs", "/wxs/geor_loc/ows"]))
+    print(rc.get_last_taskid_for_taskname_and_args("geordash.checks.ows.owsservice", ["wfs", "/wxs/geor_loc/ows"]))
