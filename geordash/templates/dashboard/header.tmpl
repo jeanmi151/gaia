@@ -79,6 +79,10 @@ Non connecté
       <li class="nav-item dropdown px-2">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">Geonetwork</a>
         <ul class="dropdown-menu">
+{% if 'sec-roles' in request.headers and 'GN_EDITOR' in request.headers['sec-roles'] %}
+          {{ render_dropdown_item('dashboard.my_metadata', 'Mes métadonnées') }}
+          <li><hr class="dropdown-divider"></li>
+{% endif %}
           {{ render_dropdown_item('dashboard.csw', 'Tout Geonetwork', portal='srv') }}
 <!-- XX loop over list of subportals here -->
           <li><hr class="dropdown-divider"></li>
@@ -97,16 +101,18 @@ Non connecté
           <li><hr class="dropdown-divider"></li>
         </ul>
       </li>
-{% if superuser %}
       <li class="nav-item dropdown px-2">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mapstore</a>
         <ul class="dropdown-menu">
-          {{ render_dropdown_item('dashboard.admin.mapstore_maps', 'Cartes') }}
-          {{ render_dropdown_item('dashboard.admin.mapstore_contexts', 'Contextes') }}
+          {{ render_dropdown_item('dashboard.my_maps_and_apps', 'Cartes et contextes') }}
+{% if superuser %}
+          <li><hr class="dropdown-divider"></li>
+          {{ render_dropdown_item('dashboard.admin.mapstore_maps', 'Toutes les cartes') }}
+          {{ render_dropdown_item('dashboard.admin.mapstore_contexts', 'Tous les contextes') }}
           {{ render_dropdown_item('dashboard.admin.mapstore_configs', 'Configurations') }}
+{% endif %}
         </ul>
       </li>
-{% endif %}
     </ul>
   </div>
 </div>
