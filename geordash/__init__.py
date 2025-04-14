@@ -38,6 +38,7 @@ def create_app() -> Flask:
                 'superuser': is_superuser(),
                 'bootstrap': app.extensions["bootstrap"],
                 'localgsbaseurl': app.extensions["conf"].get('localgs', 'urls'),
+                'localgnbaseurl': app.extensions["conf"].get('localgn', 'urls'),
                 'headerScript': app.extensions["conf"].get('headerScript'),
                 'headerHeight': app.extensions["conf"].get('headerHeight'),
                 'headerUrl': app.extensions["conf"].get('headerUrl'),
