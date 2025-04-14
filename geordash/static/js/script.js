@@ -1,6 +1,40 @@
 const baseurl = '/' + window.location.pathname.split('/')[1]
 
-const fetchForHome = () => {
+const fetchForHome = (widgets) => {
+  widgets.forEach(function(o) {
+    fetch(baseurl + '/tasks/lastresultbytask/' + o["taskname"] + "?taskargs=" + o["taskargs"].join(","))
+      .then(response => response.json())
+      .then(mydata => {
+        if (mydata === "notask") {
+          $(o["prefix"] + '-abstract').html("<span class='text-warning'>no " + o["taskname"] + " job found with args " + o["taskargs"].join(",") + ", something went wrong ?</span>")
+          return;
+        }
+        let str = "<span class='text-success'>" + mydata['value'].length + ' entries</span><br/>';
+        let errors = 0;
+        let objWithErrors = 0;
+        mydata['value'].forEach(obj => {
+          const nerrors = obj['problems'].length;
+          if (nerrors > 0) {
+            errors += nerrors;
+            objWithErrors += 1;
+          }
+        });
+        if (errors > 0) {
+          str += "<span class='text-danger'>" + errors + " errors found in " + objWithErrors + " objects !</span>";
+        } else {
+          str += "<span class='text-success'> no errors !</span>";
+        }
+        $(o["prefix"] + '-abstract').html(str);
+        const d = new Date(mydata["finished"] * 1000);
+        $(o["prefix"] + '-lastupdated').html("Information valid as of "+ d.toLocaleString("fr-FR") + '<br/>(taskid: '+ mydata['taskid'] + ')')
+    })
+    .catch(function(err) {
+      $(o["prefix"] + '-abstract').html("<span class='bg-danger text-white'>something went wrong</span>")
+    });
+  })
+}
+
+const fetchMyMd = (localgnbaseurl) => {
   fetch(baseurl + '/api/geonetwork/metadatas.json')
     .then(response => response.json())
     .then(mydata => {
@@ -29,7 +63,9 @@ const fetchForHome = () => {
     .catch(function(err) {
       $('#md').remove()
     });
+}
 
+const fetchMyMaps = () => {
   fetch(baseurl + '/api/mapstore/maps.json')
     .then(response => response.json())
     .then(mydata => {
