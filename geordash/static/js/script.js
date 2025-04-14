@@ -19,7 +19,7 @@ const fetchForHome = () => {
               value['uuid'] = value['_id'];
             }
             value['dhlink']='<a href="/datahub/dataset/' + value['_id'] + '">voir</a>';
-            value['editlink']='<a href="/geocat/srv/fre/catalog.edit#/metadata/' + value['gnid'] +'?redirectUrl=catalog.edit">editer</a>';
+            value['editlink']='<a href="/' + localgnbaseurl + '/srv/fre/catalog.edit#/metadata/' + value['gnid'] +'?redirectUrl=catalog.edit">editer</a>';
             xxdata.push(value);
         });
         $(function() {
