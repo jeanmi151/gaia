@@ -71,6 +71,20 @@ def result(id: str) -> dict[str, object]:
         "value": value,
     }
 
+@tasks_bp.get("/lastresultbytask/<string:taskname>")
+def last_result_by_taskname_and_args(taskname: str) -> dict[str, object]:
+    args = request.args.get('taskargs', None)
+    if args:
+      argslist = args.split(',')
+    else:
+      argslist = []
+    app.logger.info(f"last_result_by_taskname_and_args({taskname},{argslist})")
+    taskid = app.extensions["rcli"].get_last_taskid_for_taskname_and_args(taskname, argslist)
+    if taskid:
+        app.logger.info(f"fetching result for taskid {taskid}")
+        return result(taskid)
+    return jsonify("notask")
+
 @tasks_bp.get("/forget/<id>")
 @check_role(role='SUPERUSER')
 def forget(id: str):
