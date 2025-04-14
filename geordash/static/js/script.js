@@ -5,7 +5,7 @@ const fetchForHome = (widgets) => {
     fetch(baseurl + '/tasks/lastresultbytask/' + o["taskname"] + "?taskargs=" + o["taskargs"].join(","))
       .then(response => response.json())
       .then(mydata => {
-        if (Number.isInteger(mydata["finished"])) {
+        if (parseInt(mydata["finished"])) {
           const d = new Date(mydata["finished"] * 1000);
           $(o["prefix"] + '-lastupdated').html("Information valid as of "+ d.toLocaleString("fr-FR") + '<br/>(taskid: '+ mydata['taskid'] + ')')
         }
