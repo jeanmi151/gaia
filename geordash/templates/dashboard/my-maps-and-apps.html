@@ -1,0 +1,50 @@
+{% set title = 'Mes cartes et applications' %}
+{% include 'header.tmpl' %}
+
+{% block scripts %}
+<script>
+  fetchMyMaps();
+</script>
+{% endblock %}
+{% block content %}
+<div class="container">
+<div id='mapstore'>
+  Vous avez accès aux cartes et applications suivantes:
+  <ul>
+    <li>soit parce que vous en êtes l'auteur</li>
+    <li>soit parce qu'on vous en a explicitement autorisé l'accès</li>
+    <li>soit parce qu'elles sont publiques</li>
+  </ul>
+  <div id='maps'>
+  <h2 id='mapstitle'>Maps</h2>
+  <table id="mapstable" class="table">
+    <thead>
+      <tr>
+        <th data-field="id">ID</th>
+        <th data-field="name">Title</th>
+        <th data-field="viewlink">View</th>
+       </tr>
+    </thead>
+  </table>
+  </div>
+
+  <div id='ctx'>
+  <h2 id='ctxtitle'>Applications</h2>
+  <table id="ctxtable" class="table">
+    <thead>
+      <tr>
+        <th data-field="id">ID</th>
+        <th data-field="name">Title</th>
+        <th data-field="viewlink">Voir</th>
+{% if 'sec-roles' in request.headers and 'MAPSTORE_ADMIN' in request.headers['sec-roles'] %}
+        <th data-field="editlink">Edit</th>
+{% endif %}
+      </tr>
+    </thead>
+  </table>
+  </div>
+</div>
+</div>
+{% endblock %}
+</body>
+</html>

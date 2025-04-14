@@ -1,0 +1,28 @@
+{% set title = 'Mes métadonnées' %}
+{% include 'header.tmpl' %}
+
+{% block scripts %}
+<script>
+  fetchMyMd('{{ localgnbaseurl }}');
+</script>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div id='md'>
+    <h2 id='mdtitle'>Metadatas</h2>
+    <p>si le champ UUID n'est pas un lien, il est probable que la métadonnée ne soit pas publique.</p>
+    <table id="table" class="table">
+      <thead>
+        <tr>
+          <th data-field="uuid" data-sortable='true'>UUID</th>
+          <th data-field="title" data-sortable='true'>Titre</th>
+          <th data-field="dhlink">Visualiser dans datahub</th>
+          <th data-field="editlink">Editer</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+</div>
+{% endblock %}
+</body>
+</html>

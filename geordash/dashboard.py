@@ -56,6 +56,15 @@ def get_rescontent_from_resid(restype, resid):
 def home():
     return render_template('home.html')
 
+@dash_bp.route("/my-metadata")
+@check_role(role='GN_EDITOR')
+def my_metadata():
+    return render_template('my-metadata.html')
+
+@dash_bp.route("/my-maps-and-apps")
+def my_maps_and_apps():
+    return render_template('my-maps-and-apps.html')
+
 @dash_bp.route("/csw/<string:portal>")
 def csw(portal):
     # XXX for now only support the local GN
