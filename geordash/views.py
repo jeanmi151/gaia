@@ -78,10 +78,10 @@ def last_result_by_taskname_and_args(taskname: str) -> dict[str, object]:
       argslist = args.split(',')
     else:
       argslist = []
-    app.logger.info(f"last_result_by_taskname_and_args({taskname},{argslist})")
+    app.logger.debug(f"last_result_by_taskname_and_args({taskname},{argslist})")
     taskid = app.extensions["rcli"].get_last_taskid_for_taskname_and_args(taskname, argslist)
     if taskid:
-        app.logger.info(f"fetching result for taskid {taskid}")
+        app.logger.debug(f"fetching result for taskid {taskid}")
         return result(taskid)
     return jsonify("notask")
 
