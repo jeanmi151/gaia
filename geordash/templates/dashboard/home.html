@@ -12,6 +12,53 @@
 <p>
 welcome to <a href='https://github.com/landryb/gaia/'>gaia (geOrchestra Automated Integrity Analysis) - a geOrchestra dashboard</a> !
 </p>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+ <div class="col">
+  <div class="card h-100" id="gs-wms-card">
+    <div class="card-body">
+      <h5 class="card-title">Geoserver WMS</h5>
+      <p class="card-text" id="gs-wms-abstract">Placeholder</p>
+      <p class="card-text"><small class="text-muted" id="gs-wms-lastupdated">Job never ran</small></p>
+    </div>
+  </div>
+ </div>
+ <div class="col">
+  <div class="card h-100" id="gs-wfs-card">
+    <div class="card-body">
+      <h5 class="card-title">Geoserver WFS</h5>
+      <p class="card-text" id="gs-wfs-abstract">Placeholder</p>
+      <p class="card-text"><small class="text-muted" id="gs-wfs-lastupdated">Job never ran</small></p>
+    </div>
+  </div>
+ </div>
+ <div class="col">
+  <div class="card h-100" id="ms-map-card">
+    <div class="card-body">
+      <h5 class="card-title">Mapstore maps</h5>
+      <p class="card-text" id="ms-map-abstract">Placeholder</p>
+      <p class="card-text"><small class="text-muted" id="ms-map-lastupdated">Job never ran</small></p>
+    </div>
+  </div>
+ </div>
+ <div class="col">
+  <div class="card h-100" id="ms-ctx-card">
+    <div class="card-body">
+      <h5 class="card-title">Mapstore contexts</h5>
+      <p class="card-text" id="ms-ctx-abstract">Placeholder</p>
+      <p class="card-text"><small class="text-muted" id="ms-ctx-lastupdated">Job never ran</small></p>
+    </div>
+  </div>
+ </div>
+ <div class="col">
+  <div class="card h-100" id="gn-csw-card">
+    <div class="card-body">
+      <h5 class="card-title">Geonetwork CSW</h5>
+      <p class="card-text" id="gn-csw-abstract">Placeholder</p>
+      <p class="card-text"><small class="text-muted" id="gn-csw-lastupdated">Job never ran</small></p>
+    </div>
+  </div>
+ </div>
+</div>
 <div id='access'>You have access to the following resources</div>
 {% if 'sec-roles' in request.headers and 'GN_EDITOR' in request.headers['sec-roles'] %}
 <div id='md'>
