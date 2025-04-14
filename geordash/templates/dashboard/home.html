@@ -12,11 +12,6 @@
 <p>
 welcome to <a href='https://github.com/landryb/gaia/'>gaia (geOrchestra Automated Integrity Analysis) - a geOrchestra dashboard</a> !
 </p>
-{% if 'sec-username' in request.headers %}
-You're authenticated as {{ request.headers['sec-username'] }}
-{% else %}
-You're not authenticated
-{% endif %}
 <div id='access'>You have access to the following resources</div>
 {% if 'sec-roles' in request.headers and 'GN_EDITOR' in request.headers['sec-roles'] %}
 <div id='md'>
