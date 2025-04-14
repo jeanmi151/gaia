@@ -3,7 +3,18 @@
 
         {% block scripts %}
             <script>
-              fetchForHome();
+              fetchForHome([
+                {"prefix": "#gs-wms", "taskname": "geordash.checks.ows.owsservice","taskargs": ["wms","/{{ localgsbaseurl }}/ows" ]},
+                {"prefix": "#gs-wfs", "taskname": "geordash.checks.ows.owsservice","taskargs": ["wfs","/{{ localgsbaseurl }}/ows" ]},
+                {"prefix": "#gn-csw", "taskname": "geordash.checks.csw.check_catalog","taskargs": ["/{{ localgnbaseurl }}/srv/fre/csw" ]},
+{% if 'sec-roles' in request.headers and 'MAPSTORE_ADMIN' in request.headers['sec-roles'] %}
+                {"prefix": "#ms-map", "taskname": "geordash.checks.mapstore.check_resources","taskargs": ['MAP']},
+                {"prefix": "#ms-ctx", "taskname": "geordash.checks.mapstore.check_resources","taskargs": ['CONTEXT']},
+{% endif %}
+              ]);
+{% if 'sec-roles' not in request.headers or ( 'sec-roles' in request.headers and 'MAPSTORE_ADMIN' not in request.headers['sec-roles'] ) %}
+              fetchMapsAndCtxCount('{{ url_for('dashboard.my_maps_and_apps') }}');
+{% endif %}
             </script>
         {% endblock %}
         <!-- Your page content -->
