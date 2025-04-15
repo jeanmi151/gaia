@@ -168,3 +168,16 @@ def metadatas():
                 return jsonify(retval)
     else:
         return preauth.status_code
+
+@api_bp.route("/geoserver/workspaces.json")
+def geoserver_workspaces():
+    """
+    Get the list of workspaces by querying the rest API
+    Reuses the credentials of the current user by passing request headers
+    """
+    gsurl = app.extensions["conf"].get(app.extensions["conf"].get('localgs', 'urls'), 'secproxytargets')
+    workspaces = requests.get(gsurl + 'rest/workspaces.json',
+        headers = request.headers)
+    if workspaces.status_code != 200:
+        return workspaces.text
+    return workspaces.json()
