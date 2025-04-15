@@ -255,6 +255,13 @@ def get_resources_using_ows(owstype, url, layer=None):
                         servicemap[skey] = set()
                     layermap[lkey].add(val)
                     servicemap[skey].add(val)
+                    if serviceurl != l['url']:
+                        # store the service a second time in the servicemap with the 'original' url including the workspace
+                        (ourl, layername) = normalize_gs_workspace_layer (l['url'], None)
+                        oskey = (l['type'], ourl)
+                        if oskey not in servicemap:
+                            servicemap[oskey] = set()
+                        servicemap[oskey].add(val)
                 case _:
                     pass
     if layer is None:
