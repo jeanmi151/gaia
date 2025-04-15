@@ -5,7 +5,7 @@
 from flask import Blueprint
 from flask import request, render_template, url_for, make_response, jsonify
 from flask import current_app as app
-from geordash.api import geonetwork_subportals, get_res_details
+from geordash.api import geonetwork_subportals, get_res_details, geoserver_workspaces
 from geordash.checks.mapstore import get_all_res
 from geordash.decorators import is_superuser, check_role
 
@@ -28,6 +28,16 @@ def geonetwork():
         p['url'] = '/' + localgn + '/' + p['uuid'] + '/fre/csw'
         p['xurl'] = url_for('dashboard.csw', portal=p['uuid'])
     return render_template("admin/geonetwork.html", portals=portals)
+
+@admin_bp.route("/geoserver")
+@check_role(role='ADMINISTRATOR')
+def geoserver():
+    localgs = app.extensions["conf"].get('localgs', 'urls')
+    ws = geoserver_workspaces()
+    if 'workspaces' not in ws and 'workspace' not in ws['workspaces'] or type (ws['workspaces']['workspace']) != list:
+        return make_response(jsonify({'error': f'an error occured when fetching workspaces: got {ws}'}, 404))
+    workspaces = ws['workspaces']['workspace']
+    return render_template("admin/geoserver.html", workspaces=workspaces)
 
 @admin_bp.route("/mapstore/maps")
 @check_role(role='MAPSTORE_ADMIN')
