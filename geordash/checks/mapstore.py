@@ -22,7 +22,7 @@ from celery import Task
 from celery import group
 from celery.utils.log import get_task_logger
 from geordash.logwrap import get_logger
-from geordash.utils import objtype
+from geordash.utils import objtype, normalize_gs_workspace_layer
 
 
 # solves conflicts in relationship naming ?
@@ -223,6 +223,7 @@ def get_resources_using_ows(owstype, url, layer=None):
     msc = app.extensions["msc"]
     if '~' in url:
         url = url.replace('~','/')
+    (url, layer) = normalize_gs_workspace_layer (url, layer)
     layermap = dict()
     servicemap = dict()
     resources = msc.session().query(msc.Resource).filter(or_(msc.Resource.category_id == msc.cat['MAP'], msc.Resource.category_id == msc.cat['CONTEXT'])).all()
