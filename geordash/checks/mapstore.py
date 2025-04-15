@@ -244,8 +244,10 @@ def get_resources_using_ows(owstype, url, layer=None):
                 continue
             match l['type']:
                 case 'wms'|'wfs'|'wmts':
-                    lkey = (l['type'], l['url'], l['name'])
-                    skey = (l['type'], l['url'])
+                    serviceurl = l['url']
+                    (serviceurl, layername) = normalize_gs_workspace_layer (l['url'], l['name'])
+                    lkey = (l['type'], serviceurl, layername)
+                    skey = (l['type'], serviceurl)
                     val = (rcat, r.id, r.name)
                     if lkey not in layermap:
                         layermap[lkey] = set()
