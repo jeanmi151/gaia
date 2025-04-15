@@ -223,7 +223,9 @@ def get_resources_using_ows(owstype, url, layer=None):
     msc = app.extensions["msc"]
     if '~' in url:
         url = url.replace('~','/')
+#    get_logger("CheckMapstore").debug(f"looking for usage of type {owstype} url {url} layer {layer}")
     (url, layer) = normalize_gs_workspace_layer (url, layer)
+#    get_logger("CheckMapstore").debug(f"after normalization, url is {url} and layer is {layer}")
     layermap = dict()
     servicemap = dict()
     resources = msc.session().query(msc.Resource).filter(or_(msc.Resource.category_id == msc.cat['MAP'], msc.Resource.category_id == msc.cat['CONTEXT'])).all()
@@ -246,6 +248,8 @@ def get_resources_using_ows(owstype, url, layer=None):
                 case 'wms'|'wfs'|'wmts':
                     serviceurl = l['url']
                     (serviceurl, layername) = normalize_gs_workspace_layer (l['url'], l['name'])
+#                    if serviceurl != l['url'] or layername != l['name']:
+#                        get_logger("CheckMapstore").debug(f"normalize_gs_workspace_url({l['url']},{l['name']}) returned ({url}, {layername})")
                     lkey = (l['type'], serviceurl, layername)
                     skey = (l['type'], serviceurl)
                     val = (rcat, r.id, r.name)
