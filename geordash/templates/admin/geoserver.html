@@ -1,0 +1,44 @@
+{% set title = 'admin geoserver' %}
+{% include 'header.tmpl' %}
+
+{% block scripts %}
+<script>
+$(document).ready(function(){
+{% if workspaces | length == 0 %}
+  $('#workspacestable').remove()
+  $('#workspaceheader').html("<span class='text-warning'>Aucun workspace configuré ?</span>")
+{% endif %}
+});
+</script>
+{% endblock %}
+{% block content %}
+ <div class="container">
+<h1>Geoserver</h1>
+<div id='workspaceheader'>
+Liste des espaces de travail configurés dans geoserver, chacun des liens pointent vers la page listant les couches du service.
+</div>
+    <table
+      id="workspacestable"
+      data-pagination="true"
+      data-toggle="table"
+      data-search="true">
+      <thead>
+        <tr>
+          <th data-field="name">Nom</th>
+          <th data-field="wmslink">WMS</th>
+          <th data-field="wfslink">WFS</th>
+        </tr>
+      </thead>
+{% if workspaces | length > 0 %}
+{% for w in workspaces %}
+  <tr>
+    <td>{{ w['name'] }}</td>
+    <td><a href='{{ url_for('dashboard.ows', stype='wms', url=localgsbaseurl + '~' + w['name'] + '~ows') }}'>/{{ localgsbaseurl }}/{{ w['name'] }}/wms</a></td>
+    <td><a href='{{ url_for('dashboard.ows', stype='wfs', url=localgsbaseurl + '~' + w['name'] + '~ows') }}'>/{{ localgsbaseurl }}/{{ w['name'] }}/wfs</a></td>
+{% endfor %}
+{% endif %}
+   </table>
+   </div>
+{% endblock %}
+</body>
+</html>
