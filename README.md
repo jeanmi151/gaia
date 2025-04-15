@@ -134,10 +134,24 @@ map by its numeric id, you should be able to directly access it by typing the
 url in your browser.
 
 ### `/`
-lists:
-- metadatas belonging to the connected user
-- maps and contexts he is allowed to visit
-- additionals links to admin pages for users having ROLE_SUPERUSER
+shows cards with results of the last check for:
+- all geoserver WMS layers
+- all geoserver WFS layers
+- all geonetwork metadatas
+
+if the user is a superuser:
+- all mapstore maps
+- all mapstore contexts
+
+instead, amount of maps/contexts that the current user can access.
+
+### `/my-metadata`
+- lists the metadata a user with ROLE_GN_EDITOR can edit
+
+### `/my-maps-and-apps`
+- lists the mapstore maps and context the current user can access
+- whether he is connected and has been granted access to/created some content
+- or the public content that is available
 
 ### `/admin/mapstore/configs`
 - lists current problems on mapstore configuration files in the datadir (`new.json`, `config.json`, `localConfig.json`)
@@ -154,6 +168,9 @@ lists:
 
 ### `/admin/geonetwork`
 - lists currently configured portals in geonetwork
+
+### `/admin/geoserver`
+- lists currently configured workspaces in geoserver
 
 ### `/map/<mapid>`
 - displays map details & current problems
