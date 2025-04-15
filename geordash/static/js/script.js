@@ -370,7 +370,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                     $(targetpbdivid).empty();
                   }
                   const d = new Date(data["finished"] * 1000);
-                  $(targetpbdetdivid).text('vérification faite le '+ d);
+                  $(targetpbdetdivid).text('vérification faite le '+ d.toLocaleString("fr-FR"));
                   if ($(targetpreviousdivid).children().length == 0) {
                     $(targetpreviousdivid).html(ArrayToHtmlList([]));
                   }
