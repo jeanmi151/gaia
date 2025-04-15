@@ -3,6 +3,7 @@
 # vim: ts=4 sw=4 et
 
 from flask import current_app as app
+from geordash.logwrap import get_logger
 
 def find_localmduuid(service, layername):
     localmduuids = set()
@@ -50,3 +51,61 @@ def objtype(o):
     """
     k = o.__class__
     return ".".join([k.__module__, k.__name__])
+
+def normalize_gs_workspace_layer(url, layer=None):
+    """
+    normalize the various ways to address the same gs layer:
+    - https://fqdn/wxs/wms -> /wxs/ows
+    - /wxs/wms -> /wxs/ows
+    - wxs/wfs -> /wxs/ows
+    - /wxs/cd01/wfs, layer=foo -> /wxs/ows, layer=cd01:foo
+    - /wxs/cd01/wms, layer=cd01:foo -> /wxs/ows, layer=cd01:foo
+    - /wxs/wms, layer=cd01:foo -> /wxs/ows, layer=cd01:foo
+    """
+
+    localgsbaseurl = app.extensions["conf"].get('localgs', 'urls')
+    localdomain = "https://" + app.extensions["conf"].get("domainName")
+
+    if url.startswith(localdomain):
+        # strip localdomain from looked up url, should end up with /localgsbaseurl/<ws>/{ows,wms,wfs}
+        url = url.removeprefix(localdomain)
+    else:
+        # if url doesnt start with localdomain or isnt a full url, ensure it starts with a leading / (shouldnt happen.. who knows)
+        if not url.startswith('https://') and not url.startswith('http://') and not url.startswith('/'):
+            url = '/' + url
+
+    # are we talking to 'a geoserver' ?
+    if '/' + localgsbaseurl + '/' in url:
+        # account for the various ways to use geoserver (eg /ows, /wms, /wfs...)
+        # and ensure the url finishes by /ows
+        url = url.removesuffix('/wms').removesuffix('/wfs').removesuffix('/ows') + '/ows'
+        # look for the workspace in the url, set the url to the global one and
+        # put the workspace as a prefix of the layername
+        if layer is not None and url.count('/') > 2:
+            ourl = url
+            # url like protocol://domain
+            if url.startswith('https://') or url.startswith('http://'):
+                parts = url.split('/')
+                protocol = parts[0]
+                fqdn = parts[2]
+                # that's a full url with the workspace
+                if url.count('/') == 5 and parts[5] == 'ows':
+                    ws = parts[4]
+                else:
+                    if ':' in layer:
+                        ws = layer.split(':')[0]
+                    else:
+                        get_logger("CheckMapstore").warning(f"havent been able to find workspace with url {url} and layer {layer}")
+                url = f"{protocol}//{fqdn}/{localgsbaseurl}/ows"
+            else:
+                # url without protocol://domain
+                ws = url.split('/')[2]
+                url = '/' + localgsbaseurl + '/ows'
+            # wfs layers have the ws prefix, even when adressed from a workspace service url
+            if ':' in layer:
+                layer = ws + ':' + layer.split(':')[1]
+            else:
+                layer = ws + ':' + layer
+#            get_logger("CheckMapstore").debug(f"found workspace '{ws}' in url '{ourl}', setting url to '{url}' and layer to '{layer}'")
+
+    return (url, layer)
