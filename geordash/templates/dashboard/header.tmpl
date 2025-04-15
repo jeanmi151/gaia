@@ -97,8 +97,10 @@ Non connecté
         <ul class="dropdown-menu">
           {{ render_dropdown_item('dashboard.ows', 'Toutes les couches WMS', stype='wms', url=localgsbaseurl + '~ows') }}
           {{ render_dropdown_item('dashboard.ows', 'Toutes les couches WFS', stype='wfs', url=localgsbaseurl + '~ows') }}
-<!-- XX loop over list of workspaces here -->
+{% if superuser %}
           <li><hr class="dropdown-divider"></li>
+          {{ render_dropdown_item('dashboard.admin.geoserver', 'Liste des workspaces') }}
+{% endif %}
         </ul>
       </li>
       <li class="nav-item dropdown px-2">
