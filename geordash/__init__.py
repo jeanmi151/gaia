@@ -18,7 +18,7 @@ import logging
 from os import getenv
 
 from datetime import datetime, date, time
-def format_datetime(value, format="%d %b %Y %I:%M %p"):
+def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
     """Format a date time to (Default): d Mon YYYY HH:MM P"""
     if value is None:
         return ""
