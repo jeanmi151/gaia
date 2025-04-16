@@ -95,7 +95,7 @@ def normalize_gs_workspace_layer(url, layer=None):
                     if ':' in layer:
                         ws = layer.split(':')[0]
                     else:
-                        get_logger("CheckMapstore").warning(f"havent been able to find workspace with url {url} and layer {layer}, returning as-is")
+                        get_logger("CheckMapstore").debug(f"havent been able to find workspace with url {url} and layer {layer}, returning as-is")
                         return (url, layer)
                 url = f"{protocol}//{fqdn}/{localgsbaseurl}/ows"
             else:
