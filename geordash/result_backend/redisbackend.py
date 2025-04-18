@@ -181,13 +181,15 @@ class RedisClient:
             self.task_by_taskname[taskname][tuple(args)] = dict()
         self.task_by_taskname[taskname][tuple(args)][taskid] = {'finished': finished}
 
-    def compare_task_by_finished_ts(o):
-        if isinstance(o['finished'], datetime):
-            return str(o['finished'])
-        return o['finished']
-
     def get_last_taskid_for_taskname_and_args(self, taskname, args):
         tasks = self.get_taskids_by_taskname_and_args(taskname, args)
+
+        # lambda function for max() call below
+        def compare_task_by_finished_ts(o):
+            if isinstance(o['finished'], datetime):
+                return str(o['finished'])
+            return o['finished']
+
         if tasks:
             last_task = max(tasks, key=compare_task_by_finished_ts)
             return last_task['id']
