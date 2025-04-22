@@ -28,7 +28,10 @@ class RedisClient:
                 continue
             name = task["name"]
             args = task["args"]
-            self.add_taskid_for_taskname_and_args(name, args, k.decode()[17:], task["date_done"])
+            date_done = task["date_done"]
+            if type(date_done) == str:
+                date_done = datetime.fromisoformat(date_done).replace(tzinfo=timezone.utc)
+            self.add_taskid_for_taskname_and_args(name, args, k.decode()[17:], date_done)
 
         # analyse tasksets
         for k in self.r.scan_iter("celery-taskset-meta-*"):
