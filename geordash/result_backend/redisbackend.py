@@ -23,7 +23,7 @@ class RedisClient:
         # and the ones found in taskset-meta-* to avoid storing (and reporting)
         # them twice. Those 'extra' grouptasks are scheduled by beat, and arent
         # seen when grouptasks are manually triggered.
-        child_tasksets = dict()
+        self.child_tasksets = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):
             v = self.get(k.decode())
             try:
@@ -33,7 +33,7 @@ class RedisClient:
                 continue
             if 'children' in task and len(task['children']) > 0:
                 tsid = task["result"][0][0]
-                child_tasksets[tsid] = k
+                self.child_tasksets[tsid] = k.decode()[17:]
                 get_logger("RedisClient").debug(f"task {k} has a child taskset: {tsid}")
             name = task["name"]
             args = task["args"]
@@ -45,8 +45,8 @@ class RedisClient:
         # analyse tasksets
         for k in self.r.scan_iter("celery-taskset-meta-*"):
             tsid = k.decode()[20:]
-            if tsid in child_tasksets:
-                get_logger("RedisClient").debug(f"ignoring taskset with id {tsid}, already stored with task {child_tasksets[tsid]}")
+            if tsid in self.child_tasksets:
+                get_logger("RedisClient").debug(f"ignoring taskset with id {tsid}, already stored with task {self.child_tasksets[tsid]}")
                 continue
             (name, args, date_done) = self.get_taskset_details(k.decode())
             self.add_taskid_for_taskname_and_args(name, args, tsid, date_done)
