@@ -380,7 +380,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                     link.attr("id", 'display-taskres-' + taskid)
                     link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + data['taskid'] + "'," + showdelete + ",'" + targetdivid + "');");
                     link.attr("title","Show result for task " + data["taskid"]);
-                    link.text("check at " + d);
+                    link.text("check at " + d.toLocaleString("fr-FR"));
                     if (showdelete) {
                       const link2 = $("<a>");
                       link2.attr("href","javascript:DeleteTask('" + data["taskid"] + "');");
