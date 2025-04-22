@@ -36,6 +36,10 @@ class RedisClient:
             self.add_taskid_for_taskname_and_args(name, args, k.decode()[20:], date_done)
 
     def get_taskset_details(self, key):
+        """
+        from a given taskset, try to reconstruct the grouptask properties
+        (eg name, args & date_done) from the child tasks properties
+        """
         v = self.get(key)
         if v is None:
             get_logger("RedisClient").error(f"found nothing for a taskset with {key}, shouldnt happen")
@@ -64,6 +68,9 @@ class RedisClient:
                     get_logger("RedisClient").error(f"{name} mismatched task name for {tid}")
             if args is None:
                 args = task["args"][:-1]
+            # specialcase for check_resources job checking all maps *and* resources
+            if name.endswith('check_res') and args is not None and task["args"][:-1] != args:
+                args = []
             # find the last finishing job
             if type(task["date_done"]) == str:
                 subtask_done = datetime.fromisoformat(task["date_done"])
@@ -80,7 +87,6 @@ class RedisClient:
                 name = 'geordash.checks.ows.owsservice'
             if name.endswith('check_res'):
                 name = 'geordash.checks.mapstore.check_resources'
-                args = []
             if name.endswith('check_record'):
                 name = 'geordash.checks.csw.check_catalog'
         return (name, args, date_done)
