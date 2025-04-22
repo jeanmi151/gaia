@@ -19,6 +19,11 @@ class RedisClient:
     def __init__(self, url):
         self.r = redis.Redis.from_url(url)
         self.task_by_taskname = dict()
+        # store relationship between 'extra' grouptasks stored as task-meta-*
+        # and the ones found in taskset-meta-* to avoid storing (and reporting)
+        # them twice. Those 'extra' grouptasks are scheduled by beat, and arent
+        # seen when grouptasks are manually triggered.
+        child_tasksets = dict()
         for k in self.r.scan_iter("celery-task-meta-*"):
             v = self.get(k.decode())
             try:
@@ -26,6 +31,10 @@ class RedisClient:
             except json.JSONDecodeError as e:
                 get_logger("RedisClient").error(f"discarding {k}, not json ? {e}")
                 continue
+            if 'children' in task and len(task['children']) > 0:
+                tsid = task["result"][0][0]
+                child_tasksets[tsid] = k
+                get_logger("RedisClient").debug(f"task {k} has a child taskset: {tsid}")
             name = task["name"]
             args = task["args"]
             date_done = task["date_done"]
@@ -35,8 +44,12 @@ class RedisClient:
 
         # analyse tasksets
         for k in self.r.scan_iter("celery-taskset-meta-*"):
+            tsid = k.decode()[20:]
+            if tsid in child_tasksets:
+                get_logger("RedisClient").debug(f"ignoring taskset with id {tsid}, already stored with task {child_tasksets[tsid]}")
+                continue
             (name, args, date_done) = self.get_taskset_details(k.decode())
-            self.add_taskid_for_taskname_and_args(name, args, k.decode()[20:], date_done)
+            self.add_taskid_for_taskname_and_args(name, args, tsid, date_done)
 
     def get_taskset_details(self, key):
         """
