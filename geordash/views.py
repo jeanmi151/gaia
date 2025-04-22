@@ -64,7 +64,7 @@ def result(id: str) -> dict[str, object]:
         "ready": ready,
         "completed": completed,
         "task": result.name if hasattr(result,'name') else name,
-        "finished": (finished.strftime('%s') if finished is not None else False),
+        "finished": (finished.timestamp() if finished is not None else False),
         "args": result.args if hasattr(result,'args') else args,
         "successful": result.successful() if ready else None,
         "state": result.state if hasattr(result,'state') else None,
