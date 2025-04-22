@@ -89,7 +89,7 @@ def last_result_by_taskname_and_args(taskname: str) -> dict[str, object]:
 @check_role(role='SUPERUSER')
 def forget(id: str):
     # forget first in the revmap
-    app.extensions["rcli"].forget(id)
+    childid = app.extensions["rcli"].forget(id)
     result = GroupResult.restore(id)
     if result is None:
         result = AsyncResult(id)
@@ -98,6 +98,11 @@ def forget(id: str):
         result.delete()
     # if is a taskset, should also forget all subtasks
     result.forget()
+    if childid:
+        app.logger.debug(f"dropping {childid} as linked to {id}")
+        childres = GroupResult.restore(childid)
+        childres.delete()
+        childres.forget()
     return jsonify("ok")
 
 @tasks_bp.get("/forgetogc/<string:stype>/<string:url>")
