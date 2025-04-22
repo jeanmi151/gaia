@@ -163,7 +163,12 @@ class RedisClient:
                 taskids = self.task_by_taskname[taskname][tuple(args)]
                 if taskid in taskids:
                     del taskids[taskid]
-                    return taskid
+
+        # find child tasksets to remove/forget:
+        taskids = [key for key, val in self.child_tasksets.items() if val == taskid]
+        if taskids:
+            return taskids[0]
+        return None
 
     def get_taskids_by_taskname_and_args(self, taskname, args):
         if taskname in self.task_by_taskname:
