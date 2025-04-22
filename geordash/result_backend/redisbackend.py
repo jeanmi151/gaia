@@ -13,7 +13,7 @@ except:
         return logging.getLogger()
 
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 class RedisClient:
     def __init__(self, url):
@@ -73,7 +73,7 @@ class RedisClient:
                 args = []
             # find the last finishing job
             if type(task["date_done"]) == str:
-                subtask_done = datetime.fromisoformat(task["date_done"])
+                subtask_done = datetime.fromisoformat(task["date_done"]).replace(tzinfo=timezone.utc)
             else:
                 subtask_done = task["date_done"]
                 get_logger("RedisClient").debug(f"sd={subtask_done}, type={type(subtask_done)}")
