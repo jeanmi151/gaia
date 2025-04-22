@@ -164,7 +164,8 @@ const DisplayPrev = (type, resid, taskids, showdelete, targetdivid = '#previousl
         link.attr("id", 'display-taskres-' + t['id'])
         link.attr("href","javascript:PollTaskRes('" + type +"','"+ resid + "','" + t['id'] + "'," + showdelete + ",'" + targettitledivid + "');");
         link.attr("title","Show result for task " + t['id']);
-        link.text("check at " + t['finished']);
+        const d = new Date(t["finished"] * 1000);
+        link.text("check at " + d.toLocaleString("fr-FR"));
         if (showdelete) {
           const link2 = $("<a>");
           link2.attr("href","javascript:DeleteTask('" + t['id'] + "');");
