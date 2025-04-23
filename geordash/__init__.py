@@ -30,6 +30,20 @@ def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
 
 def create_app() -> Flask:
     app = Flask(__name__, static_url_path='/gaia/static')
+    # if INVOCATION_ID is set -> running from systemd
+    if getenv('INVOCATION_ID') != None:
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.handlers[0].setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
+        app.logger.setLevel(gunicorn_logger.level)
+    else:
+        # running from gunicorn but outside systemd -> set global loglevel to the gunicorn level
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        if len(gunicorn_logger.handlers) > 0:
+            logging.basicConfig(level=gunicorn_logger.level)
+        # running outside of gunicorn so probably flask run --debug, set global loglevel to DEBUG
+        elif app.debug:
+            logging.basicConfig(level=logging.DEBUG)
 
     @app.context_processor
     def inject_globals():
@@ -68,15 +82,6 @@ def create_app() -> Flask:
     dashboard.dash_bp.register_blueprint(api.api_bp)
     dashboard.dash_bp.register_blueprint(admin.admin_bp)
     app.register_blueprint(dashboard.dash_bp)
-    if getenv('INVOCATION_ID') != None:
-        gunicorn_logger = logging.getLogger('gunicorn.error')
-        if len(gunicorn_logger.handlers) == 0:
-            return app
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.handlers[0].setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
-        app.logger.setLevel(gunicorn_logger.level)
-    else:
-        app.logger.setLevel(logging.DEBUG)
     return app
 
 def celery_init_app(app: Flask) -> Celery:
