@@ -9,8 +9,9 @@ try:
 except:
     # to run this module standalone for testing
     import logging
-    def get_logger():
-        return logging.getLogger()
+    logging.basicConfig(level=logging.DEBUG)
+    def get_logger(name):
+        return logging.getLogger(name)
 
 import sys
 from datetime import datetime, timezone
