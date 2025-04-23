@@ -119,7 +119,15 @@ the configuration has to be done:
 - in [`celeryconfig.py`](geordash/celeryconfig.py.example) for celery configuration/options
 
 the [`env`](env.example) file should also contain options used to start celery, and during
-development both services can be started in foreground by `run.sh`
+development both services can be started by `run.sh`, which:
+
+- starts a `celery` process in the background (with its loglevel set according to CELERY_LOGLEVEL)
+- starts a `flask` process in foreground with debug levels set to the maximum.
+
+it is also possible to start a gunicorn process manually instead of flask via
+```
+gunicorn --log-level DEBUG 'geordash:create_app()'
+```
 
 # Usage
 
