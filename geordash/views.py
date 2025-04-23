@@ -17,6 +17,7 @@ from geordash.decorators import check_role
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+
 @tasks_bp.get("/result/<id>")
 def result(id: str) -> dict[str, object]:
     result = GroupResult.restore(id)
@@ -28,8 +29,12 @@ def result(id: str) -> dict[str, object]:
     if result is None:
         result = AsyncResult(id)
         # regular task triggered by beat, the asyncresult first result entry contains the groupresult id
-        if type(result.result) == list and result.name in ('geordash.checks.mapstore.check_resources', 'geordash.checks.ows.owsservice', 'geordash.checks.csw.check_catalog'):
-#            print(f"real taskset id is {result.result[0][0]}")
+        if type(result.result) == list and result.name in (
+            "geordash.checks.mapstore.check_resources",
+            "geordash.checks.ows.owsservice",
+            "geordash.checks.csw.check_catalog",
+        ):
+            #            print(f"real taskset id is {result.result[0][0]}")
             result = GroupResult.restore(result.result[0][0])
             # shouldnt happen, but make sure we have 'a result'...
             if result is None:
@@ -39,13 +44,10 @@ def result(id: str) -> dict[str, object]:
         finished = result.date_done
         if result.state == "FAILURE" and isinstance(result.result, Exception):
             s = f"{str(result.result)} {result.traceback}"
-            app.logger.error(f"task {result.id} badly failed with a {type(result.result)} exception, returning exception string/traceback to the client: {s}")
-            return {
-                "taskid": result.id,
-                "ready": True,
-                "successful": False,
-                "value": s
-            }
+            app.logger.error(
+                f"task {result.id} badly failed with a {type(result.result)} exception, returning exception string/traceback to the client: {s}"
+            )
+            return {"taskid": result.id, "ready": True, "successful": False, "value": s}
         else:
             value = result.get() if result.ready() else result.result
     else:
@@ -55,38 +57,44 @@ def result(id: str) -> dict[str, object]:
             value = list()
             for r in result.results:
                 try:
-                    value.append({'args': r.args, 'problems': r.get()['problems']})
+                    value.append({"args": r.args, "problems": r.get()["problems"]})
                 except Exception as e:
-                    app.logger.error(f"failed getting results from celery on task {r.id} with {r.args}, got {str(e)}")
+                    app.logger.error(
+                        f"failed getting results from celery on task {r.id} with {r.args}, got {str(e)}"
+                    )
     ready = result.ready()
     return {
         "taskid": result.id,
         "ready": ready,
         "completed": completed,
-        "task": result.name if hasattr(result,'name') else name,
+        "task": result.name if hasattr(result, "name") else name,
         "finished": (finished.timestamp() if finished is not None else False),
-        "args": result.args if hasattr(result,'args') else args,
+        "args": result.args if hasattr(result, "args") else args,
         "successful": result.successful() if ready else None,
-        "state": result.state if hasattr(result,'state') else None,
+        "state": result.state if hasattr(result, "state") else None,
         "value": value,
     }
 
+
 @tasks_bp.get("/lastresultbytask/<string:taskname>")
 def last_result_by_taskname_and_args(taskname: str) -> dict[str, object]:
-    args = request.args.get('taskargs', None)
+    args = request.args.get("taskargs", None)
     if args:
-      argslist = args.split(',')
+        argslist = args.split(",")
     else:
-      argslist = []
+        argslist = []
     app.logger.debug(f"last_result_by_taskname_and_args({taskname},{argslist})")
-    taskid = app.extensions["rcli"].get_last_taskid_for_taskname_and_args(taskname, argslist)
+    taskid = app.extensions["rcli"].get_last_taskid_for_taskname_and_args(
+        taskname, argslist
+    )
     if taskid:
         app.logger.debug(f"fetching result for taskid {taskid}")
         return result(taskid)
     return jsonify("notask")
 
+
 @tasks_bp.get("/forget/<id>")
-@check_role(role='SUPERUSER')
+@check_role(role="SUPERUSER")
 def forget(id: str):
     # forget first in the revmap
     childid = app.extensions["rcli"].forget(id)
@@ -105,72 +113,94 @@ def forget(id: str):
         childres.forget()
     return jsonify("ok")
 
+
 @tasks_bp.get("/forgetogc/<string:stype>/<string:url>")
-@check_role(role='SUPERUSER')
+@check_role(role="SUPERUSER")
 def forgetogc(stype, url):
-    if stype not in ('wms', 'wmts', 'wfs', 'csw'):
+    if stype not in ("wms", "wmts", "wfs", "csw"):
         return abort(412)
     url = unmunge(url)
     n = app.extensions["owscache"].forget(stype, url)
     return {"deleted": n}
+
 
 @tasks_bp.route("/check/mapstore/configs.json")
 def check_mapstore_configs():
     result = check_configs.delay()
     return {"result_id": result.id}
 
+
 @tasks_bp.route("/check/map/<int:mapid>.json")
 def check_map(mapid):
-    result = check_res.delay('MAP',mapid)
+    result = check_res.delay("MAP", mapid)
     return {"result_id": result.id}
+
 
 @tasks_bp.route("/check/context/<int:ctxid>.json")
 def check_ctx(ctxid):
-    result = check_res.delay('CONTEXT',ctxid)
+    result = check_res.delay("CONTEXT", ctxid)
     return {"result_id": result.id}
+
 
 @tasks_bp.route("/check/mapstore/maps.json")
 def check_mapstore_maps():
-    groupresult = check_resources(['MAP'])
+    groupresult = check_resources(["MAP"])
     if groupresult.id:
-        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', ['MAP'], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.mapstore.check_resources", ["MAP"], groupresult.id
+        )
     return {"result_id": groupresult.id}
+
 
 @tasks_bp.route("/check/mapstore/contexts.json")
 def check_mapstore_contexts():
-    groupresult = check_resources(['CONTEXT'])
+    groupresult = check_resources(["CONTEXT"])
     if groupresult.id:
-        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', ['CONTEXT'], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.mapstore.check_resources", ["CONTEXT"], groupresult.id
+        )
     return {"result_id": groupresult.id}
+
 
 @tasks_bp.route("/check/mapstore/resources.json")
 def check_mapstore_resources():
     groupresult = check_resources()
     if groupresult.id:
-        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.mapstore.check_resources', [], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.mapstore.check_resources", [], groupresult.id
+        )
     return {"result_id": groupresult.id}
+
 
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
 def check_owslayer(stype, url, lname):
-    if stype not in ('wms', 'wmts', 'wfs'):
+    if stype not in ("wms", "wmts", "wfs"):
         return abort(412)
     url = unmunge(url)
     service = app.extensions["owscache"].get(stype, url)
     if service.s is None:
         return abort(404)
     # if a wfs from geoserver, prepend ws to lname
-    if stype == 'wfs' and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
-        ws = url.split('/')[-2]
+    if (
+        stype == "wfs"
+        and ":" not in lname
+        and service.s.updateSequence
+        and service.s.updateSequence.isdigit()
+    ):
+        ws = url.split("/")[-2]
         lname = f"{ws}:{lname}"
     if lname not in service.contents():
         return abort(404)
     result = geordash.checks.ows.owslayer.delay(stype, url, lname, True)
     return {"result_id": result.id}
 
+
 @tasks_bp.route("/check/owsservice/<string:stype>/<string:url>.json")
 def check_owsservice(stype, url):
-    app.logger.info(f"check_owsservice triggered by webui, checking owsservice in {stype} {url}")
-    if stype not in ('wms', 'wmts', 'wfs'):
+    app.logger.info(
+        f"check_owsservice triggered by webui, checking owsservice in {stype} {url}"
+    )
+    if stype not in ("wms", "wmts", "wfs"):
         return abort(412)
     url = unmunge(url)
     service = app.extensions["owscache"].get(stype, url)
@@ -181,23 +211,29 @@ def check_owsservice(stype, url):
         return abort(404)
     if groupresult.id:
         app.logger.debug(f"returning grouptask id {groupresult.id} for owsservice")
-        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.ows.owsservice', [stype, url], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.ows.owsservice", [stype, url], groupresult.id
+        )
     return {"result_id": groupresult.id}
+
 
 @tasks_bp.route("/check/csw/<string:url>/<string:uuid>.json")
 def check_cswrecord(url, uuid):
     url = unmunge(url)
-    service = app.extensions["owscache"].get('csw', url)
+    service = app.extensions["owscache"].get("csw", url)
     if service.s is None:
         return abort(404)
     result = geordash.checks.csw.check_record.delay(url, uuid)
     return {"result_id": result.id}
 
+
 @tasks_bp.route("/check/cswservice/<string:url>.json")
 def check_cswservice(url):
-    app.logger.info(f"check_cswservice triggered by webui, checking cswservice in {url}")
+    app.logger.info(
+        f"check_cswservice triggered by webui, checking cswservice in {url}"
+    )
     url = unmunge(url)
-    service = app.extensions["owscache"].get('csw', url)
+    service = app.extensions["owscache"].get("csw", url)
     if service.s is None:
         return abort(404)
     groupresult = geordash.checks.csw.check_catalog(url)
@@ -205,5 +241,7 @@ def check_cswservice(url):
         return abort(404)
     if groupresult.id:
         app.logger.debug(f"returning grouptask id {groupresult.id} for cswservice")
-        app.extensions["rcli"].add_taskid_for_taskname_and_args('geordash.checks.csw.check_catalog', [url], groupresult.id)
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.csw.check_catalog", [url], groupresult.id
+        )
     return {"result_id": groupresult.id}

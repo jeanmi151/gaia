@@ -18,27 +18,32 @@ import logging
 from os import getenv
 
 from datetime import datetime, date, time
+
+
 def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
     """Format a date time to (Default): d Mon YYYY HH:MM P"""
     if value is None:
         return ""
-    if  isinstance(value, float):
+    if isinstance(value, float):
         return datetime.fromtimestamp(value).strftime(format)
-    if  isinstance(value, str):
+    if isinstance(value, str):
         return datetime.fromtimestamp(int(value)).strftime(format)
     return value.strftime(format)
 
+
 def create_app() -> Flask:
-    app = Flask(__name__, static_url_path='/gaia/static')
+    app = Flask(__name__, static_url_path="/gaia/static")
     # if INVOCATION_ID is set -> running from systemd
-    if getenv('INVOCATION_ID') != None:
-        gunicorn_logger = logging.getLogger('gunicorn.error')
+    if getenv("INVOCATION_ID") != None:
+        gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
-        app.logger.handlers[0].setFormatter(logging.Formatter("%(levelname)s in %(module)s: %(message)s"))
+        app.logger.handlers[0].setFormatter(
+            logging.Formatter("%(levelname)s in %(module)s: %(message)s")
+        )
         app.logger.setLevel(gunicorn_logger.level)
     else:
         # running from gunicorn but outside systemd -> set global loglevel to the gunicorn level
-        gunicorn_logger = logging.getLogger('gunicorn.error')
+        gunicorn_logger = logging.getLogger("gunicorn.error")
         if len(gunicorn_logger.handlers) > 0:
             logging.basicConfig(level=gunicorn_logger.level)
         # running outside of gunicorn so probably flask run --debug, set global loglevel to DEBUG
@@ -47,22 +52,25 @@ def create_app() -> Flask:
 
     @app.context_processor
     def inject_globals():
-        instancename = app.extensions["conf"].get('instancename')
-        return { 'instancename': instancename,
-                'superuser': is_superuser(),
-                'bootstrap': app.extensions["bootstrap"],
-                'localgsbaseurl': app.extensions["conf"].get('localgs', 'urls'),
-                'localgnbaseurl': app.extensions["conf"].get('localgn', 'urls'),
-                'headerScript': app.extensions["conf"].get('headerScript'),
-                'headerHeight': app.extensions["conf"].get('headerHeight'),
-                'headerUrl': app.extensions["conf"].get('headerUrl'),
-                'headerConfigFile': app.extensions["conf"].get('headerConfigFile'),
-                'useLegacyHeader': app.extensions["conf"].get('useLegacyHeader'),
-                'georchestraStyleSheet': app.extensions["conf"].get('georchestraStyleSheet'),
-                'logoUrl': app.extensions["conf"].get('logoUrl')
-            }
+        instancename = app.extensions["conf"].get("instancename")
+        return {
+            "instancename": instancename,
+            "superuser": is_superuser(),
+            "bootstrap": app.extensions["bootstrap"],
+            "localgsbaseurl": app.extensions["conf"].get("localgs", "urls"),
+            "localgnbaseurl": app.extensions["conf"].get("localgn", "urls"),
+            "headerScript": app.extensions["conf"].get("headerScript"),
+            "headerHeight": app.extensions["conf"].get("headerHeight"),
+            "headerUrl": app.extensions["conf"].get("headerUrl"),
+            "headerConfigFile": app.extensions["conf"].get("headerConfigFile"),
+            "useLegacyHeader": app.extensions["conf"].get("useLegacyHeader"),
+            "georchestraStyleSheet": app.extensions["conf"].get(
+                "georchestraStyleSheet"
+            ),
+            "logoUrl": app.extensions["conf"].get("logoUrl"),
+        }
 
-    app.jinja_env.filters['datetimeformat'] = format_datetime
+    app.jinja_env.filters["datetimeformat"] = format_datetime
     # cant work since its at /bootstrap and cant be below /gaia ?
     # app.config.update(BOOTSTRAP_SERVE_LOCAL=True)
     app.config.from_prefixed_env()
@@ -84,6 +92,7 @@ def create_app() -> Flask:
     app.register_blueprint(dashboard.dash_bp)
     return app
 
+
 def celery_init_app(app: Flask) -> Celery:
     class FlaskTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
@@ -91,13 +100,17 @@ def celery_init_app(app: Flask) -> Celery:
                 return self.run(*args, **kwargs)
 
     celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object('geordash.celeryconfig')
+    celery_app.config_from_object("geordash.celeryconfig")
     celery_app.set_default()
-    if getenv('INVOCATION_ID') != None:
+    if getenv("INVOCATION_ID") != None:
         celery_app.conf.worker_log_format = "%(levelname)s: %(message)s"
-        celery_app.conf.worker_task_log_format = "%(task_name)s[%(task_id)s] - %(levelname)s: %(message)s"
+        celery_app.conf.worker_task_log_format = (
+            "%(task_name)s[%(task_id)s] - %(levelname)s: %(message)s"
+        )
     app.extensions["celery"] = celery_app
     events_handler = CeleryEventsHandler(app)
-    evht = threading.Thread(name='evh',target=events_handler.start_listening, daemon=True)
+    evht = threading.Thread(
+        name="evh", target=events_handler.start_listening, daemon=True
+    )
     evht.start()
     return celery_app

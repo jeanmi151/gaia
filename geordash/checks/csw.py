@@ -11,6 +11,7 @@ from owslib.ows import ExceptionReport
 from geordash.logwrap import get_logger
 from geordash.utils import objtype
 
+
 @shared_task()
 def check_catalog(url):
     """
@@ -22,7 +23,7 @@ def check_catalog(url):
     :return: the list of errors
     """
     taskslist = list()
-    service = app.extensions["owscache"].get('csw', url)
+    service = app.extensions["owscache"].get("csw", url)
     if service.s is None:
         return False
 
@@ -34,6 +35,7 @@ def check_catalog(url):
     groupresult = grouptask.apply_async()
     groupresult.save()
     return groupresult
+
 
 @shared_task()
 def check_record(url, uuid):
@@ -47,10 +49,18 @@ def check_record(url, uuid):
     """
     get_logger("CheckCsw").info(f"checking uuid {uuid} in csw {url}")
     ret = dict()
-    ret['problems'] = list()
-    service = app.extensions["owscache"].get('csw', url)
+    ret["problems"] = list()
+    service = app.extensions["owscache"].get("csw", url)
     if service.s is None:
-        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': objtype(service.exception), 'exceptionstr': str(service.exception)})
+        ret["problems"].append(
+            {
+                "type": "OGCException",
+                "url": url,
+                "stype": "csw",
+                "exception": objtype(service.exception),
+                "exceptionstr": str(service.exception),
+            }
+        )
         return ret
 
     csw = service.s
@@ -58,10 +68,18 @@ def check_record(url, uuid):
         csw.getrecordbyid([uuid])
     except ExceptionReport as e:
         # most probably owslib.ows.ExceptionReport: 'OperationNotAllowedEx : Operation not allowed'
-        ret['problems'].append({'type':'OGCException', 'url': url, 'stype': 'csw', 'exception': objtype(e), 'exceptionstr': str(e)})
+        ret["problems"].append(
+            {
+                "type": "OGCException",
+                "url": url,
+                "stype": "csw",
+                "exception": objtype(e),
+                "exceptionstr": str(e),
+            }
+        )
         return ret
     if len(csw.records) != 1:
-        ret['problems'].append({'type': 'NoSuchMetadata', 'uuid': uuid, 'url': url})
+        ret["problems"].append({"type": "NoSuchMetadata", "uuid": uuid, "url": url})
         return ret
 
     # since we've just done a getrecordbyid we have the full view
@@ -71,53 +89,104 @@ def check_record(url, uuid):
         service.records[uuid] = r
     hasvalidlink = False
     for u in r.uris:
-        if u['protocol'] in ('OGC:WMS', 'OGC:WFS'):
-            stype = u['protocol'].split(':')[1].lower()
-            if u['url'] is None:
-                ret['problems'].append({'type': 'EmptyUrl', 'protocol': u['protocol']})
-            url = u['url'].rstrip('?')
+        if u["protocol"] in ("OGC:WMS", "OGC:WFS"):
+            stype = u["protocol"].split(":")[1].lower()
+            if u["url"] is None:
+                ret["problems"].append({"type": "EmptyUrl", "protocol": u["protocol"]})
+            url = u["url"].rstrip("?")
             localdomain = "https://" + app.extensions["conf"].get("domainName")
             if url.startswith(localdomain):
                 url = url.removeprefix(localdomain)
-            lname = u['name']
+            lname = u["name"]
             service = app.extensions["owscache"].get(stype, url)
             if service.s is None:
-                ret['problems'].append({'type':'OGCException', 'url': url, 'stype': stype, 'exception': objtype(service.exception), 'exceptionstr': str(service.exception)})
+                ret["problems"].append(
+                    {
+                        "type": "OGCException",
+                        "url": url,
+                        "stype": stype,
+                        "exception": objtype(service.exception),
+                        "exceptionstr": str(service.exception),
+                    }
+                )
             else:
-                if stype == 'wfs' and lname and ':' not in lname and service.s.updateSequence and service.s.updateSequence.isdigit():
-                    ws = url.split('/')[-2]
+                if (
+                    stype == "wfs"
+                    and lname
+                    and ":" not in lname
+                    and service.s.updateSequence
+                    and service.s.updateSequence.isdigit()
+                ):
+                    ws = url.split("/")[-2]
                     lname = f"{ws}:{lname}"
                     get_logger("CheckCsw").debug(f"modified lname for {lname}")
                 if lname not in service.contents():
-                    ret['problems'].append({'type':'NoSuchLayer', 'url': url, 'stype': stype, 'lname': lname})
+                    ret["problems"].append(
+                        {
+                            "type": "NoSuchLayer",
+                            "url": url,
+                            "stype": stype,
+                            "lname": lname,
+                        }
+                    )
                 else:
                     hasvalidlink = True
-                    get_logger("CheckCsw").debug(f"layer {lname} exists in {stype} service at {url}")
+                    get_logger("CheckCsw").debug(
+                        f"layer {lname} exists in {stype} service at {url}"
+                    )
         else:
-            if u['protocol'] != None and (u['protocol'].startswith('WWW:DOWNLOAD') or u['protocol'].startswith('WWW:LINK')) and (u['url'] != None and u['url'].startswith('http')):
+            if (
+                u["protocol"] != None
+                and (
+                    u["protocol"].startswith("WWW:DOWNLOAD")
+                    or u["protocol"].startswith("WWW:LINK")
+                )
+                and (u["url"] != None and u["url"].startswith("http"))
+            ):
                 # check that the url exists
                 try:
                     timeout = 5
-                    if 'outputformat=shape-zip' in u['url'].lower():
+                    if "outputformat=shape-zip" in u["url"].lower():
                         timeout = 60
-                    if '@' in u['url']:
+                    if "@" in u["url"]:
                         from urllib.parse import urlparse
                         from requests.auth import HTTPBasicAuth
-                        parts = urlparse(u['url'])
-                        r = requests.head(u['url'], timeout = timeout, auth=HTTPBasicAuth(parts.username, parts.password))
+
+                        parts = urlparse(u["url"])
+                        r = requests.head(
+                            u["url"],
+                            timeout=timeout,
+                            auth=HTTPBasicAuth(parts.username, parts.password),
+                        )
                     else:
-                        r = requests.head(u['url'], timeout = timeout)
+                        r = requests.head(u["url"], timeout=timeout)
                     if r.status_code != 200:
-                        ret['problems'].append({'type': 'BrokenProtocolUrl', 'url': u['url'], 'protocol': u['protocol'], 'code': r.status_code})
+                        ret["problems"].append(
+                            {
+                                "type": "BrokenProtocolUrl",
+                                "url": u["url"],
+                                "protocol": u["protocol"],
+                                "code": r.status_code,
+                            }
+                        )
                     else:
                         hasvalidlink = True
                     get_logger("CheckCsw").debug(f"{u['url']} -> {r.status_code}")
                 except Exception as e:
-                    ret['problems'].append({'type': 'ConnectionFailure', 'url': u['url'], 'exception': objtype(e), 'exceptionstr': str(e)})
-            elif u['protocol'] != None and u['url'] == None:
-                    ret['problems'].append({'type': 'EmptyUrl', 'protocol': u['protocol']})
+                    ret["problems"].append(
+                        {
+                            "type": "ConnectionFailure",
+                            "url": u["url"],
+                            "exception": objtype(e),
+                            "exceptionstr": str(e),
+                        }
+                    )
+            elif u["protocol"] != None and u["url"] == None:
+                ret["problems"].append({"type": "EmptyUrl", "protocol": u["protocol"]})
             else:
-                get_logger("CheckCsw").debug(f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}")
+                get_logger("CheckCsw").debug(
+                    f"didnt try querying non-ogc non-http url as {u['protocol']} : {u['url']}"
+                )
     if not hasvalidlink:
-        ret['problems'].append({'type': 'MdHasNoLinks'})
+        ret["problems"].append({"type": "MdHasNoLinks"})
     return ret

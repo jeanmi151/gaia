@@ -5,6 +5,7 @@ from celery.utils.log import get_task_logger
 from flask import request, current_app as app
 import logging
 
+
 # wrapper to get the appropriate logger, depending if we're in a flask or celery context
 def get_logger(name=__name__):
     if request:
