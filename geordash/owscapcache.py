@@ -37,6 +37,18 @@ class CachedEntry:
         self.timestamp = None
         self.exception = None
 
+    def nelems(self):
+        if self.stype in ("wms", "wmts", "wfs"):
+            return len(self.s.contents)
+        else:
+            if hasattr(self.s, "records"):
+                return len(self.s.records)
+            else:
+                if self.records:
+                    return len(self.records)
+                else:
+                    return 0
+
     def contents(self):
         if self.stype in ("wms", "wmts", "wfs"):
             return self.s.contents
