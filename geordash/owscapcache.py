@@ -22,7 +22,14 @@ import json
 import traceback
 import requests
 
-from geordash.logwrap import get_logger
+try:
+    from geordash.logwrap import get_logger
+except:
+    # to run this module standalone for testing
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    def get_logger(name):
+        return logging.getLogger(name)
 
 is_dataset = PropertyIsEqualTo("Type", "dataset")
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
@@ -266,10 +273,10 @@ class OwsCapCache:
 
 
 if __name__ == "__main__":
-    import logging
+    import sys
+    sys.path.append('.')
+    import config
     from flask import Flask
-
-    logging.basicConfig(level=logging.DEBUG)
     from georchestraconfig import GeorchestraConfig
 
     c = OwsCapCache(GeorchestraConfig(), Flask(__name__))
