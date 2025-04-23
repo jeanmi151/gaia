@@ -218,31 +218,32 @@ class OwsCapCache:
         if url not in self.services[service_type]:
             return self.fetch(service_type, url, force_fetch)
         else:
+            ce = self.services[service_type][url]
             if (
-                self.services[service_type][url].timestamp + self.cache_lifetime
+                ce.timestamp + self.cache_lifetime
                 > time()
                 and not force_fetch
             ):
-                if self.services[service_type][url].s == None:
+                if ce.s == None:
                     get_logger("OwsCapCache").warning(
-                        f"already got a {type(self.services[service_type][url].exception)} for {service_type} {url} in cache, returning cached failure"
+                        f"already got a {type(ce.exception)} for {service_type} {url} in cache, returning cached failure"
                     )
-                    return self.services[service_type][url]
+                    return ce
                 get_logger("OwsCapCache").debug(
                     f"returning {service_type} getcapabilities from process in-memory cache for {url}, ts={self.services[service_type][url].timestamp}"
                 )
-                return self.services[service_type][url]
+                return ce
             else:
                 if force_fetch:
                     get_logger("OwsCapCache").info(
                         f"force-fetching {service_type} getcapabilities from {url}"
                     )
                 elif (
-                    self.services[service_type][url].timestamp + self.cache_lifetime
+                    ce.timestamp + self.cache_lifetime
                     > time()
                 ):
                     get_logger("OwsCapCache").info(
-                        f"cached entry for {service_type} {url} expired (ts={self.services[service_type][url].timestamp}), refetching"
+                        f"cached entry for {service_type} {url} expired (ts={ce.timestamp}), refetching"
                     )
                 return self.fetch(service_type, url, True)
 
