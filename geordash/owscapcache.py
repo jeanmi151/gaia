@@ -77,7 +77,7 @@ class CachedEntry:
                 f"cached {len(self.records)} csw records for {self.url}"
             )
         else:
-            get_logger("OwsCapCache").info(
+            get_logger("OwsCapCache").debug(
                 f"returning {len(self.records)} cached csw records for {self.url}"
             )
         return self.records
