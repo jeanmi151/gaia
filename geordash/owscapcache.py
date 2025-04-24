@@ -48,13 +48,10 @@ class CachedEntry:
         if self.stype in ("wms", "wmts", "wfs"):
             return len(self.s.contents)
         else:
-            if hasattr(self.s, "records"):
-                return len(self.s.records)
+            if self.records:
+                return len(self.records)
             else:
-                if self.records:
-                    return len(self.records)
-                else:
-                    return 0
+                return 0
 
     def contents(self):
         if self.stype in ("wms", "wmts", "wfs"):
