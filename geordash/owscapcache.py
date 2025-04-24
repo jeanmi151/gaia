@@ -212,6 +212,10 @@ class OwsCapCache:
         entry.timestamp = time()
         self.services[service_type][url] = entry
         # persist entry in redis
+        self.set_entry_in_redis(rkey, entry)
+        return entry
+
+    def set_entry_in_redis(self, rkey, entry):
         if entry.exception is not None:
             json_entry = json.dumps(jsonpickle.encode(entry, unpicklable=False))
         else:
@@ -221,7 +225,6 @@ class OwsCapCache:
         get_logger("OwsCapCache").debug(
             f"persisted {rkey} in redis with ttl {self.cache_lifetime}, ts={entry.timestamp}"
         )
-        return entry
 
     def get(self, service_type, url, force_fetch=False):
         # is a relative url, prepend https://domainName
