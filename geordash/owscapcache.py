@@ -101,11 +101,10 @@ class OwsCapCache:
         except:
             get_logger("OwsCapCache").error(f"wrong can't set redis url {url}")
 
-    def fetch(self, service_type, url, force_fetch=False):
-        if service_type not in ("wms", "wmts", "wfs", "csw"):
-            return None
-        # check first in redis
-        rkey = f"{service_type}-{url.replace('/','~')}"
+    def get_entry_from_redis(self, rkey, force_fetch=False):
+        """
+        returns a CachedEntry object, or None if not found
+        """
         re = self.rediscli.get(rkey)
         if re:
             ce = jsonpickle.decode(json.loads(re.decode("utf-8")))
@@ -117,10 +116,21 @@ class OwsCapCache:
             elif ce.timestamp + self.cache_lifetime > time() and not force_fetch:
                 ttl = self.rediscli.ttl(rkey)
                 get_logger("OwsCapCache").debug(
-                    f"returning {service_type} entry from redis cache with {ce.nelems()} items for key {rkey}, ts={ce.timestamp} (and redis ttl {ttl})"
+                    f"returning {rkey} entry from redis cache with {ce.nelems()} items, ts={ce.timestamp} (and redis ttl {ttl})"
                 )
-                self.services[service_type][url] = ce
                 return ce
+        return None
+
+    def fetch(self, service_type, url, force_fetch=False):
+        if service_type not in ("wms", "wmts", "wfs", "csw"):
+            return None
+        # check first in redis
+        rkey = f"{service_type}-{url.replace('/','~')}"
+        re = self.get_entry_from_redis(rkey, force_fetch)
+        if re:
+            self.services[service_type][url] = re
+            return re
+
         get_logger("OwsCapCache").info(
             "fetching {} getcapabilities for {}".format(service_type, url)
         )
