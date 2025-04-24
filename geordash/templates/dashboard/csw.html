@@ -31,7 +31,11 @@ $(document).ready(function(){
 <div class="container">
 <p id='details'>Details pour le service csw {{ s.s.url }}</p>
 <p>titre: {{ s.s.identification.title }}<p>
-<p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}</p>
+<p>capacités du service récupérées: {{ s.timestamp | datetimeformat }}
+{% if superuser %}
+<a id='reloadlink' href="javascript:ReloadCapabilities('csw','{{ url }}')" title='Reload capabilities from the remote service and refresh the page'><i class="bi bi-arrow-repeat"></i></a>
+{% endif %}
+</p>
 <p>{{ s.contents().items() | length }} métadonnées <strong>publiques</strong> récupérées</p>
 <p>Note: les métadonnées non publiques et externes/moissonnées ne sont pas incluses. Les informations fournies sur cette page proviennent d'une requête CSW.</p>
 <h2 id='pbtitle'>Problems</h2>
