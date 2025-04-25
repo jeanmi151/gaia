@@ -286,17 +286,3 @@ class OwsCapCache:
         else:
             get_logger("OwsCapCache").debug(f"{rkey} not found in capabilities cache ?")
             return 0
-
-
-if __name__ == "__main__":
-    import sys
-    sys.path.append('.')
-    import config
-    from flask import Flask
-    from georchestraconfig import GeorchestraConfig
-
-    c = OwsCapCache(GeorchestraConfig(), Flask(__name__))
-    s = c.get("wfs", "/wxs/ows")
-    print(s)
-    s = c.get("wfs", "/wxs/ows")
-    print(s)
