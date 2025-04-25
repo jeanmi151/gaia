@@ -20,7 +20,6 @@ from flask import current_app as app
 from celery import shared_task
 from celery import Task
 from celery import group
-from celery.utils.log import get_task_logger
 from geordash.logwrap import get_logger
 from geordash.utils import objtype, normalize_gs_workspace_layer
 

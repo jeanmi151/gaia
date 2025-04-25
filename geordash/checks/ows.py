@@ -7,7 +7,6 @@ import requests
 from celery import shared_task
 from celery import Task
 from celery import group
-from celery.utils.log import get_task_logger
 
 from flask import current_app as app
 from geordash.utils import find_localmduuid, unmunge, objtype
