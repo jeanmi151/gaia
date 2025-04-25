@@ -216,7 +216,7 @@ class OwsCapCache:
         self.rediscli.set(rkey, json_entry)
         self.rediscli.expire(rkey, self.cache_lifetime)
         get_logger("OwsCapCache").debug(
-            f"persisted {rkey} in redis with ttl {self.cache_lifetime}, ts={entry.timestamp}"
+            f"persisted {rkey} in redis with nelems={entry.nelems()}, ttl {self.cache_lifetime}, ts={entry.timestamp}"
         )
 
     def get(self, service_type, url, force_fetch=False):
