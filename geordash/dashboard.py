@@ -85,14 +85,15 @@ def csw(portal):
     if service.s is None:
         return abort(404)
     cswrecords = list()
-    for uuid, record in service.contents().items():
-        cswrecords.append(
-            {
-                "title": record.title,
-                "url": record.identifier,
-                "xurl": url_for("dashboard.cswentry", portal=portal, uuid=uuid),
-            }
-        )
+    if service.nelems() > 0:
+        for uuid, record in service.contents().items():
+            cswrecords.append(
+                {
+                    "title": record.title,
+                    "url": record.identifier,
+                    "xurl": url_for("dashboard.cswentry", portal=portal, uuid=uuid),
+                }
+            )
     all_jobs_for_csw = app.extensions["rcli"].get_taskids_by_taskname_and_args(
         "geordash.checks.csw.check_catalog", [cswurl]
     )
