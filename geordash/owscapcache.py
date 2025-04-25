@@ -22,14 +22,7 @@ import json
 import traceback
 import requests
 
-try:
-    from geordash.logwrap import get_logger
-except:
-    # to run this module standalone for testing
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    def get_logger(name):
-        return logging.getLogger(name)
+from geordash.logwrap import get_logger
 
 is_dataset = PropertyIsEqualTo("Type", "dataset")
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
