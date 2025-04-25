@@ -229,24 +229,24 @@ class OwsCapCache:
             return self.fetch(service_type, url, force_fetch)
         else:
             ce = self.services[service_type][url]
-            if (
-                ce.timestamp + self.cache_lifetime
-                > time()
-                and not force_fetch
-            ):
+            if ce.timestamp + self.cache_lifetime > time() and not force_fetch:
                 if ce.s == None:
                     get_logger("OwsCapCache").warning(
                         f"already got a {type(ce.exception)} for {service_type} {url} in cache, returning cached failure"
                     )
                     return ce
-                if service_type == 'csw':
+                if service_type == "csw":
                     rkey = f"{service_type}-{url.replace('/','~')}"
                     re = self.get_entry_from_redis(rkey)
                     if re and re.records is None and ce.records is not None:
-                        get_logger("OwsCapCache").info(f"updating redis key {rkey} with {ce.nelems()} cached records")
+                        get_logger("OwsCapCache").info(
+                            f"updating redis key {rkey} with {ce.nelems()} cached records"
+                        )
                         self.set_entry_in_redis(rkey, ce)
                     if re and re.records is not None and ce.records is None:
-                        get_logger("OwsCapCache").debug(f"our in-memory csw cached entry for {url} had no records and the one in redis with {rkey} has {re.nelems()}, updating our local one")
+                        get_logger("OwsCapCache").debug(
+                            f"our in-memory csw cached entry for {url} had no records and the one in redis with {rkey} has {re.nelems()}, updating our local one"
+                        )
                         self.services[service_type][url] = re
                         ce = re
                 get_logger("OwsCapCache").debug(
@@ -258,10 +258,7 @@ class OwsCapCache:
                     get_logger("OwsCapCache").info(
                         f"force-fetching {service_type} getcapabilities from {url}"
                     )
-                elif (
-                    ce.timestamp + self.cache_lifetime
-                    > time()
-                ):
+                elif ce.timestamp + self.cache_lifetime > time():
                     get_logger("OwsCapCache").info(
                         f"cached entry for {service_type} {url} expired (ts={ce.timestamp}), refetching"
                     )
