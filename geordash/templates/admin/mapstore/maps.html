@@ -24,6 +24,8 @@ $(document).ready(function(){
       {'field': 'viewurl', 'title': 'View'}
     ]
   });
+{% else %}
+  $('#go').attr('disabled', true);
 {% endif %}
 });
 </script>
@@ -36,7 +38,7 @@ $(document).ready(function(){
 <h2>Check mapstore maps</h2>
 <p>check all mapstore maps.</p>
 <form id='check' action="javascript:CheckRes('mapstore', 'maps', {{ superuser|int}} );">
-<input type=submit value="check all mapstore maps now">
+<input id='go' type=submit value="check all mapstore maps now">
 </form>
 <h4 id='pbtitle'>Problems</h4>
 <div id='pbdetails'></div>
