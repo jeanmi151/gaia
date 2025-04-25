@@ -246,12 +246,16 @@ class OwsCapCache:
                         f"already got a {type(ce.exception)} for {service_type} {url} in cache, returning cached failure"
                     )
                     return ce
-                if service_type == 'csw' and ce.records is not None:
+                if service_type == 'csw':
                     rkey = f"{service_type}-{url.replace('/','~')}"
                     re = self.get_entry_from_redis(rkey)
-                    if re and re.records is None:
+                    if re and re.records is None and ce.records is not None:
                         get_logger("OwsCapCache").info(f"updating redis key {rkey} with {ce.nelems()} cached records")
                         self.set_entry_in_redis(rkey, ce)
+                    if re and re.records is not None and ce.records is None:
+                        get_logger("OwsCapCache").debug(f"our in-memory csw cached entry for {url} had no records and the one in redis with {rkey} has {re.nelems()}, updating our local one")
+                        self.services[service_type][url] = re
+                        ce = re
                 get_logger("OwsCapCache").debug(
                     f"returning {service_type} getcapabilities from process in-memory cache for {url} with {ce.nelems()} entries, ts={ce.timestamp}"
                 )
