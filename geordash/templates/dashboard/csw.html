@@ -46,6 +46,7 @@ $(document).ready(function(){
 <form id='check' action="javascript:CheckRes('cswservice', '{{ url }}', {{ superuser|int }});">
 <input type=submit value="check all metadatas now">
 </form>
+{% if cswrecords | length > 0 %}
 <h2 id='records'>Contents: {{ cswrecords | length }} records</h2>
 <table id="cswrecordstable"
   data-pagination="true"
@@ -53,6 +54,10 @@ $(document).ready(function(){
   data-sort-name="title"
   data-search="true">
 </table>
+{% else %}
+<h2 id='records'>Caching records from csw..</h2>
+<div id="progress"></div>
+{% endif %}
 <h2 id='previous'>Previous</h2>
 <p id='previouslist'></p>
 </div>
