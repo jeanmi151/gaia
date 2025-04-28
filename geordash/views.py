@@ -11,6 +11,7 @@ from flask import jsonify
 
 from geordash.utils import unmunge
 from geordash.checks.mapstore import check_res, check_configs, check_resources
+from geordash.tasks.fetch_csw import get_records
 import geordash.checks.ows
 import geordash.checks.csw
 from geordash.decorators import check_role
@@ -123,6 +124,23 @@ def forgetogc(stype, url):
     n = app.extensions["owscache"].forget(stype, url)
     return {"deleted": n}
 
+@tasks_bp.get("/fetchcswrecords/<string:portal>.json")
+def start_fetch_csw(portal: str):
+    result = get_records.delay(portal)
+    return {"taskid": result.id}
+
+@tasks_bp.get("/fetchcswresults/<string:taskid>")
+def get_csw_records_progress(taskid: str):
+    """
+    taskid should be the task id for a get_records task
+    if given a garbage id, celery returns a None result and state=PENDING ?
+    but how should one differentiate that from a really PENDING task ?
+    """
+    result = AsyncResult(taskid)
+    return {
+        'state': result.state,
+        'completed': result.result,
+    }
 
 @tasks_bp.route("/check/mapstore/configs.json")
 def check_mapstore_configs():
