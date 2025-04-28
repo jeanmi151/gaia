@@ -36,13 +36,12 @@ def create_app() -> Flask:
     # if INVOCATION_ID is set -> running from systemd
     if getenv("INVOCATION_ID") != None:
         gunicorn_logger = logging.getLogger("gunicorn.error")
-        if len(gunicorn_logger.handlers) == 0:
-            return app
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.handlers[0].setFormatter(
-            logging.Formatter("%(levelname)s in %(module)s: %(message)s")
-        )
-        app.logger.setLevel(gunicorn_logger.level)
+        if len(gunicorn_logger.handlers) > 0:
+            app.logger.handlers = gunicorn_logger.handlers
+            app.logger.handlers[0].setFormatter(
+                logging.Formatter("%(levelname)s in %(module)s: %(message)s")
+            )
+            app.logger.setLevel(gunicorn_logger.level)
     else:
         # running from gunicorn but outside systemd -> set global loglevel to the gunicorn level
         gunicorn_logger = logging.getLogger("gunicorn.error")
