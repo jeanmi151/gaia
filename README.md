@@ -100,6 +100,14 @@ and visit https://<sdiurl>/gaia/, which should list for now:
 if your datadir isn't in `/etc/georchestra`, point the `georchestradatadir`
 environment variable to the path where your datadir is located.
 
+the datadir is used to:
+- [configure the header](geordash/__init__.py#L62) and find the [fully-qualified domain name](geordash/dashboard.py#L129) (used in several places) from `default.properties`
+- find out the [path for geonetwork/geoserver](geordash/__init__.py#L60) from mapstore's `localgs`/`local` entries in `mapstore/configs/localConfig.json`. if not found, will default to `/geonetwork/` and `/geoserver/`.
+- find how to [connect to the mapstore schema](geordash/checks/mapstore.py#L41) from `mapstore/geostore.properties`
+- find where are mapstore/geoserver/geonetwork, eg their direct url:port behind the S-P by reading `security-proxy/target-mappings.properties` (cf the calls to `conf.get("xxx", "secproxytargets")` in [that file](geordash/api.py))
+- some work is probably required to achieve the same with the yaml config for the gateway
+- this is used to query them directly on behalf of the currently connected user
+- the datadir files are analyzed/parsed [here](geordash/georchestraconfig.py#L15)
 
 ## cache
 
