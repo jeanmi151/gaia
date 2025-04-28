@@ -215,9 +215,14 @@ class OwsCapCache:
             json_entry = json.dumps(jsonpickle.encode(entry))
         self.rediscli.set(rkey, json_entry)
         self.rediscli.expire(rkey, self.cache_lifetime)
-        get_logger("OwsCapCache").debug(
-            f"persisted {rkey} in redis with nelems={entry.nelems()}, ttl {self.cache_lifetime}, ts={entry.timestamp}"
-        )
+        if entry.exception is not None:
+            get_logger("OwsCapCache").debug(
+                f"persisted {rkey} in redis with exception {type(entry.exception)}, ttl {self.cache_lifetime}, ts={entry.timestamp}"
+            )
+        else:
+            get_logger("OwsCapCache").debug(
+                f"persisted {rkey} in redis with nelems={entry.nelems()}, ttl {self.cache_lifetime}, ts={entry.timestamp}"
+            )
 
     def get(self, service_type, url, force_fetch=False):
         # is a relative url, prepend https://domainName
