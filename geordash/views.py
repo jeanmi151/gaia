@@ -124,10 +124,12 @@ def forgetogc(stype, url):
     n = app.extensions["owscache"].forget(stype, url)
     return {"deleted": n}
 
+
 @tasks_bp.get("/fetchcswrecords/<string:portal>.json")
 def start_fetch_csw(portal: str):
     result = get_records.delay(portal)
     return {"taskid": result.id}
+
 
 @tasks_bp.get("/fetchcswresults/<string:taskid>")
 def get_csw_records_progress(taskid: str):
@@ -138,9 +140,10 @@ def get_csw_records_progress(taskid: str):
     """
     result = AsyncResult(taskid)
     return {
-        'state': result.state,
-        'completed': result.result,
+        "state": result.state,
+        "completed": result.result,
     }
+
 
 @tasks_bp.route("/check/mapstore/configs.json")
 def check_mapstore_configs():
