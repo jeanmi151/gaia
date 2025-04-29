@@ -6,7 +6,7 @@ from celery.result import AsyncResult, GroupResult
 from celery import group
 from flask import current_app as app
 from flask import Blueprint
-from flask import request
+from flask import request, abort
 from flask import jsonify
 
 from geordash.utils import unmunge
