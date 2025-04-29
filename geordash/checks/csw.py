@@ -93,6 +93,7 @@ def check_record(url, uuid):
             stype = u["protocol"].split(":")[1].lower()
             if u["url"] is None:
                 ret["problems"].append({"type": "EmptyUrl", "protocol": u["protocol"]})
+                continue
             url = u["url"].rstrip("?")
             localdomain = "https://" + app.extensions["conf"].get("domainName")
             if url.startswith(localdomain):
