@@ -3,6 +3,7 @@
 # vim: ts=4 sw=4 et
 
 import requests
+from requests.exceptions import ReadTimeout
 
 from celery import shared_task
 from celery import Task
@@ -223,11 +224,15 @@ def owslayer(stype, url, layername, single=False):
                     }
                 )
 
-    except ServiceException as e:
-        if type(e.args) == tuple and (
-            "interdit" in e.args[0]
-            or "401 Authorization Required" in e.args[0]
-            or "HTTP Status 401 – Unauthorized" in e.args[0]
+    except (ServiceException, ReadTimeout) as e:
+        if (
+            type(e) == ServiceException
+            and type(e.args) == tuple
+            and (
+                "interdit" in e.args[0]
+                or "401 Authorization Required" in e.args[0]
+                or "HTTP Status 401 – Unauthorized" in e.args[0]
+            )
         ):
             ret["problems"].append(
                 {
