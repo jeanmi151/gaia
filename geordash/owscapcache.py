@@ -242,6 +242,11 @@ class OwsCapCache:
                 if service_type == "csw":
                     rkey = f"{service_type}-{url.replace('/','~')}"
                     re = self.get_entry_from_redis(rkey)
+                    if re is None:
+                        get_logger("OwsCapCache").info(
+                            f"redis key {rkey} doesnt exist but we have a (probably invalid now) in-memory entry for {service_type} {url}, refreshing"
+                        )
+                        return self.fetch(service_type, url, force_fetch)
                     if re and re.records is None and ce.records is not None:
                         get_logger("OwsCapCache").info(
                             f"updating redis key {rkey} with {ce.nelems()} cached records"
