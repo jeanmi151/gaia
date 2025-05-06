@@ -14,6 +14,7 @@ from geordash.utils import find_localmduuid, unmunge, objtype
 from geordash.logwrap import get_logger
 
 import xml.etree.ElementTree as ET
+from lxml.etree import XMLSyntaxError
 from owslib.util import ServiceException
 
 
@@ -196,7 +197,7 @@ def owslayer(stype, url, layername, single=False):
                             "expected": "featurecollection",
                         }
                     )
-            except lxml.etree.XMLSyntaxError as e:
+            except XMLSyntaxError as e:
                 ret["problems"].append({"type": "ExpectedXML", "return": xml.decode()})
 
         elif stype == "wmts":
