@@ -211,6 +211,8 @@ const GetPbStr = (p) => {
       return `${p.operation} succeeded but the first XML tag was ${p.first_tag} instead of ${p.expected}`
     case 'ExpectedXML':
       return `${p.operation} succeeded but didnt return XML ? ${p.return}`
+    case 'XMLParseError':
+      return `${p.operation} succeeded but failed parsing XML ? ${p.return}`
     case 'ServiceException':
       return `Failed ${p.operation} on layer '${p.layername}' in ${p.stype} at ${p.url}, got ${p.e}: ${p.estr}`
     case 'ForbiddenAccess':
