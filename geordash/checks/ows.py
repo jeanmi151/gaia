@@ -199,6 +199,8 @@ def owslayer(stype, url, layername, single=False):
                     )
             except XMLSyntaxError as e:
                 ret["problems"].append({"type": "ExpectedXML", "return": xml.decode()})
+            except ET.ParseError as e:
+                ret["problems"].append({"type": "XMLParseError", "return": str(e)})
 
         elif stype == "wmts":
             operation = "GetTile"
