@@ -24,7 +24,6 @@ import requests
 
 from geordash.logwrap import get_logger
 
-is_dataset = PropertyIsEqualTo("Type", "dataset")
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
 
 
