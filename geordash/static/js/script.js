@@ -314,10 +314,6 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                     $(targetdivid).text('Waiting');
                   }
                   setTimeout(poll, 2000)
-                } else if (!data["successful"]) {
-                  $(targetdivid).text("Protch !");
-                  $(targetpbdivid).text('Something crashed, check browser console');
-                  console.error(data)
                 } else {
                   if (Array.isArray(data["value"])) {
                       var p = data['value'].filter(function(f) {
@@ -352,13 +348,21 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       });
                       data["value"].problems = probs.flat(1)
                   } else {
-                      const probs = data["value"].problems.map(i => {
-                        return GetPbStr(i)
-                      })
-                      data["value"].problems = probs
+                      // if problems is undef, single task badly failed and returned the python exception as value
+                      if (data["value"].problems !== undefined) {
+                        const probs = data["value"].problems.map(i => {
+                          return GetPbStr(i)
+                        })
+                        data["value"].problems = probs
+                      }
                   }
-                  if (data["value"].problems.length > 0) {
-                    $(targetdivid).text(data["value"].problems.length + ' problems found');
+                  if (data["value"].problems !== undefined && data["value"].problems.length > 0) {
+                    if (!data["successful"]) {
+                      $(targetdivid).text("some job failed, did " + data["completed"] + " - on those, " + data["value"].problems.length + ' problems found');
+                      console.error(data)
+                    } else {
+                      $(targetdivid).text(data["value"].problems.length + ' problems found');
+                    }
                     if (Array.isArray(data["value"])) {
                         var argtitle = 'Layer'
                         if (data['task'].includes('csw')) {
@@ -401,7 +405,15 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                         $(targetpbdivid).html(ArrayToHtmlList(data["value"].problems));
                     }
                   } else {
-                    $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
+                    if (!data["successful"]) {
+                      if (data["completed"] !== undefined) {
+                        $(targetdivid).text("some job failed, did " + data["completed"] + " - on those, found no errors");
+                      } else {
+                        $(targetdivid).text("job failed badly, raw error: " + data["value"]);
+                      }
+                    } else {
+                      $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
+                    }
                     $(targetpbdivid).empty();
                   }
                   const d = new Date(data["finished"] * 1000);
