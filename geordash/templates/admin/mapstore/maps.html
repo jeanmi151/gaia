@@ -4,6 +4,7 @@
         {% block scripts %}
 <script>
 let prev = {{ previous_resources_jobs | tojson() }};
+let tableData = {{ res | tojson }};
 if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
@@ -15,7 +16,7 @@ $(document).ready(function(){
   DisplayPrev('mapstore', 'maps', prev, {{ superuser|int }}, '#previouslist');
 {% if res | length > 0 %}
   $('#mapstable').bootstrapTable({
-    data: {{ res | tojson }},
+    data: tableData,
     columns: [
       {'field': 'url', 'sortable': true, 'title': "Identifier", 'formatter': 'urlFormatter'},
       {'field': 'title', 'sortable': true, 'title':'Titre' },

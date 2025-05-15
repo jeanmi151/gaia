@@ -4,6 +4,7 @@
         {% block scripts %}
 <script>
 let prev = {{ previous_jobs | tojson() }};
+let tableData = {{ layers | tojson }};
 if (prev && Array.isArray(prev) && prev.length > 0) {
   const last = prev.reduce((a, b) => {
     return new Date(a['finished']) > new Date(b['finished']) ? a : b;
@@ -15,7 +16,7 @@ $(document).ready(function(){
   DisplayPrev('owsservice/{{ type }}', '{{ url }}', prev, {{ superuser|int }});
 {% if layers | length > 0 %}
   $('#owslayerstable').bootstrapTable({
-    data: {{ layers | tojson }},
+    data: tableData,
     columns: [
       {'title': 'Index', 'formatter': 'runningFormatter'},
       {'title': 'Name', 'field': 'url', 'sortable': true, 'formatter': 'urlFormatter'},
