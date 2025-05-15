@@ -104,12 +104,26 @@ def owslayer(stype, url, layername, single=False):
         for m in l.metadataUrls:
             mdurl = m["url"]
             # check first that the url exists
-            r = requests.head(mdurl)
-            if r.status_code != 200:
+            try:
+                r = requests.head(mdurl)
+                if r.status_code != 200:
+                    ret["problems"].append(
+                        {
+                            "type": "BrokenMetadataUrl",
+                            "url": mdurl,
+                            "code": r.status_code,
+                        }
+                    )
+                get_logger("CheckOws").debug(f"{mdurl} -> {r.status_code}")
+            except Exception as e:
                 ret["problems"].append(
-                    {"type": "BrokenMetadataUrl", "url": mdurl, "code": r.status_code}
+                    {
+                        "type": "ConnectionFailure",
+                        "url": mdurl,
+                        "exception": objtype(e),
+                        "exceptionstr": str(e),
+                    }
                 )
-            get_logger("CheckOws").debug(f"{mdurl} -> {r.status_code}")
         if len(l.metadataUrls) == 0:
             ret["problems"].append({"type": "NoMetadataUrl"})
 
