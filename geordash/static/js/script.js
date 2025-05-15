@@ -358,8 +358,16 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                   }
                   if (data["value"].problems !== undefined && data["value"].problems.length > 0) {
                     if (!data["successful"]) {
-                      $(targetdivid).text("some job failed, did " + data["completed"] + " - on those, " + data["value"].problems.length + ' problems found');
-                      console.error(data)
+                      /*
+                       * try to figure out which job actually failed
+                       * url member is a csw record identifier, or a wfs/wms layer name
+                       * the last (args.at(-1)) job arg is also a csw record identifier or a wfs/wms layer name
+                       * figure out which is missing from the list of returned jobs
+                       */
+                      const all = tableData.map(i => { return i.url });
+                      const done = data["value"].map(i => { return i.args.at(-1) });
+                      const missing = all.filter(x => !done.includes(x));
+                      $(targetdivid).text("jobs on " + missing + " failed, did " + data["completed"] + " - on those, " + data["value"].problems.length + ' problems found');
                     } else {
                       $(targetdivid).text(data["value"].problems.length + ' problems found');
                     }
