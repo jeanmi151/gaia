@@ -19,9 +19,22 @@ def parse_map(xmlstring):
     details["title"] = getelemat(
         xml, "/config/metadata/rdf:RDF/rdf:Description/dc:title", nsmap=nsmap
     )
-    details["date"] = getelemat(
-        xml, "/config/metadata/rdf:RDF/rdf:Description/dc:date", nsmap=nsmap
-    )
+    if details["title"] == None:
+        app = xml.xpath("/config/application", namespaces=nsmap)
+        if app and len(app) > 0:
+            details["title"] = app[0].attrib["title"]
+
+    if len(xml.xpath("/config/metadata")) > 0:
+        details["dc"] = dict()
+        details["dc"]["date"] = getelemat(
+            xml, "/config/metadata/rdf:RDF/rdf:Description/dc:date", nsmap=nsmap
+        )
+        details["dc"]["creator"] = getelemat(
+            xml, "/config/metadata/rdf:RDF/rdf:Description/dc:creator", nsmap=nsmap
+        )
+        details["dc"]["subject"] = [ele.text for ele in xml.xpath(
+            "/config/metadata/rdf:RDF/rdf:Description/dc:subject", namespaces=nsmap
+        )]
     layers = list()
     baselayers = list()
     for l in xml.xpath(

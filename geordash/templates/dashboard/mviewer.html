@@ -20,9 +20,24 @@ $(document).ready(function(){
         {% block content %}
 <div class="container">
 <p id='details'>Details pour la carte mviewer {{ url }}, ayant pour titre {{ details.title }}</p>
+{% if details.dc is defined %}
 <ul>
-<li>Date: {{ details.date }}</li>
+<li>Date: {{ details.dc.date }}</li>
+<li>Auteur: {{ details.dc.creator }}</li>
+{% if details.dc.subject is defined and details.dc.subject | length > 0 %}
+<li>
+Mots clefs:
+<ul>
+{% for s in details.dc.subject %}
+<li>{{ s }}</li>
+{% endfor %}
 </ul>
+</li>
+{% endif %}
+</ul>
+{% else %}
+Attention, il n'y a pas de section <code>&lt;metadata&gt;</code> ?
+{% endif %}
 <form id='check' action="javascript:CheckRes('mviewer', '{{ url }}', {{ superuser|int }});">
 <input type=submit value="check now">
 </form>
