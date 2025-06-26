@@ -233,7 +233,7 @@ def owslayer(stype, url, lname):
 
 @dash_bp.route("/mviewer/<string:url>")
 def mviewer(url):
-    url = unmunge(url)
+    url = unmunge(url, False)
     r = requests.get(url)
     if r.status_code == 200:
         all_jobs_for_mviewer = app.extensions["rcli"].get_taskids_by_taskname_and_args(

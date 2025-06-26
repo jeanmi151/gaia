@@ -197,7 +197,7 @@ def check_mapstore_resources():
 
 @tasks_bp.route("/check/mviewer/<string:url>.json")
 def check_mviewer(url):
-    url = unmunge(url)
+    url = unmunge(url, False)
     r = requests.get(url)
     if r.status_code != 200:
         return abort(404)
