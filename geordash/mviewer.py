@@ -53,6 +53,10 @@ def parse_map(xmlstring):
             # layer not public, ignoring
             continue
         if l.tag == "layer":
+            tpl = l.find('./template')
+            tplurl = None
+            if tpl is not None and "url" in tpl.attrib:
+                tplurl = tpl.attrib["url"]
             styles = list()
             if "sld" in l.attrib and l.attrib["sld"] != "":
                 styles = [s.lstrip() for s in l.attrib["sld"].split(",")]
@@ -63,6 +67,7 @@ def parse_map(xmlstring):
                     "name": layername,
                     "title": l.attrib.get("name"),
                     "styles": styles,
+                    "templateurl": tplurl
                 }
             )
         else:
