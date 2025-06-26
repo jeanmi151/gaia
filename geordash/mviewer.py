@@ -4,7 +4,7 @@
 
 import requests
 from lxml import etree
-from gsdscanner.xmlutils import getelemat
+from geordash.utils import getelemat
 
 
 def parse_map(xmlstring):
