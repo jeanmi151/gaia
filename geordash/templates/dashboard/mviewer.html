@@ -57,13 +57,14 @@ dans
 {% if l.styles | length > 0 %}
 {% if l.styles | length == 1 %}
 avec le style {{ l.styles[0] }}
-{% endif %}
+{% else %}
 avec les styles suivants:
 <ul>
 {% for s in l.styles %}
 <li>{{ s }}</li>
 {% endfor %}
 </ul>
+{% endif %}
 {% endif %}
 {% endfor %}
 </li>
