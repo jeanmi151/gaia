@@ -32,7 +32,7 @@ def find_localmduuid(service, layername):
     return localmduuids
 
 
-def unmunge(url):
+def unmunge(url, prunefqdn=True):
     """
     takes a munged url in the form ~geoserver(|~ws)~ows or http(s):~~fqdn~geoserver(|~ws)~ows
     returns: a proper url with slashes, eventually stripped of the local ids domainName (eg /geoserver/ws/ows)
@@ -41,7 +41,7 @@ def unmunge(url):
     if not url.startswith("/") and not url.startswith("http"):
         url = "/" + url
     localdomain = "https://" + app.extensions["conf"].get("domainName")
-    if url.startswith(localdomain):
+    if url.startswith(localdomain) and prunefqdn:
         url = url.removeprefix(localdomain)
     return url
 
