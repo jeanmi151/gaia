@@ -49,7 +49,7 @@ def unmunge(url, prunefqdn=True):
     localdomain = "https://" + app.extensions["conf"].get("domainName")
     if url.startswith(localdomain) and prunefqdn:
         url = url.removeprefix(localdomain)
-    if not url.startswith(localdomain) and not prunefqdn:
+    if not url.startswith("http") and not url.startswith(localdomain) and not prunefqdn:
         url = localdomain + url
     return url
 
