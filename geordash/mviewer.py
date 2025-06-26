@@ -54,7 +54,7 @@ def parse_map(xmlstring):
             continue
         if l.tag == "layer":
             styles = list()
-            if "sld" in l.attrib:
+            if "sld" in l.attrib and l.attrib["sld"] != "":
                 styles = [s.lstrip() for s in l.attrib["sld"].split(",")]
             layers.append(
                 {
