@@ -73,6 +73,10 @@ def check_mviewer(url):
                             else:
                                 pass
                                 # check that r.text is parsable sld ?
+                    if l["templateurl"]:
+                        r = requests.head(l["templateurl"], allow_redirects=True)
+                        if r.status_code != 200:
+                            ret["problems"].append({"type": "NoSuchResource", "restype": "template", "resid": l["templateurl"]})
             case _:
                 get_logger("CheckMviewer").debug(l)
     return ret
