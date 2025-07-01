@@ -19,7 +19,7 @@ that route should be called by the [`CheckRes` js method](https://github.com/geo
 
 ## group task
 
-a group task is a task iterating over a list of resources, and triggering a subtask for each resource. For example the [owsservice](https://github.com/georchestra/gaia/blob/master/geordash/checks/ows.py#L71) lauches an [`owslayer`] check on each layer in the given ogc service.
+a group task is a task iterating over a list of resources, and triggering a subtask for each resource. For example the [`owsservice`](https://github.com/georchestra/gaia/blob/master/geordash/checks/ows.py#L71) group task enqueues an [`owslayer`](https://github.com/georchestra/gaia/blob/master/geordash/checks/ows.py#L85) check on each layer in the given ogc service.
 
 if adding a new one, code has to be added in some places to mark the relationship between the child and parent task type:
 - in [`result()`](https://github.com/georchestra/gaia/blob/master/geordash/views.py#L33) method, which checks how to get the results from all the sub-tasks
