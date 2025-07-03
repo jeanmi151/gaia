@@ -4,11 +4,6 @@
 
 import requests
 
-from owslib.wms import WebMapService
-from owslib.wfs import WebFeatureService
-from owslib.wmts import WebMapTileService
-from owslib.util import ServiceException
-
 from flask import current_app as app
 from celery import shared_task
 from celery import Task
