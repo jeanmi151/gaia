@@ -13,6 +13,20 @@ from geordash.mviewer import parse_map
 from geordash.utils import unmunge, objtype
 
 
+@shared_task
+def check_all():
+    mviewer_configs = app.extensions["owscache"].get_mviewer_configs()
+    if not mviewer_configs:
+        return False
+    taskslist = list()
+    for url in mviewer_configs:
+        taskslist.append(check_mviewer.s(url))
+    grouptask = group(taskslist)
+    groupresult = grouptask.apply_async()
+    groupresult.save()
+    return groupresult
+
+
 @shared_task()
 def check_mviewer(url):
     url = unmunge(url, False)
