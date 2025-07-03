@@ -196,6 +196,16 @@ def check_mapstore_resources():
     return {"result_id": groupresult.id}
 
 
+@tasks_bp.route("/check/mviewer/configs.json")
+def check_all_mviewer():
+    groupresult = geordash.checks.mviewer.check_all()
+    if groupresult.id:
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.mviewer.check_all", [], groupresult.id
+        )
+    return {"result_id": groupresult.id}
+
+
 @tasks_bp.route("/check/mviewer/<string:url>.json")
 def check_mviewer(url):
     url = unmunge(url, False)
