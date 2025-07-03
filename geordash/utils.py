@@ -6,11 +6,13 @@ from flask import current_app as app
 from geordash.logwrap import get_logger
 from lxml import etree
 
+
 def getelemat(xml: etree._ElementTree, path: str, nsmap=None):
     r = xml.xpath(path, namespaces=nsmap)
     if len(r) > 0:
         return r[0].text
     return None
+
 
 def find_localmduuid(service, layername):
     localmduuids = set()

@@ -32,9 +32,12 @@ def parse_map(xmlstring):
         details["dc"]["creator"] = getelemat(
             xml, "/config/metadata/rdf:RDF/rdf:Description/dc:creator", nsmap=nsmap
         )
-        details["dc"]["subject"] = [ele.text for ele in xml.xpath(
-            "/config/metadata/rdf:RDF/rdf:Description/dc:subject", namespaces=nsmap
-        )]
+        details["dc"]["subject"] = [
+            ele.text
+            for ele in xml.xpath(
+                "/config/metadata/rdf:RDF/rdf:Description/dc:subject", namespaces=nsmap
+            )
+        ]
     layers = list()
     baselayers = list()
     for l in xml.xpath(
@@ -66,7 +69,7 @@ def parse_map(xmlstring):
             # layer not public, ignoring
             continue
         if l.tag == "layer":
-            tpl = l.find('./template')
+            tpl = l.find("./template")
             tplurl = None
             if tpl is not None and "url" in tpl.attrib:
                 tplurl = tpl.attrib["url"]
@@ -80,7 +83,7 @@ def parse_map(xmlstring):
                     "name": layername,
                     "title": l.attrib.get("name"),
                     "styles": styles,
-                    "templateurl": tplurl
+                    "templateurl": tplurl,
                 }
             )
         else:

@@ -204,6 +204,7 @@ def check_mviewer(url):
     result = geordash.checks.mviewer.check_mviewer.delay(url)
     return {"result_id": result.id}
 
+
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
 def check_owslayer(stype, url, lname):
     if stype not in ("wms", "wmts", "wfs"):

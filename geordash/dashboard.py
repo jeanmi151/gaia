@@ -231,6 +231,7 @@ def owslayer(stype, url, lname):
         previous_jobs=all_jobs_for_owslayer,
     )
 
+
 @dash_bp.route("/mviewer/<string:url>")
 def mviewer(url):
     url = unmunge(url, False)
@@ -243,10 +244,11 @@ def mviewer(url):
             "mviewer.html",
             url=url.replace("/", "~"),
             previous_jobs=all_jobs_for_mviewer,
-            details=parse_map(r.text)
+            details=parse_map(r.text),
         )
     else:
         return abort(404)
+
 
 @dash_bp.route("/map/<int:mapid>")
 def map(mapid):
