@@ -26,10 +26,6 @@ $(document).ready(function(){
 {% else %}
   $('#go').attr('disabled', true);
 {% endif %}
-  if (prev === null) {
-    $('#pbdetails').html('No previous group check was run');
-    $('#previouslist').html('No previous group check was run');
-  }
 });
 
 /* horrible function constructing the redirect to the mviewer details page for the entered url */
@@ -51,10 +47,10 @@ function GoToUrl() {
 <input id='go' type=submit value="check all mviewer configs now">
 </form>
 <h4 id='pbtitle'>Problems</h4>
-<div id='pbdetails'></div>
+<div id='pbdetails'>No group check has been run yet</div>
 <div id="problems"></div>
 <h4 id='previous'>Previous</h4>
-<p id='previouslist'></p>
+<p id='previouslist'>No previous group check result has been found</p>
 </div>
 {% if confs | length > 0 %}
 <h2 id='mapstitle'>Configs</h2>
