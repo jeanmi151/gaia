@@ -237,6 +237,20 @@ def mviewer(url):
     url = unmunge(url, False)
     r = requests.get(url)
     if r.status_code == 200:
+        mviewer_configs = app.extensions["owscache"].get_mviewer_configs()
+        if not mviewer_configs:
+            app.extensions["owscache"].set_mviewer_configs(
+                set(
+                    {
+                        url,
+                    }
+                )
+            )
+        else:
+            if url not in mviewer_configs:
+                mviewer_configs.add(url)
+                app.extensions["owscache"].set_mviewer_configs(mviewer_configs)
+
         all_jobs_for_mviewer = app.extensions["rcli"].get_taskids_by_taskname_and_args(
             "geordash.checks.mviewer.check_mviewer", [url]
         )
