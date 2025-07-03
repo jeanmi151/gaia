@@ -34,6 +34,7 @@ def result(id: str) -> dict[str, object]:
         # regular task triggered by beat, the asyncresult first result entry contains the groupresult id
         if type(result.result) == list and result.name in (
             "geordash.checks.mapstore.check_resources",
+            "geordash.checks.mviewer.check_all",
             "geordash.checks.ows.owsservice",
             "geordash.checks.csw.check_catalog",
         ):
