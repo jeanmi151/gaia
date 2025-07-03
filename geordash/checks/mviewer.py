@@ -29,7 +29,6 @@ def check_all():
 
 @shared_task()
 def check_mviewer(url):
-    url = unmunge(url, False)
     r = requests.get(url)
     if r.status_code != 200:
         return {
