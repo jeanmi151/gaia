@@ -19,7 +19,8 @@ $(document).ready(function(){
         <!-- Your page content -->
         {% block content %}
 <div class="container">
-<p id='details'>Details pour la carte mviewer {{ url }}, ayant pour titre {{ details.title }}</p>
+{% set rurl = url.replace('~','/') %}
+<p id='details'>Details pour la carte mviewer <a href="{{ rurl }}">{{ rurl }}</a> (<a href="https://geobretagne.fr/mviewer/?config={{ rurl }}">voir dans le mviewer de geobretagne</a>), ayant pour titre {{ details.title }}</p>
 {% if details.dc is defined %}
 <ul>
 <li>Date: {{ details.dc.date }}</li>
