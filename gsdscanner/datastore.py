@@ -3,7 +3,7 @@
 # vim: ts=4 sw=4 et
 
 from lxml import etree
-from .xmlutils import getelemat
+from geordash.utils import getelemat
 
 
 class Datastore(dict):

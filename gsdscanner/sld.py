@@ -5,7 +5,7 @@
 from os.path import getsize
 from lxml import etree
 from lxml.etree import XMLParser
-from .xmlutils import getelemat
+from geordash.utils import getelemat
 
 
 class SLD(dict):
