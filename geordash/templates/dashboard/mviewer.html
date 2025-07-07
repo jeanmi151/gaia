@@ -70,7 +70,7 @@ la carte utilise les couches OGC suivantes:
 <a href='{{ url_for('dashboard.owslayer', stype=l.type, url=l.url.replace('/', '~').split('?')[0], lname=l.name) }}'>{{ l.name }}</a>
 dans
 <a href='{{ url_for('dashboard.ows', stype=l.type, url=l.url.replace('/', '~')) }}'>{{ l.url }}</a>
-{% if l.templateurl is defined %}
+{% if l.templateurl != None %}
 (url du template: {{ l.templateurl }})
 {% endif %}
 {% if l.styles | length > 0 %}
