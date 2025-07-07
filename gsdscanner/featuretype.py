@@ -5,6 +5,7 @@
 from lxml import etree
 from .xmlutils import getelemat
 
+
 class FeatureType(dict):
     def __init__(self, xmlf):
         self.file = xmlf
@@ -14,16 +15,16 @@ class FeatureType(dict):
 
     def parse(self):
         xml = etree.parse(self.file)
-        self.id = getelemat(xml, '/featureType/id')
-        self.name = getelemat(xml, '/featureType/name')
-        self.title = getelemat(xml, '/featureType/title')
-        self.declaredsrs = getelemat(xml, '/featureType/srs')
-        self.advertised = getelemat(xml, '/featureType/advertised')
+        self.id = getelemat(xml, "/featureType/id")
+        self.name = getelemat(xml, "/featureType/name")
+        self.title = getelemat(xml, "/featureType/title")
+        self.declaredsrs = getelemat(xml, "/featureType/srs")
+        self.advertised = getelemat(xml, "/featureType/advertised")
         if self.advertised is None:
-            self.advertised = 'true'
-        self.enabled = getelemat(xml, '/featureType/enabled')
+            self.advertised = "true"
+        self.enabled = getelemat(xml, "/featureType/enabled")
         if self.enabled is None:
-            self.enabled = 'true'
-        self.namespaceid = getelemat(xml, '/featureType/namespace/id')
-        self.datastoreid = getelemat(xml, '/featureType/store/id')
+            self.enabled = "true"
+        self.namespaceid = getelemat(xml, "/featureType/namespace/id")
+        self.datastoreid = getelemat(xml, "/featureType/store/id")
         # XXX metadataLinks

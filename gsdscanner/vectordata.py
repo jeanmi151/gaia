@@ -5,11 +5,12 @@
 from os.path import getsize
 from osgeo.ogr import Open
 
+
 class VectorData(dict):
     def __init__(self, path):
         self.file = path
         self.filesize = getsize(path)
-        self.id = self.file.replace('/','~')
+        self.id = self.file.replace("/", "~")
         self.type = None
         self.layers = dict()
 
@@ -26,5 +27,9 @@ class VectorData(dict):
             proj = None
             if sr is not None:
                 proj = sr.GetName()
-            self.layers[l.GetName()] = {'featurecount': len(l), 'projection': proj, 'bbox': l.GetExtent() }
+            self.layers[l.GetName()] = {
+                "featurecount": len(l),
+                "projection": proj,
+                "bbox": l.GetExtent(),
+            }
         ds = None

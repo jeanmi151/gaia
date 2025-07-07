@@ -5,6 +5,7 @@
 from lxml import etree
 from .xmlutils import getelemat
 
+
 class Workspace(dict):
     def __init__(self, xmlf):
         self.file = xmlf
@@ -14,5 +15,5 @@ class Workspace(dict):
 
     def parse(self):
         xml = etree.parse(self.file)
-        self.id = getelemat(xml, '/workspace/id')
-        self.name = getelemat(xml, '/workspace/name')
+        self.id = getelemat(xml, "/workspace/id")
+        self.name = getelemat(xml, "/workspace/name")

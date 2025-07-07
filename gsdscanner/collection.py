@@ -4,7 +4,9 @@
 
 from lxml import etree
 from glob import glob
-#from .workspace import Workspace
+
+# from .workspace import Workspace
+
 
 class Collection:
     def __init__(self, glob, objtype):
@@ -18,9 +20,9 @@ class Collection:
 
     def list(self):
         if type(self.glob) == list:
-            files = sum([glob(x, recursive='**' in x) for x in self.glob], [])
+            files = sum([glob(x, recursive="**" in x) for x in self.glob], [])
         else:
-            files = glob(self.glob, recursive='**' in self.glob)
+            files = glob(self.glob, recursive="**" in self.glob)
         for f in files:
             e = self.type(f)
             e.parse()

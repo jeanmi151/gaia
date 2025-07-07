@@ -5,6 +5,7 @@
 from lxml import etree
 from .xmlutils import getelemat
 
+
 class Datastore(dict):
     def __init__(self, xmlf):
         self.file = xmlf
@@ -14,12 +15,14 @@ class Datastore(dict):
 
     def parse(self):
         xml = etree.parse(self.file)
-        self.id = getelemat(xml, '/dataStore/id')
-        self.name = getelemat(xml, '/dataStore/name')
-        self.type = getelemat(xml, '/dataStore/type')
-        self.enabled = getelemat(xml, '/dataStore/enabled')
-        self.workspaceid = getelemat(xml, '/dataStore/workspace/id')
+        self.id = getelemat(xml, "/dataStore/id")
+        self.name = getelemat(xml, "/dataStore/name")
+        self.type = getelemat(xml, "/dataStore/type")
+        self.enabled = getelemat(xml, "/dataStore/enabled")
+        self.workspaceid = getelemat(xml, "/dataStore/workspace/id")
         # can be none
-        self.connurl = getelemat(xml, '/dataStore/connectionParameters/entry[@key="url"]')
+        self.connurl = getelemat(
+            xml, '/dataStore/connectionParameters/entry[@key="url"]'
+        )
         # if type = PostGIS (JNDI) look for name matching connurl java:comp/env/ in tomcat's conf/server.xml
         # and list tables in the given database

@@ -5,15 +5,17 @@
 from os.path import getsize
 from osgeo.gdal import Open
 
+
 class RasterData(dict):
     def __init__(self, path):
         self.file = path
         self.filesize = getsize(path)
-        self.id = self.file.replace('/','~')
+        self.id = self.file.replace("/", "~")
         self.projection = None
         self.bbox = None
         self.type = None
-#        self.parse()
+
+    #        self.parse()
 
     def __repr__(self):
         return f"RasterData: id={self.id}, type={self.type}, proj={self.projection}, bbox={self.bbox}"
@@ -29,9 +31,9 @@ class RasterData(dict):
             self.projection = sr.GetName()
             sr = None
         gt = ds.GetGeoTransform()
-        xsize = ds.RasterXSize # Size in the x-direction
-        ysize = ds.RasterYSize # Size in the y-direction
-        xr = abs(gt[1]) # Resolution in the x-direction
-        yr = abs(gt[-1]) # Resolution in the y-direction
+        xsize = ds.RasterXSize  # Size in the x-direction
+        ysize = ds.RasterYSize  # Size in the y-direction
+        xr = abs(gt[1])  # Resolution in the x-direction
+        yr = abs(gt[-1])  # Resolution in the y-direction
         self.bbox = [gt[0], gt[3] - (ysize * yr), gt[0] + (xsize * xr), gt[3]]
         ds = None

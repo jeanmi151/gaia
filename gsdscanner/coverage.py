@@ -5,6 +5,7 @@
 from lxml import etree
 from .xmlutils import getelemat
 
+
 class Coverage(dict):
     def __init__(self, xmlf):
         self.file = xmlf
@@ -14,11 +15,11 @@ class Coverage(dict):
 
     def parse(self):
         xml = etree.parse(self.file)
-        self.id = getelemat(xml, '/coverage/id')
-        self.name = getelemat(xml, '/coverage/name')
-        self.nativeName = getelemat(xml, '/coverage/nativeName')
-        self.title = getelemat(xml, '/coverage/title')
-        self.declaredsrs = getelemat(xml, '/coverage/srs')
-        self.namespaceid = getelemat(xml, '/coverage/namespace/id')
-        self.coveragestoreid = getelemat(xml, '/coverage/store/id')
+        self.id = getelemat(xml, "/coverage/id")
+        self.name = getelemat(xml, "/coverage/name")
+        self.nativeName = getelemat(xml, "/coverage/nativeName")
+        self.title = getelemat(xml, "/coverage/title")
+        self.declaredsrs = getelemat(xml, "/coverage/srs")
+        self.namespaceid = getelemat(xml, "/coverage/namespace/id")
+        self.coveragestoreid = getelemat(xml, "/coverage/store/id")
         # XXX metadataLinks

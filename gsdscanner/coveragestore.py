@@ -5,6 +5,7 @@
 from lxml import etree
 from .xmlutils import getelemat
 
+
 class Coveragestore(dict):
     def __init__(self, xmlf):
         self.file = xmlf
@@ -14,9 +15,11 @@ class Coveragestore(dict):
 
     def parse(self):
         xml = etree.parse(self.file)
-        self.id = getelemat(xml, '/coverageStore/id')
-        self.name = getelemat(xml, '/coverageStore/name')
-        self.type = getelemat(xml, '/coverageStore/type')
-        self.enabled = getelemat(xml, '/coverageStore/enabled')
-        self.workspaceid = getelemat(xml, '/coverageStore/workspace/id')
-        self.url = getelemat(xml, '/coverageStore/url') #path (relative to datadir) to tif or folder for type=imagemosaic ?
+        self.id = getelemat(xml, "/coverageStore/id")
+        self.name = getelemat(xml, "/coverageStore/name")
+        self.type = getelemat(xml, "/coverageStore/type")
+        self.enabled = getelemat(xml, "/coverageStore/enabled")
+        self.workspaceid = getelemat(xml, "/coverageStore/workspace/id")
+        self.url = getelemat(
+            xml, "/coverageStore/url"
+        )  # path (relative to datadir) to tif or folder for type=imagemosaic ?

@@ -5,6 +5,7 @@
 from lxml import etree
 from .xmlutils import getelemat
 
+
 class Namespace(dict):
     def __init__(self, xmlf):
         self.file = xmlf
@@ -14,6 +15,6 @@ class Namespace(dict):
 
     def parse(self):
         xml = etree.parse(self.file)
-        self.id = getelemat(xml, '/namespace/id')
-        self.name = getelemat(xml, '/namespace/prefix')
-        self.uri = getelemat(xml, '/namespace/uri')
+        self.id = getelemat(xml, "/namespace/id")
+        self.name = getelemat(xml, "/namespace/prefix")
+        self.uri = getelemat(xml, "/namespace/uri")
