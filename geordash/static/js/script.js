@@ -266,7 +266,7 @@ const FetchCswRecords = (portal) => {
     .then(mydata => {
       $(targetdivid).text("Queuing background task..");
       const poll = () => {
-        fetch(baseurl + '/tasks/fetchcswresults/' + mydata["taskid"])
+        fetch(baseurl + '/tasks/taskresults/' + mydata["taskid"])
           .then(response => response.json())
           .then(data => {
 //            console.log(data)

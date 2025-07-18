@@ -134,10 +134,10 @@ def start_fetch_csw(portal: str):
     return {"taskid": result.id}
 
 
-@tasks_bp.get("/fetchcswresults/<string:taskid>")
-def get_csw_records_progress(taskid: str):
+@tasks_bp.get("/taskresults/<string:taskid>")
+def get_task_result(taskid: str):
     """
-    taskid should be the task id for a get_records task
+    taskid should be the task id for a get_records or parse_gsdatadir task
     if given a garbage id, celery returns a None result and state=PENDING ?
     but how should one differentiate that from a really PENDING task ?
     """
