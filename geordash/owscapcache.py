@@ -313,18 +313,18 @@ class OwsCapCache:
             re = self.rediscli.get(rkey)
             if re:
                 gsdd = jsonpickle.decode(json.loads(re.decode("utf-8")))
+                # update local version, this one is populated
+                self.services[rkey] = gsdd
             else:
-                try:
-                    gsdd = GSDatadirScanner(find_geoserver_datadir(defpath))
-                    # TODO: compare datadir versions
-                    gsdd.parseAll()
-                except:
-                    # XXX return proper error ?
-                    return None
-                else:
-                    # push to redis
-                    json_entry = json.dumps(jsonpickle.encode(gsdd))
-                    self.rediscli.set(rkey, json_entry)
-            # update local version
-            self.services["geoserver_datadir"] = gsdd
+                # return a dummy unparsed one
+                gsdd = GSDatadirScanner(find_geoserver_datadir(defpath))
+                return gsdd
+
         return self.services["geoserver_datadir"]
+
+    def update_geoserver_datadir_view(self, gsdd: GSDatadirScanner):
+        rkey = "geoserver_datadir"
+        json_entry = json.dumps(jsonpickle.encode(gsdd))
+        self.rediscli.set(rkey, json_entry)
+        # update local version
+        self.services[rkey] = gsdd
