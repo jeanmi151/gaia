@@ -115,3 +115,4 @@ class GSDatadirScanner:
 
     def parseAll(self):
         self.parse(self.available_keys)
+        self.parsed = True
