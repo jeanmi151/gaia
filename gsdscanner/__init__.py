@@ -24,6 +24,7 @@ class GSDatadirScanner:
         self, path="/srv/data/geoserver"
     ):  # default path for ansible deployments
         self.basepath = path
+        self.parsed = False
         self.collections = dict()
         self.available_keys = [
             "workspaces",
