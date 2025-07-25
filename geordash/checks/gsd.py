@@ -20,7 +20,7 @@ from gsdscanner.rasterdata import RasterData
 
 @shared_task()
 def gsdatadir(defpath=None):
-    gsd = app.extensions["owscache"].get_geoserver_datadir_view(defpath)
+    gsd = app.extensions["owscache"].get_geoserver_datadir_view(defpath=defpath, parse_now=True)
     if gsd is None:
         return False
     taskslist = list()
@@ -35,7 +35,7 @@ def gsdatadir(defpath=None):
 
 @shared_task()
 def gsdatadir_item(colltype, key, defpath=None):
-    gsd = app.extensions["owscache"].get_geoserver_datadir_view(defpath)
+    gsd = app.extensions["owscache"].get_geoserver_datadir_view(defpath=defpath, parse_now=True)
     if gsd is None:
         return False
     if colltype not in gsd.available_keys:
