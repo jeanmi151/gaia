@@ -13,6 +13,7 @@ import requests
 from geordash.utils import unmunge
 from geordash.checks.mapstore import check_res, check_configs, check_resources
 from geordash.tasks.fetch_csw import get_records
+from geordash.tasks.gsdatadir import parse_gsdatadir
 import geordash.checks.ows
 import geordash.checks.csw
 import geordash.checks.mviewer
@@ -127,6 +128,11 @@ def forgetogc(stype, url):
     n = app.extensions["owscache"].forget(stype, url)
     return {"deleted": n}
 
+
+@tasks_bp.get("/parsegsd.json")
+def start_parse_gsd():
+    result = parse_gsdatadir.delay()
+    return {"taskid": result.id}
 
 @tasks_bp.get("/fetchcswrecords/<string:portal>.json")
 def start_fetch_csw(portal: str):
