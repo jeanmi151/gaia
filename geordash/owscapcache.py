@@ -303,7 +303,7 @@ class OwsCapCache:
         json_entry = json.dumps(jsonpickle.encode(confs))
         return self.rediscli.set("mviewer_configs", json_entry)
 
-    def get_geoserver_datadir_view(self, defpath=None):
+    def get_geoserver_datadir_view(self, parse_now=False, defpath=None):
         """check in local memory if we have a GSDatadirScanner object,
         if not, check in redis. If not found in redis, create one (async?)
         """
@@ -318,6 +318,9 @@ class OwsCapCache:
             else:
                 # return a dummy unparsed one
                 gsdd = GSDatadirScanner(find_geoserver_datadir(defpath))
+                if parse_now:
+                    gsdd.parseAll()
+                    self.update_geoserver_datadir_view(gsdd)
                 return gsdd
 
         return self.services["geoserver_datadir"]
