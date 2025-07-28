@@ -305,25 +305,31 @@ class OwsCapCache:
 
     def get_geoserver_datadir_view(self, parse_now=False, defpath=None):
         """check in local memory if we have a GSDatadirScanner object,
-        if not, check in redis. If not found in redis, create one (async?)
+        if not, check in redis. If not found in redis, create one.
         """
-        if "geoserver_datadir" not in self.services:
-            # XX put path and hostname in rkey ?
-            rkey = "geoserver_datadir"
+        # XX put path and hostname in rkey ?
+        rkey = "geoserver_datadir"
+        # will parse global.xml to have the datadir version (should be _latest_)
+        gsdd = GSDatadirScanner(find_geoserver_datadir(defpath))
+        if rkey not in self.services:
             re = self.rediscli.get(rkey)
             if re:
-                gsdd = jsonpickle.decode(json.loads(re.decode("utf-8")))
-                # update local version, this one is populated
-                self.services[rkey] = gsdd
-            else:
-                # return a dummy unparsed one
-                gsdd = GSDatadirScanner(find_geoserver_datadir(defpath))
-                if parse_now:
-                    gsdd.parseAll()
-                    self.update_geoserver_datadir_view(gsdd)
-                return gsdd
+                cached_gsdd = jsonpickle.decode(json.loads(re.decode("utf-8")))
+                if cached_gsdd.version >= gsdd.version:
+                    # update in-memory cache, this one is parsed
+                    self.services[rkey] = cached_gsdd
+                    return cached_gsdd
+        else:
+            # check if current is newer than the one cached in memory
+            cached_gsdd = self.services[rkey]
+            if cached_gsdd.version >= gsdd.version:
+                return cached_gsdd
 
-        return self.services["geoserver_datadir"]
+        if parse_now:
+            gsdd.parseAll()
+            self.update_geoserver_datadir_view(gsdd)
+        # returns an unparsed one if parse_now was False
+        return gsdd
 
     def update_geoserver_datadir_view(self, gsdd: GSDatadirScanner):
         rkey = "geoserver_datadir"
