@@ -42,7 +42,7 @@ class GSDatadirScanner:
         # XXX handle access errors re ownership/rights
         tree = etree.parse(f"{path}/global.xml")
         self.pburl = getelemat(tree, "/global/settings/proxyBaseUrl")
-        self.version = getelemat(tree, "/global/updateSequence")
+        self.version = int(getelemat(tree, "/global/updateSequence"))
 
     def parse(self, toparse):
         print(f"parse({toparse})")
