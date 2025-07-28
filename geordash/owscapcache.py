@@ -318,12 +318,11 @@ class OwsCapCache:
                 if cached_gsdd.version >= gsdd.version:
                     # update in-memory cache, this one is parsed
                     self.services[rkey] = cached_gsdd
-                    return cached_gsdd
+                    return self.services[rkey]
         else:
             # check if current is newer than the one cached in memory
-            cached_gsdd = self.services[rkey]
-            if cached_gsdd.version >= gsdd.version:
-                return cached_gsdd
+            if self.services[rkey].version >= gsdd.version:
+                return self.services[rkey]
 
         if parse_now:
             gsdd.parseAll()
