@@ -57,12 +57,13 @@ def test_get_gsd_view():
     gsd = c.get_geoserver_datadir_view()
     assert type(gsd.version) == int
 
-def test_check_single_datastore():
+
+def check_single_item(itemtype, itemid):
     # force-forget existing cache
     c.rediscli.delete("geoserver_datadir")
-    c.services['geoserver_datadir'] = None
-    # queue a task checking the first datastore
-    task = gsdatadir_item.delay('datastore', 'DataStoreInfoImpl-51d47a63:192666818c2:-28c8')
+    c.services["geoserver_datadir"] = None
+    # queue a task checking the given item
+    task = gsdatadir_item.delay(itemtype, itemid)
     wait_for_task_completion(task.id)
     result = AsyncResult(task.id)
     assert result.state == "SUCCESS"
@@ -74,8 +75,33 @@ def test_check_datadir():
     result = AsyncResult(task.id)
     assert result.state == "SUCCESS"
 
+
+def test_check_subset_of_items():
+    for i in [
+        ("datastores", "DataStoreInfoImpl-51d47a63:192666818c2:-28c8"),
+        ("datastores", "DataStoreInfoImpl-7581aaf0:196fd6d0a41:-7eae"),  # -> geopackage
+        (
+            "datastores",
+            "DataStoreInfoImpl-21032313:18bf2254dd6:-3fcb",
+        ),  # -> directory of shapefile
+        (
+            "datastores",
+            "DataStoreInfoImpl--138c48ab:181c7cdace7:-9fe",
+        ),  # -> JNDI (eclext)
+        (
+            "coveragestores",
+            "CoverageStoreInfoImpl-749831bb:18dd0fbce6e:-74f9",
+        ),  # -> GeoTIFF
+        (
+            "coveragestores",
+            "CoverageStoreInfoImpl-749831bb:18dd0fbce6e:-745e",
+        ),  # -> ImageMosaic
+    ]:
+        check_single_item(i[0], i[1])
+
+
 # when run standalone
 if __name__ == "__main__":
     test_get_gsd_view()
-    test_check_single_datastore()
+    test_check_subset_of_items()
     test_check_datadir()
