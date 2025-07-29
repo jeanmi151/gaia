@@ -36,7 +36,7 @@ def find_geoserver_datadir(default):
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     if default is None:
-        default = "/srv/webapps/geoserver"
+        default = "/srv/data/geoserver"
     return default
 
 
