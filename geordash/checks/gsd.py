@@ -90,7 +90,11 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
                 "skey": key,
             }
         )
-    if item.type in ["Shapefile", "Directory of spatial files (shapefiles)"]:
+    if item.type in [
+        "Shapefile",
+        "Directory of spatial files (shapefiles)",
+        "GeoPackage",
+    ]:
         if item.connurl is None:
             ret["problems"].append({"type": "EmptyConnUrl", "skey": key})
         else:
@@ -99,26 +103,26 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
             if not os.path.isabs(dirpath):
                 idx = item.file.find("workspaces")
                 dirpath = item.file[0:idx] + dirpath
-            if not os.path.isdir(dirpath):
-                ret["problems"].append(
-                    {"type": "NoSuchDir", "path": dirpath, "skey": key}
-                )
+            if item.type == "GeoPackage":
+                if not os.path.isfile(dirpath):
+                    ret["problems"].append(
+                        {"type": "NoSuchFile", "path": dirpath, "skey": key}
+                    )
+                # check for existence in vectordata collection
+                vdk = dirpath.replace("/", "~")
+                if not gsd.collections["vectordatas"].has(vdk):
+                    ret["problems"].append(
+                        {"type": "NoSuchVectorData", "vdk": vdk, "skey": key}
+                    )
+            # shapefile and directory of shapefile point at a dir
             else:
-                get_logger("CheckGsd").debug(f"{dirpath} is a dir")
-    elif item.type == "GeoPackage":
-        if item.connurl is None:
-            ret["problems"].append({"type": "EmptyConnUrl", "skey": key})
-        else:
-            if not os.path.isfile(item.connurl):
-                ret["problems"].append(
-                    {"type": "NoSuchFile", "path": item.connurl, "skey": key}
-                )
-            else:
-                get_logger("CheckGsd").debug(f"{dirpath} is a file")
+                if not os.path.isdir(dirpath):
+                    ret["problems"].append(
+                        {"type": "NoSuchDir", "path": dirpath, "skey": key}
+                    )
     elif item.type == "PostGIS (JNDI)":
         # todo: check schema existence in jndiref
         pass
-    # todo: check vectordata existence
     return ret
 
 
