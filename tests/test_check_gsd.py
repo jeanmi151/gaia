@@ -78,6 +78,10 @@ def test_check_datadir():
 
 def test_check_subset_of_items():
     for i in [
+        (
+            "featuretypes",
+            "FeatureTypeInfoImpl--19799db4:196fd2b59d4:-7ffd",
+        ),  # -> geopackage public/parcelles_ally
         ("datastores", "DataStoreInfoImpl-51d47a63:192666818c2:-28c8"),
         ("datastores", "DataStoreInfoImpl-7581aaf0:196fd6d0a41:-7eae"),  # -> geopackage
         (
