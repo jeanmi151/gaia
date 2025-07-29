@@ -27,6 +27,8 @@ def gsdatadir(defpath=None):
         return False
     taskslist = list()
     for colltype in gsd.available_keys:
+        if colltype in ["namespaces", "workspaces"]:
+            continue
         for k in gsd.collections[colltype].coll:
             taskslist.append(gsdatadir_item.s(colltype, k, defpath))
     grouptask = group(taskslist)
