@@ -134,6 +134,25 @@ def check_coveragestore(
                 "skey": key,
             }
         )
+    if item.type == "GeoTIFF":
+        # if relative path, prepend datadir basepath
+        tifpath = item.url.removeprefix("file:")
+        if not os.path.isabs(tifpath):
+            idx = item.file.find("workspaces")
+            tifpath = item.file[0:idx] + tifpath
+        if not os.path.isfile(tifpath):
+            ret["problems"].append({"type": "NoSuchFile", "path": tifpath, "skey": key})
+        else:
+            get_logger("CheckGsd").debug(f"{tifpath} is a file")
+    elif item.type == "ImageMosaic":
+        dirpath = item.url.removeprefix("file:")
+        if not os.path.isabs(dirpath):
+            idx = item.file.find("workspaces")
+            dirpath = item.file[0:idx] + dirpath
+        if not os.path.isdir(dirpath):
+            ret["problems"].append({"type": "NoSuchDir", "path": dirpath, "skey": key})
+        else:
+            get_logger("CheckGsd").debug(f"{dirpath} is a dir")
     # todo: check rasterdata existence
     return ret
 
