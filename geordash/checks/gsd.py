@@ -168,6 +168,30 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
         ret["problems"].append(
             {"type": "NoSuchDatastore", "dsid": item.datastoreid, "skey": key}
         )
+    else:
+        ds = gsd.collections["datastores"].coll.get(item.datastoreid)
+        if ds.type == "GeoPackage":
+            fpath = ds.connurl.removeprefix("file:")
+            # if relative path, prepend datadir basepath (extracted from item.file)
+            if not os.path.isabs(fpath):
+                idx = ds.file.find("workspaces")
+                fpath = ds.file[0:idx] + fpath
+            vdk = fpath.replace("/", "~")
+            if gsd.collections["vectordatas"].has(vdk):
+                vd = gsd.collections["vectordatas"].coll.get(vdk)
+                # check that a layer named from item.nativeName exists in the vd matching the gs
+                if item.nativename not in vd.layers:
+                    ret["problems"].append(
+                        {"type": "NoSuchLayer", "stype": ds.type, "url": vdk}
+                    )
+                else:
+                    get_logger("CheckGsd").debug(
+                        f"{item.nativename} exists in {ds.type} at {fpath} (vdk={vdk})"
+                    )
+            else:
+                ret["problems"].append(
+                    {"type": "NoSuchVectorData", "vdk": vdk, "skey": ds.id}
+                )
     if not gsd.collections["namespaces"].has(item.namespaceid):
         ret["problems"].append(
             {
