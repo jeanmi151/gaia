@@ -18,6 +18,7 @@ except:
     def get_logger(name):
         return logging.getLogger(name)
 
+
 from time import sleep
 
 # configure a celery client
@@ -36,6 +37,7 @@ c = OwsCapCache(GeorchestraConfig(), Flask(__name__))
 # import the module we want to test
 from geordash.checks.gsd import gsdatadir, gsdatadir_item
 
+
 def wait_for_task_completion(taskid):
     while True:
         result = AsyncResult(taskid)
@@ -50,9 +52,10 @@ def wait_for_task_completion(taskid):
             break
         sleep(1)
 
+
 def test_get_gsd_view():
     gsd = c.get_geoserver_datadir_view()
-    assert(type(gsd.version) == int)
+    assert type(gsd.version) == int
 
 def test_check_single_datastore():
     # force-forget existing cache
