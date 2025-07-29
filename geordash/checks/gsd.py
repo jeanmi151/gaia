@@ -138,26 +138,28 @@ def check_coveragestore(
                 "skey": key,
             }
         )
-    if item.type == "GeoTIFF":
+    if item.type in ["GeoTIFF", "ImageMosaic"]:
         # if relative path, prepend datadir basepath
-        tifpath = item.url.removeprefix("file:")
-        if not os.path.isabs(tifpath):
+        fpath = item.url.removeprefix("file:")
+        if not os.path.isabs(fpath):
             idx = item.file.find("workspaces")
-            tifpath = item.file[0:idx] + tifpath
-        if not os.path.isfile(tifpath):
-            ret["problems"].append({"type": "NoSuchFile", "path": tifpath, "skey": key})
-        else:
-            get_logger("CheckGsd").debug(f"{tifpath} is a file")
-    elif item.type == "ImageMosaic":
-        dirpath = item.url.removeprefix("file:")
-        if not os.path.isabs(dirpath):
-            idx = item.file.find("workspaces")
-            dirpath = item.file[0:idx] + dirpath
-        if not os.path.isdir(dirpath):
-            ret["problems"].append({"type": "NoSuchDir", "path": dirpath, "skey": key})
-        else:
-            get_logger("CheckGsd").debug(f"{dirpath} is a dir")
-    # todo: check rasterdata existence
+            fpath = item.file[0:idx] + fpath
+        if item.type == "GeoTIFF":
+            if not os.path.isfile(fpath):
+                ret["problems"].append(
+                    {"type": "NoSuchFile", "path": fpath, "skey": key}
+                )
+            # check for existence in rasterdata collection
+            rdk = fpath.replace("/", "~")
+            if not gsd.collections["rasterdatas"].has(rdk):
+                ret["problems"].append(
+                    {"type": "NoSuchRasterData", "rdk": rdk, "skey": key}
+                )
+        elif item.type == "ImageMosaic":
+            if not os.path.isdir(fpath):
+                ret["problems"].append(
+                    {"type": "NoSuchDir", "path": fpath, "skey": key}
+                )
     return ret
 
 
