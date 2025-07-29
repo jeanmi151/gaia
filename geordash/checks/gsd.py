@@ -17,6 +17,10 @@ from gsdscanner.sld import SLD
 from gsdscanner.vectordata import VectorData
 from gsdscanner.rasterdata import RasterData
 
+from geordash.logwrap import get_logger
+
+import os
+
 
 @shared_task()
 def gsdatadir(defpath=None):
@@ -86,6 +90,34 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
                 "skey": key,
             }
         )
+    if item.type in ["Shapefile", "Directory of spatial files (shapefiles)"]:
+        if item.connurl is None:
+            ret["problems"].append({"type": "EmptyConnUrl", "skey": key})
+        else:
+            dirpath = item.connurl.removeprefix("file:")
+            # if relative path, prepend datadir basepath (extracted from item.file)
+            if not os.path.isabs(dirpath):
+                idx = item.file.find("workspaces")
+                dirpath = item.file[0:idx] + dirpath
+            if not os.path.isdir(dirpath):
+                ret["problems"].append(
+                    {"type": "NoSuchDir", "path": dirpath, "skey": key}
+                )
+            else:
+                get_logger("CheckGsd").debug(f"{dirpath} is a dir")
+    elif item.type == "GeoPackage":
+        if item.connurl is None:
+            ret["problems"].append({"type": "EmptyConnUrl", "skey": key})
+        else:
+            if not os.path.isfile(item.connurl):
+                ret["problems"].append(
+                    {"type": "NoSuchFile", "path": item.connurl, "skey": key}
+                )
+            else:
+                get_logger("CheckGsd").debug(f"{dirpath} is a file")
+    elif item.type == "PostGIS (JNDI)":
+        # todo: check schema existence in jndiref
+        pass
     # todo: check vectordata existence
     return ret
 
