@@ -9,6 +9,7 @@ from geordash.utils import getelemat
 class FeatureType(dict):
     def __init__(self, xmlf):
         self.file = xmlf
+        self.nativename = None
 
     def __repr__(self):
         return f"FeatureType: file={self.file}, id={self.id}, name={self.name}, title={self.title}"
@@ -27,4 +28,5 @@ class FeatureType(dict):
             self.enabled = "true"
         self.namespaceid = getelemat(xml, "/featureType/namespace/id")
         self.datastoreid = getelemat(xml, "/featureType/store/id")
+        self.nativename = getelemat(xml, "/featureType/nativeName")
         # XXX metadataLinks
