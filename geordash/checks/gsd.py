@@ -288,7 +288,7 @@ def check_vectordata(gsd: GSDatadirScanner, item: VectorData, key: str, ret: dic
 
 
 def check_workspace(gsd: GSDatadirScanner, item: Workspace, key: str, ret: dict):
-    """check that workspaces are referenced (eg no empty workspaces)"""
-    if len(item.referencd_by) == 0:
+    """check that workspace is referenced (eg not an empty workspace..)"""
+    if len(item.referenced_by) == 0:
         ret["problems"].append({"type": "EmptyWorkspace", "skey": key})
     return ret
