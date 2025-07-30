@@ -4,6 +4,7 @@
 
 from lxml import etree
 from geordash.utils import getelemat
+import os
 
 
 class Datastore(dict):
@@ -43,5 +44,12 @@ class Datastore(dict):
                 self.schema = getelemat(
                     xml, '/dataStore/connectionParameters/entry[@key="schema"]'
                 )
+        if self.connurl and not self.connurl.startswith('java:'):
+            # drop scheme prefix, and prepend basedir (extracted from self.file) if relative path
+            path = self.connurl.removeprefix('file:')
+            if not os.path.isabs(path):
+                idx = self.file.find("workspaces")
+                path = self.file[0:idx] + path
+            self.connurl = path
         # if type = PostGIS (JNDI) look for name matching connurl java:comp/env/ in tomcat's conf/server.xml
         # and list tables in the given database
