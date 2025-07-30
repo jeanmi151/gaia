@@ -261,7 +261,7 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
                 }
             )
     else:
-        if s.workspaceid != None:
+        if item.workspaceid != None:
             ret["problems"].append({"type": "WorkspaceInGlobalStyle", "skey": key})
     # check that sldfilename relative to style exists XXX doesnt handle css styles yet
     #    sldpath = dirname(s.file) + '/' + s.sldfilename
