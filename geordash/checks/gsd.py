@@ -160,12 +160,16 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
         )
     else:
         ds = gsd.collections["datastores"].coll.get(item.datastoreid)
-        if ds.type == "GeoPackage":
-            fpath = ds.connurl.removeprefix("file:")
-            # if relative path, prepend datadir basepath (extracted from item.file)
-            if not os.path.isabs(fpath):
-                idx = ds.file.find("workspaces")
-                fpath = ds.file[0:idx] + fpath
+        if ds.type in [
+            "Shapefile",
+            "Directory of spatial files (shapefiles)",
+            "GeoPackage",
+        ]:
+            fpath = ds.connurl
+            if "shapefile" in ds.type.lower():
+                if fpath.endswith('/'):
+                    fpath = fpath.removesuffix('/')
+                fpath = f"{fpath}/{item.nativename}.shp"
             vdk = fpath.replace("/", "~")
             if gsd.collections["vectordatas"].has(vdk):
                 vd = gsd.collections["vectordatas"].coll.get(vdk)
