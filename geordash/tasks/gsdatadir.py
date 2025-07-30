@@ -29,6 +29,8 @@ def parse_gsdatadir(self):
         get_logger("ParseGsDatadir").debug(
             f"current={t} ({len(gsd.collections[t].coll)} entries), done {i}/{len(gsd.available_keys)}"
         )
+    gsd.compute_crossref()
+    get_logger("ParseGsDatadir").debug(f"computed crossrefs")
     gsd.parsed=True
     app.extensions["owscache"].update_geoserver_datadir_view(gsd)
     return ni
