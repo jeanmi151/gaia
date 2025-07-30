@@ -145,6 +145,8 @@ def check_coveragestore(
                 ret["problems"].append(
                     {"type": "NoSuchRasterData", "rdk": rdk, "skey": key}
                 )
+            else:
+                gsd.collections["rasterdatas"].coll.get(rdk).referenced_by.add(key)
         elif item.type == "ImageMosaic":
             if not os.path.isdir(item.url):
                 ret["problems"].append(
