@@ -15,6 +15,7 @@ class SLD(dict):
         self.id = self.file.replace("/", "~")
         self.name = None
         self.firstrulename = None
+        self.referenced_by = set()
 
     def __repr__(self):
         return f"SLD: file={self.file}, id={self.id}, name={self.name}"
