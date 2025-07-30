@@ -98,27 +98,22 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
         if item.connurl is None:
             ret["problems"].append({"type": "EmptyConnUrl", "skey": key})
         else:
-            dirpath = item.connurl.removeprefix("file:")
-            # if relative path, prepend datadir basepath (extracted from item.file)
-            if not os.path.isabs(dirpath):
-                idx = item.file.find("workspaces")
-                dirpath = item.file[0:idx] + dirpath
             if item.type == "GeoPackage":
-                if not os.path.isfile(dirpath):
+                if not os.path.isfile(item.connurl):
                     ret["problems"].append(
-                        {"type": "NoSuchFile", "path": dirpath, "skey": key}
+                        {"type": "NoSuchFile", "path": item.connurl, "skey": key}
                     )
                 # check for existence in vectordata collection
-                vdk = dirpath.replace("/", "~")
+                vdk = item.connurl.replace("/", "~")
                 if not gsd.collections["vectordatas"].has(vdk):
                     ret["problems"].append(
                         {"type": "NoSuchVectorData", "vdk": vdk, "skey": key}
                     )
             # shapefile and directory of shapefile point at a dir
             else:
-                if not os.path.isdir(dirpath):
+                if not os.path.isdir(item.connurl):
                     ret["problems"].append(
-                        {"type": "NoSuchDir", "path": dirpath, "skey": key}
+                        {"type": "NoSuchDir", "path": item.connurl, "skey": key}
                     )
     elif item.type == "PostGIS (JNDI)":
         # todo: check schema existence in jndiref
