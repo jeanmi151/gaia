@@ -280,6 +280,9 @@ def check_sld(gsd: GSDatadirScanner, item: SLD, key: str, ret: dict):
 
 
 def check_rasterdata(gsd: GSDatadirScanner, item: RasterData, key: str, ret: dict):
+    """check that rasterdata is referenced/used"""
+    if len(item.referenced_by) == 0:
+        ret["problems"].append({"type": "UnusedRasterData", "skey": key})
     return ret
 
 
