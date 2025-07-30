@@ -169,8 +169,8 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
         ]:
             fpath = ds.connurl
             if "shapefile" in ds.type.lower():
-                if fpath.endswith('/'):
-                    fpath = fpath.removesuffix('/')
+                if fpath.endswith("/"):
+                    fpath = fpath.removesuffix("/")
                 fpath = f"{fpath}/{item.nativename}.shp"
             vdk = fpath.replace("/", "~")
             if gsd.collections["vectordatas"].has(vdk):
