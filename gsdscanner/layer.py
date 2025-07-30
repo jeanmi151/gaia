@@ -25,5 +25,6 @@ class Layer(dict):
         if self.enabled is None:
             self.enabled = "true"
         self.defaultstyleid = getelemat(xml, "/layer/defaultStyle/id")
-        self.featuretypeid = getelemat(xml, "/layer/resource/id")
+        self.featuretypeid = getelemat(xml, "/layer/resource[@class='featureType']/id")
+        self.coverageid = getelemat(xml, "/layer/resource[@class='coverage']/id")
         # XXX styles at /layer/styles/style/id
