@@ -12,6 +12,7 @@ class Datastore(dict):
         self.file = xmlf
         self.schema = None
         self.dbtype = None
+        self.referenced_by = set()
 
     def __repr__(self):
         return f"Datastore: file={self.file}, id={self.id}, name={self.name}, type={self.type}, workspaceid={self.workspaceid}"

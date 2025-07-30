@@ -10,6 +10,7 @@ import os
 class Coveragestore(dict):
     def __init__(self, xmlf):
         self.file = xmlf
+        self.referenced_by = set()
 
     def __repr__(self):
         return f"Coveragestore: file={self.file}, id={self.id}, name={self.name}, type={self.type}, workspaceid={self.workspaceid}"

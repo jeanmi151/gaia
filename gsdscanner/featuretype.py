@@ -10,6 +10,7 @@ class FeatureType(dict):
     def __init__(self, xmlf):
         self.file = xmlf
         self.nativename = None
+        self.referenced_by = set()
 
     def __repr__(self):
         return f"FeatureType: file={self.file}, id={self.id}, name={self.name}, title={self.title}"

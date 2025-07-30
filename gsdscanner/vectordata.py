@@ -16,6 +16,7 @@ class VectorData(dict):
             self.id = self.id.removesuffix(".SHP") + ".shp"
         self.type = None
         self.layers = dict()
+        self.referenced_by = set()
 
     def __repr__(self):
         return f"VectorData: id={self.id}, type={self.type}, layers={self.layers}"

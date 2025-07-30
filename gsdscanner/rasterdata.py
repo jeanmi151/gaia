@@ -14,6 +14,7 @@ class RasterData(dict):
         self.projection = None
         self.bbox = None
         self.type = None
+        self.referenced_by = set()
 
     #        self.parse()
 
