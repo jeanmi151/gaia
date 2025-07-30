@@ -116,6 +116,7 @@ class GSDatadirScanner:
 
     def parseAll(self):
         self.parse(self.available_keys)
+        self.compute_crossref()
         self.parsed = True
 
     def compute_crossref(self):
