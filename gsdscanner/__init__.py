@@ -26,6 +26,7 @@ class GSDatadirScanner:
         self.basepath = path
         self.parsed = False
         self.collections = dict()
+        # XXX handle layergroups
         self.available_keys = [
             "workspaces",
             "datastores",
