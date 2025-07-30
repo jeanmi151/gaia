@@ -16,6 +16,7 @@ from gsdscanner.style import Style
 from gsdscanner.sld import SLD
 from gsdscanner.vectordata import VectorData
 from gsdscanner.rasterdata import RasterData
+from gsdscanner.workspace import Workspace
 
 from geordash.logwrap import get_logger
 
@@ -281,4 +282,11 @@ def check_rasterdata(gsd: GSDatadirScanner, item: RasterData, key: str, ret: dic
 
 
 def check_vectordata(gsd: GSDatadirScanner, item: VectorData, key: str, ret: dict):
+    return ret
+
+
+def check_workspaces(gsd: GSDatadirScanner, item: Workspace, key: str, ret: dict):
+    """check that workspaces are referenced (eg no empty workspaces)"""
+    if len(item.referencd_by) == 0:
+        ret["problems"].append({"type": "EmptyWorkspace", "skey": key})
     return ret
