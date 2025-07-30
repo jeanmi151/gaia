@@ -175,6 +175,7 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
             vdk = fpath.replace("/", "~")
             if gsd.collections["vectordatas"].has(vdk):
                 vd = gsd.collections["vectordatas"].coll.get(vdk)
+                vd.referenced_by.add(key)
                 # check that a layer named from item.nativeName exists in the vd matching the gs
                 if item.nativename not in vd.layers:
                     ret["problems"].append(
