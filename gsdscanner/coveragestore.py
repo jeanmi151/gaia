@@ -24,7 +24,7 @@ class Coveragestore(dict):
         self.url = getelemat(
             xml, "/coverageStore/url"
         )  # path (relative to datadir) to tif or folder for type=imagemosaic ?
-        path = self.url.removeprefix('file:')
+        path = self.url.removeprefix("file:")
         if not os.path.isabs(path):
             idx = self.file.find("workspaces")
             path = self.file[0:idx] + path

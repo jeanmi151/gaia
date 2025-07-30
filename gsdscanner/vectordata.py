@@ -11,9 +11,9 @@ class VectorData(dict):
         self.file = path
         self.filesize = getsize(path)
         self.id = self.file.replace("/", "~")
-        if self.id.endswith('.SHP'):
+        if self.id.endswith(".SHP"):
             # dont use replace() as SHP might be present in the path..
-            self.id = self.id.removesuffix('.SHP') + '.shp'
+            self.id = self.id.removesuffix(".SHP") + ".shp"
         self.type = None
         self.layers = dict()
 

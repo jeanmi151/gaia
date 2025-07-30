@@ -44,9 +44,9 @@ class Datastore(dict):
                 self.schema = getelemat(
                     xml, '/dataStore/connectionParameters/entry[@key="schema"]'
                 )
-        if self.connurl and not self.connurl.startswith('java:'):
+        if self.connurl and not self.connurl.startswith("java:"):
             # drop scheme prefix, and prepend basedir (extracted from self.file) if relative path
-            path = self.connurl.removeprefix('file:')
+            path = self.connurl.removeprefix("file:")
             if not os.path.isabs(path):
                 idx = self.file.find("workspaces")
                 path = self.file[0:idx] + path
