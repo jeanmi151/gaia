@@ -200,15 +200,15 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
 
 
 def check_layer(gsd: GSDatadirScanner, item: Layer, key: str, ret: dict):
-    if item.featuretypeid.startswith("FeatureTypeInfoImpl"):
+    if item.featuretypeid:
         if not gsd.collections["featuretypes"].has(item.featuretypeid):
             ret["problems"].append(
                 {"type": "NoSuchFeatureType", "ftid": item.featuretypeid, "skey": key}
             )
-    elif item.featuretypeid.startswith("CoverageInfoImpl"):
+    elif item.coverageid:
         if not gsd.collections["coverages"].has(item.featuretypeid):
             ret["problems"].append(
-                {"type": "NoSuchFeatureType", "ftid": item.featuretypeid, "skey": key}
+                {"type": "NoSuchCoverage", "cid": item.coverageid, "skey": key}
             )
     return ret
 
