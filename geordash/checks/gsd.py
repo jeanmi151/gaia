@@ -134,26 +134,21 @@ def check_coveragestore(
             }
         )
     if item.type in ["GeoTIFF", "ImageMosaic"]:
-        # if relative path, prepend datadir basepath
-        fpath = item.url.removeprefix("file:")
-        if not os.path.isabs(fpath):
-            idx = item.file.find("workspaces")
-            fpath = item.file[0:idx] + fpath
         if item.type == "GeoTIFF":
-            if not os.path.isfile(fpath):
+            if not os.path.isfile(item.url):
                 ret["problems"].append(
-                    {"type": "NoSuchFile", "path": fpath, "skey": key}
+                    {"type": "NoSuchFile", "path": item.url, "skey": key}
                 )
             # check for existence in rasterdata collection
-            rdk = fpath.replace("/", "~")
+            rdk = item.url.replace("/", "~")
             if not gsd.collections["rasterdatas"].has(rdk):
                 ret["problems"].append(
                     {"type": "NoSuchRasterData", "rdk": rdk, "skey": key}
                 )
         elif item.type == "ImageMosaic":
-            if not os.path.isdir(fpath):
+            if not os.path.isdir(item.url):
                 ret["problems"].append(
-                    {"type": "NoSuchDir", "path": fpath, "skey": key}
+                    {"type": "NoSuchDir", "path": item.url, "skey": key}
                 )
     return ret
 
