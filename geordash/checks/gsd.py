@@ -234,7 +234,7 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                 )
             else:
                 gsd.collections["rasterdatas"].coll.get(rdk).referenced_by.add(key)
-        elif item.type == "ImageMosaic":
+        elif cs.type == "ImageMosaic":
             pass
             # check that a shp exists with the same name
             # check that it's in vd
