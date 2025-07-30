@@ -287,6 +287,9 @@ def check_rasterdata(gsd: GSDatadirScanner, item: RasterData, key: str, ret: dic
 
 
 def check_vectordata(gsd: GSDatadirScanner, item: VectorData, key: str, ret: dict):
+    """check that vectordata is referenced/used"""
+    if len(item.referenced_by) == 0:
+        ret["problems"].append({"type": "UnusedVectorData", "skey": key})
     return ret
 
 
