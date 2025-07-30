@@ -112,6 +112,9 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
                     ret["problems"].append(
                         {"type": "NoSuchVectorData", "vdk": vdk, "skey": key}
                     )
+                else:
+                    vd = gsd.collections["vectordatas"].coll.get(vdk)
+                    vd.referenced_by.add(key)
             # shapefile and directory of shapefile point at a dir
             else:
                 if not os.path.isdir(item.connurl):
