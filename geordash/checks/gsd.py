@@ -214,6 +214,35 @@ def check_layer(gsd: GSDatadirScanner, item: Layer, key: str, ret: dict):
 
 
 def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
+    if not gsd.collections["coveragestores"].has(item.coveragestoreid):
+        ret["problems"].append(
+            {"type": "NoSuchCoveragestore", "dsid": item.coveragestoreid, "skey": key}
+        )
+    else:
+        cs = gsd.collections["coveragestores"].coll.get(item.coveragestoreid)
+        if cs.type == "GeoTIFF":
+            rdk = cs.url.replace("/", "~")
+            if not gsd.collections["rasterdatas"].has(rdk):
+                ret["problems"].append(
+                    {"type": "NoSuchRasterData", "rdk": rdk, "skey": cs.key}
+                )
+            else:
+                gsd.collections["rasterdatas"].coll.get(rdk).referenced_by.add(key)
+        elif item.type == "ImageMosaic":
+            pass
+            # check that a shp exists with the same name
+            # check that it's in vd
+            # iterate over features, check that each of the is an existing rd
+
+    if not gsd.collections["namespaces"].has(item.namespaceid):
+        ret["problems"].append(
+            {
+                "type": "NoSuchNamespace",
+                "nsid": item.namespaceid,
+                "stype": "featuretype",
+                "skey": key,
+            }
+        )
     return ret
 
 
