@@ -76,7 +76,7 @@ def gsdatadir_item(colltype, key, defpath=None):
         case "vectordatas":
             return check_vectordata(gsd, item, key, ret)
         case "workspaces":
-            return check_workspaces(gsd, item, key, ret)
+            return check_workspace(gsd, item, key, ret)
         case _:
             # we dont test namespaces, what's the point
             pass
@@ -287,7 +287,7 @@ def check_vectordata(gsd: GSDatadirScanner, item: VectorData, key: str, ret: dic
     return ret
 
 
-def check_workspaces(gsd: GSDatadirScanner, item: Workspace, key: str, ret: dict):
+def check_workspace(gsd: GSDatadirScanner, item: Workspace, key: str, ret: dict):
     """check that workspaces are referenced (eg no empty workspaces)"""
     if len(item.referencd_by) == 0:
         ret["problems"].append({"type": "EmptyWorkspace", "skey": key})
