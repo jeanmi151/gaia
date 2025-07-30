@@ -80,6 +80,14 @@ def test_check_subset_of_items():
     for i in [
         (
             "featuretypes",
+            "FeatureTypeInfoImpl--49a2709a:13d35ae2e83:-2704",
+        ),  # -> directory of shapefiles geor_loc/localisation/epci
+        (
+            "featuretypes",
+            "FeatureTypeInfoImpl--38c82ab9:18e79bba437:3eac",
+        ),  # -> shapefile public/DEPT03_2024_ITINERAIRE_PDESI/DEPT03_2024_ITINERAIRE_PDESI
+        (
+            "featuretypes",
             "FeatureTypeInfoImpl--19799db4:196fd2b59d4:-7ffd",
         ),  # -> geopackage public/parcelles_ally
         ("datastores", "DataStoreInfoImpl-51d47a63:192666818c2:-28c8"),
