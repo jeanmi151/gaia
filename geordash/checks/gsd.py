@@ -183,7 +183,7 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
                     )
                 else:
                     get_logger("CheckGsd").debug(
-                        f"{item.nativename} exists in {ds.type} at {fpath} (vdk={vdk})"
+                        f"{item.nativename} exists in {ds.type} at {ds.connurl} (vdk={vdk}, vd.type={vd.type})"
                     )
             else:
                 ret["problems"].append(
