@@ -32,7 +32,7 @@ def gsdatadir(defpath=None):
         return False
     taskslist = list()
     for colltype in gsd.available_keys:
-        if colltype in ["namespaces", "workspaces"]:
+        if colltype == "namespaces":
             continue
         for k in gsd.collections[colltype].coll:
             taskslist.append(gsdatadir_item.s(colltype, k, defpath))
@@ -75,8 +75,10 @@ def gsdatadir_item(colltype, key, defpath=None):
             return check_rasterdata(gsd, item, key, ret)
         case "vectordatas":
             return check_vectordata(gsd, item, key, ret)
+        case "workspaces":
+            return check_workspaces(gsd, item, key, ret)
         case _:
-            # we dont test namespaces/workspaces, what's the point
+            # we dont test namespaces, what's the point
             pass
     return ret
 
