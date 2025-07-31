@@ -267,15 +267,18 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                                 {"type": "NoSuchLayer", "stype": cs.type, "url": vdk}
                             )
                         else:
-                            if vd.layers[item.nativecoveragename]['fields'] != ['location']:
+                            if vd.layers[item.nativecoveragename]["fields"] != [
+                                "location"
+                            ]:
                                 ret["problems"].append(
-                                    {"type": "NotTileindex", "vdk": vdk })
+                                    {"type": "NotTileindex", "vdk": vdk}
+                                )
                             else:
                                 # iterate over features, check that each of them is an existing rd
                                 ds = Open(vd.file)
                                 l = ds.GetLayerByName(item.nativecoveragename)
                                 for f in l:
-                                    rpath = f.GetField('location')
+                                    rpath = f.GetField("location")
                                     # if not absolute path, prepend the coveragestore url
                                     if not rpath.startswith("/"):
                                         csdir = cs.url
@@ -285,16 +288,26 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                                     if os.path.isfile(rpath):
                                         rdk = rpath.replace("/", "~")
                                         # check that it's an existing rd
-                                        rd = gsd.collections["rasterdatas"].coll.get(rdk)
+                                        rd = gsd.collections["rasterdatas"].coll.get(
+                                            rdk
+                                        )
                                         if rd is not None:
                                             rd.referenced_by.add(key)
                                         else:
                                             ret["problems"].append(
-                                                {"type": "NoSuchRasterData", "rdk": rdk, "skey": cs.key}
+                                                {
+                                                    "type": "NoSuchRasterData",
+                                                    "rdk": rdk,
+                                                    "skey": cs.key,
+                                                }
                                             )
                                     else:
                                         ret["problems"].append(
-                                            {"type": "NoSuchFile", "path": rpath, "skey": cs.key}
+                                            {
+                                                "type": "NoSuchFile",
+                                                "path": rpath,
+                                                "skey": cs.key,
+                                            }
                                         )
                                 # release gdal resources
                                 ds = None
