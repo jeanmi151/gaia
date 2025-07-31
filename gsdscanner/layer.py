@@ -9,6 +9,8 @@ from geordash.utils import getelemat
 class Layer(dict):
     def __init__(self, xmlf):
         self.file = xmlf
+        # layers can only be referenced by layergroup objects
+        # self.referenced_by = set()
 
     def __repr__(self):
         return f"Layer: file={self.file}, id={self.id}, name={self.name}"
