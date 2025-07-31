@@ -31,8 +31,14 @@ class VectorData(dict):
             proj = None
             if sr is not None:
                 proj = sr.GetName()
+            ldefn = l.GetLayerDefn()
+            fields = list()
+            for n in range(ldefn.GetFieldCount()):
+                fdefn = ldefn.GetFieldDefn(n)
+                fields.append(fdefn.name)
             self.layers[l.GetName()] = {
                 "featurecount": len(l),
+                "fields": fields,
                 "projection": proj,
                 "bbox": l.GetExtent(),
             }
