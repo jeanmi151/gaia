@@ -3,7 +3,7 @@
 # vim: ts=4 sw=4 et
 
 from lxml import etree
-from geordash.utils import getelemat
+from geordash.utils import getelemat, getelemsat
 
 
 class Layer(dict):
@@ -29,4 +29,4 @@ class Layer(dict):
         self.defaultstyleid = getelemat(xml, "/layer/defaultStyle/id")
         self.featuretypeid = getelemat(xml, "/layer/resource[@class='featureType']/id")
         self.coverageid = getelemat(xml, "/layer/resource[@class='coverage']/id")
-        # XXX styles at /layer/styles/style/id
+        self.styleids = getelemsat(xml, "/layer/styles/style/id")
