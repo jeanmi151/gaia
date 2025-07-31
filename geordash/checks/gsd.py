@@ -43,10 +43,11 @@ def gsdatadir(defpath=None):
 
 
 @shared_task()
-def gsdatadir_item(colltype, key, defpath=None):
-    gsd = app.extensions["owscache"].get_geoserver_datadir_view(
-        defpath=defpath, parse_now=True
-    )
+def gsdatadir_item(colltype, key, defpath=None, gsd=None):
+    if gsd is None:
+        gsd = app.extensions["owscache"].get_geoserver_datadir_view(
+            defpath=defpath, parse_now=True
+        )
     if gsd is None:
         return False
     if colltype not in gsd.available_keys:
