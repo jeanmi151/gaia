@@ -14,6 +14,14 @@ def getelemat(xml: etree._ElementTree, path: str, nsmap=None):
         return r[0].text
     return None
 
+def getelemsat(xml: etree._ElementTree, path: str, nsmap=None) -> list:
+    r = xml.xpath(path, namespaces=nsmap)
+    if len(r) > 0:
+        ret = list()
+        for e in r:
+            ret.append(e.text)
+        return ret
+    return None
 
 def find_geoserver_datadir(default):
     """try hard to find the path of the geoserver datadir
