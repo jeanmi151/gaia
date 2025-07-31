@@ -23,7 +23,7 @@ import traceback
 import requests
 
 from geordash.logwrap import get_logger
-from gsdscanner import GSDatadirScanner
+import gsdscanner
 from geordash.utils import find_geoserver_datadir
 
 non_harvested = PropertyIsEqualTo("isHarvested", "false")
@@ -310,7 +310,7 @@ class OwsCapCache:
         # XX put path and hostname in rkey ?
         rkey = "geoserver_datadir"
         # will parse global.xml to have the datadir version (should be _latest_)
-        gsdd = GSDatadirScanner(find_geoserver_datadir(defpath))
+        gsdd = gsdscanner.GSDatadirScanner(find_geoserver_datadir(defpath))
         if rkey not in self.services:
             re = self.rediscli.get(rkey)
             if re:
@@ -330,7 +330,7 @@ class OwsCapCache:
         # returns an unparsed one if parse_now was False
         return gsdd
 
-    def update_geoserver_datadir_view(self, gsdd: GSDatadirScanner):
+    def update_geoserver_datadir_view(self, gsdd):
         rkey = "geoserver_datadir"
         json_entry = json.dumps(jsonpickle.encode(gsdd))
         self.rediscli.set(rkey, json_entry)
