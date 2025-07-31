@@ -345,11 +345,21 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
             )
     else:
         if item.workspaceid != None:
-            ret["problems"].append({"type": "WorkspaceInGlobalStyle", "skey": key})
-    # check that sldfilename relative to style exists XXX doesnt handle css styles yet
-    #    sldpath = dirname(s.file) + '/' + s.sldfilename
-    #    if not gds.collections['slds'].has(sldpath) and not sldpath.endswith('.css'):
-    #        print(f"{sldpath} not found")
+            # style in global ws shouldnt reference a ws ?
+            ret["problems"].append({"type": "StyleInGlobalWorkspace", "skey": key})
+
+    # todo: css styles
+    if item.format == "sld":
+        sldpath = f"{os.path.dirname(item.file)}/{item.sldfilename}"
+        if os.path.isfile(sldpath):
+            sk = sldpath.replace("/", "~")
+            s = gsd.collections["slds"].coll.get(sk)
+            if s is not None:
+                s.referenced_by.add(key)
+            else:
+                ret["problems"].append({"type": "NoSuchSLD", "path": sk, "skey": key})
+        else:
+            ret["problems"].append({"type": "NoSuchSLD", "path": sldpath, "skey": key})
     return ret
 
 
