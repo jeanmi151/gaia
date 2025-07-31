@@ -5,6 +5,7 @@
 from celery import shared_task
 from celery import group
 from flask import current_app as app
+from osgeo.ogr import Open
 
 from gsdscanner import GSDatadirScanner
 from gsdscanner.datastore import Datastore
@@ -239,10 +240,62 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
             else:
                 gsd.collections["rasterdatas"].coll.get(rdk).referenced_by.add(key)
         elif cs.type == "ImageMosaic":
-            pass
-            # check that a shp exists with the same name
-            # check that it's in vd
-            # iterate over features, check that each of the is an existing rd
+            if os.path.isdir(cs.url):
+                idx = cs.url
+                if idx.endswith("/"):
+                    idx = idx.removesuffix("/")
+                idx = f"{idx}/{item.nativecoveragename}.shp"
+                # check that a shp exists with the same name
+                if os.path.isfile(idx):
+                    vdk = idx.replace("/", "~")
+                    # check that it's in vd
+                    if gsd.collections["vectordatas"].has(vdk):
+                        vd = gsd.collections["vectordatas"].coll.get(vdk)
+                        vd.referenced_by.add(key)
+                        if item.nativecoveragename not in vd.layers:
+                            ret["problems"].append(
+                                {"type": "NoSuchLayer", "stype": cs.type, "url": vdk}
+                            )
+                        else:
+                            if vd.layers[item.nativecoveragename]['fields'] != ['location']:
+                                ret["problems"].append(
+                                    {"type": "NotTileindex", "vdk": vdk })
+                            else:
+                                # iterate over features, check that each of them is an existing rd
+                                ds = Open(vd.file)
+                                l = ds.GetLayerByName(item.nativecoveragename)
+                                for f in l:
+                                    rpath = f.GetField('location')
+                                    # if not absolute path, prepend the coveragestore url
+                                    if not rpath.startswith("/"):
+                                        csdir = cs.url
+                                        if csdir.endswith("/"):
+                                            csdir = csdir.removesuffix("/")
+                                        rpath = f"{csdir}/{rpath}"
+                                    if os.path.isfile(rpath):
+                                        rdk = rpath.replace("/", "~")
+                                        # check that it's an existing rd
+                                        rd = gsd.collections["rasterdatas"].coll.get(rdk)
+                                        if rd is not None:
+                                            rd.referenced_by.add(key)
+                                        else:
+                                            ret["problems"].append(
+                                                {"type": "NoSuchRasterData", "rdk": rdk, "skey": cs.key}
+                                            )
+                                    else:
+                                        ret["problems"].append(
+                                            {"type": "NoSuchFile", "path": rpath, "skey": cs.key}
+                                        )
+                                # release gdal resources
+                                ds = None
+                    else:
+                        ret["problems"].append(
+                            {"type": "NoSuchVectorData", "vdk": vdk, "skey": cs.id}
+                        )
+                else:
+                    ret["problems"].append(
+                        {"type": "NoSuchFile", "path": idx, "skey": cs.key}
+                    )
 
     if not gsd.collections["namespaces"].has(item.namespaceid):
         ret["problems"].append(
