@@ -18,7 +18,9 @@ class Coverage(dict):
         xml = etree.parse(self.file)
         self.id = getelemat(xml, "/coverage/id")
         self.name = getelemat(xml, "/coverage/name")
-        self.nativeName = getelemat(xml, "/coverage/nativeName")
+        self.nativename = getelemat(xml, "/coverage/nativeName")
+        # ImageMosaic
+        self.nativecoveragename = getelemat(xml, "/coverage/nativeCoverageName")
         self.title = getelemat(xml, "/coverage/title")
         self.declaredsrs = getelemat(xml, "/coverage/srs")
         self.namespaceid = getelemat(xml, "/coverage/namespace/id")
