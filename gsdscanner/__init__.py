@@ -162,3 +162,8 @@ class GSDatadirScanner:
             st = self.collections["styles"].coll.get(l.defaultstyleid)
             if st is not None:
                 st.referenced_by.add(l.id)
+            if l.styleids:
+                for sid in l.styleids:
+                    st = self.collections["styles"].coll.get(sid)
+                    if st is not None:
+                        st.referenced_by.add(sid)
