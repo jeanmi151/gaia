@@ -224,7 +224,7 @@ def check_layer(gsd: GSDatadirScanner, item: Layer, key: str, ret: dict):
                 {"type": "NoSuchFeatureType", "ftid": item.featuretypeid, "skey": key}
             )
     elif item.coverageid:
-        if not gsd.collections["coverages"].has(item.featuretypeid):
+        if not gsd.collections["coverages"].has(item.coverageid):
             ret["problems"].append(
                 {"type": "NoSuchCoverage", "cid": item.coverageid, "skey": key}
             )
