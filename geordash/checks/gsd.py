@@ -211,6 +211,12 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
 
 
 def check_layer(gsd: GSDatadirScanner, item: Layer, key: str, ret: dict):
+    """check for:
+    - featureType existing (if vector)
+    - coverage existing (if raster)
+    - default style existing
+    - each of the alternative styles existing
+    """
     if item.featuretypeid:
         if not gsd.collections["featuretypes"].has(item.featuretypeid):
             ret["problems"].append(
@@ -221,6 +227,10 @@ def check_layer(gsd: GSDatadirScanner, item: Layer, key: str, ret: dict):
             ret["problems"].append(
                 {"type": "NoSuchCoverage", "cid": item.coverageid, "skey": key}
             )
+    if not gsd.collections["styles"].has(item.defaultstyleid):
+        ret["problems"].append(
+            {"type": "NoSuchStyle", "sid": item.defaultstyleid, "skey": key}
+        )
     return ret
 
 
