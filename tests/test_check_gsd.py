@@ -79,6 +79,14 @@ def test_check_datadir():
 def test_check_subset_of_items():
     for i in [
         (
+            "coverages",
+            "CoverageInfoImpl-749831bb:18dd0fbce6e:-7301",
+        ),  # -> ImageMosaic lidar/lidar_hd_semis_sol/lidar_hd_densite_sol
+        (
+            "coverages",
+            "CoverageInfoImpl-749831bb:18dd0fbce6e:-74ee",
+        ),  # -> GeoTIFF mnt/rgealti_5m/rgealti_region_5m_mnt_2021
+        (
             "featuretypes",
             "FeatureTypeInfoImpl--49a2709a:13d35ae2e83:-2704",
         ),  # -> directory of shapefiles geor_loc/localisation/epci
