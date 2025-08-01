@@ -78,6 +78,26 @@ def test_check_datadir():
 
 def test_check_subset_of_items():
     for i in [
+        # those should raise  problems
+        ("workspaces", "WorkspaceInfoImpl-20db08bf:1456fae7fa7:14de"),  # EmptyWorkspace
+        ("datastores", "DataStoreInfoImpl-51d47a63:1930bb72719:78b8"),  # NoSuchSchema
+        ("datastores", "DataStoreInfoImpl--3b977788:148cbbec560:-7315"),  # NoSuchDir
+        (
+            "featuretypes",
+            "FeatureTypeInfoImpl-35fa0415:1814214a902:46e3",
+        ),  # NoSchTableInSchema
+        ("layers", "LayerInfoImpl-35fa0415:18124a157f7:46d1"),  # NoDefaultStyle
+        ("styles", "StyleInfoImpl-34d20d0b:166aa758cb8:-1fb2"),  # NoSuchSLD
+        ("slds", "~data~webapps~geoserver~styles~lidar_hd_dallage.sld"),  # UnusedSLD
+        (
+            "vectordatas",
+            "~data~webapps~geoserver~data~ant~Contours_Lots_201409.shp",
+        ),  # UnusedVectorData
+        (
+            "rasterdatas",
+            "~data~webapps~geoserver~data~membres~Isodebits_Auvergne_201207.tif",
+        ),  # UnusedRasterData
+        # those shouldnt raise any problem
         (
             "coverages",
             "CoverageInfoImpl-749831bb:18dd0fbce6e:-7301",
