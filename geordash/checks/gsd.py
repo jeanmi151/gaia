@@ -125,8 +125,11 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
                         {"type": "NoSuchDir", "path": item.connurl, "skey": key}
                     )
     elif item.type == "PostGIS (JNDI)":
-        # todo: check schema existence in jndiref
-        pass
+        # check that the given schema exists
+        if not item.tables:
+            ret["problems"].append(
+                {"type": "NoSuchSchema", "schema": item.schema, "skey": key}
+            )
     return ret
 
 
