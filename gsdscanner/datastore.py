@@ -3,7 +3,10 @@
 # vim: ts=4 sw=4 et
 
 from lxml import etree
-from geordash.utils import getelemat
+from geordash.utils import getelemat, find_tomcat_geoserver_jdbc_resources
+from sqlalchemy import create_engine, MetaData, inspect
+from sqlalchemy.exc import SAWarning
+from sqlalchemy.engine import URL
 import os
 
 
@@ -52,5 +55,38 @@ class Datastore(dict):
                 idx = self.file.find("workspaces")
                 path = self.file[0:idx] + path
             self.connurl = path
-        # if type = PostGIS (JNDI) look for name matching connurl java:comp/env/ in tomcat's conf/server.xml
-        # and list tables in the given database
+        # if type = PostGIS (JNDI)
+        if (
+            self.connurl
+            and self.connurl.startswith("java:")
+            and self.dbtype == "postgis"
+            and "JNDI" in self.type
+        ):
+            # ignore SAWarning about unknown types, be it 'geom' (defined in geoalchemy2) or 'xml' ?
+            import warnings
+
+            warnings.filterwarnings("ignore", category=SAWarning)
+            jdbcres = find_tomcat_geoserver_jdbc_resources()
+            # look for name matching connurl java:comp/env/ in tomcat's conf/server.xml
+            k = self.connurl.removeprefix("java:comp/env/")
+            if k in jdbcres:
+                r = jdbcres[k]
+                url = URL.create(
+                    drivername="postgresql",
+                    username=r["username"],
+                    host=r["host"],
+                    port=r["port"],
+                    password=r["password"],
+                    database=r["database"],
+                )
+                engine = create_engine(url)
+                inspector = inspect(engine)
+                if self.schema in inspector.get_schema_names():
+                    m = MetaData(engine, schema=self.schema)
+                    m.reflect()
+                    # list tables in the given database, removing the schema prefix
+                    self.tables = [
+                        t.removeprefix(f"{self.schema}.") for t in m.tables.keys()
+                    ]
+                else:
+                    self.tables = None
