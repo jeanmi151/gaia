@@ -206,6 +206,17 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
                 ret["problems"].append(
                     {"type": "NoSuchVectorData", "vdk": vdk, "skey": ds.id}
                 )
+        # if datastore is of type JNDI, look for a table name matching nativeName in the linked postgis JNDI cnx
+        elif ds.type == "PostGIS (JNDI)":
+            if ds.tables and item.nativename not in ds.tables:
+                ret["problems"].append(
+                    {
+                        "type": "NoSuchTableInSchema",
+                        "schema": ds.schema,
+                        "table": item.nativename,
+                        "skey": key,
+                    }
+                )
     if not gsd.collections["namespaces"].has(item.namespaceid):
         ret["problems"].append(
             {
@@ -215,7 +226,6 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
                 "skey": key,
             }
         )
-    # if datastore is of type JNDI, look for a table name matching nativeName in the linked postgis JNDI cnx
     return ret
 
 
