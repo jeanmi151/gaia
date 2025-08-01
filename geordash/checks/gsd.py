@@ -239,15 +239,11 @@ def check_layer(gsd: GSDatadirScanner, item: Layer, key: str, ret: dict):
                 {"type": "NoSuchStyle", "sid": item.defaultstyleid, "skey": key}
             )
     else:
-        ret["problems"].append(
-            {"type": "LayerHasNoDefaultStyle", "skey": key}
-        )
+        ret["problems"].append({"type": "LayerHasNoDefaultStyle", "skey": key})
     if item.styleids is not None:
         for sid in item.styleids:
             if not gsd.collections["styles"].has(sid):
-                ret["problems"].append(
-                    {"type": "NoSuchStyle", "sid": sid, "skey": key}
-                )
+                ret["problems"].append({"type": "NoSuchStyle", "sid": sid, "skey": key})
     return ret
 
 
