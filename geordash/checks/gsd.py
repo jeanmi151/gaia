@@ -188,7 +188,12 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
                 # check that a layer named from item.nativename exists in the vd matching the gs
                 if item.nativename not in vd.layers:
                     ret["problems"].append(
-                        {"type": "NoSuchLayer", "stype": ds.type, "url": vdk}
+                        {
+                            "type": "NoSuchLayer",
+                            "stype": ds.type,
+                            "lname": item.nativename,
+                            "url": vdk,
+                        }
                     )
                 else:
                     get_logger("CheckGsd").debug(
@@ -276,7 +281,12 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                         vd.referenced_by.add(key)
                         if item.nativecoveragename not in vd.layers:
                             ret["problems"].append(
-                                {"type": "NoSuchLayer", "stype": cs.type, "url": vdk}
+                                {
+                                    "type": "NoSuchLayer",
+                                    "stype": cs.type,
+                                    "url": vdk,
+                                    "lname": item.nativecoveragename,
+                                }
                             )
                         else:
                             if vd.layers[item.nativecoveragename]["fields"] != [
