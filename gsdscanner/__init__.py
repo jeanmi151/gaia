@@ -3,7 +3,9 @@
 # vim: ts=4 sw=4 et
 
 from lxml import etree
+from datetime import datetime
 from geordash.utils import getelemat
+from geordash.logwrap import get_logger
 
 from .workspace import Workspace
 from .datastore import Datastore
@@ -46,7 +48,6 @@ class GSDatadirScanner:
         self.version = int(getelemat(tree, "/global/updateSequence"))
 
     def parse(self, toparse):
-        print(f"parse({toparse})")
         if type(toparse) == list:
             for i in toparse:
                 self.parse(i)
@@ -115,8 +116,11 @@ class GSDatadirScanner:
                     ## XXX unreachable
 
     def parseAll(self):
+        start = datetime.now()
         self.parse(self.available_keys)
         self.compute_crossref()
+        end = datetime.now()
+        get_logger("GsdScanner").debug(f"geoserver datadir parsing took {end-start}")
         self.parsed = True
 
     def compute_crossref(self):
