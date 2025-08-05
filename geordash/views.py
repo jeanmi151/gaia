@@ -38,6 +38,7 @@ def result(id: str) -> dict[str, object]:
             "geordash.checks.mviewer.check_all",
             "geordash.checks.ows.owsservice",
             "geordash.checks.csw.check_catalog",
+            "geordash.checks.gsd.gsdatadir",
         ):
             #            print(f"real taskset id is {result.result[0][0]}")
             result = GroupResult.restore(result.result[0][0])
