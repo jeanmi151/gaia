@@ -128,7 +128,7 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
         # check that the given schema exists
         if not item.tables:
             ret["problems"].append(
-                {"type": "NoSuchSchema", "schema": item.schema, "skey": key}
+                {"type": "NoSuchSchema", "schema": item.schema, "database": item.connurl, "skey": key}
             )
     return ret
 
