@@ -67,6 +67,9 @@ class Datastore(dict):
 
             warnings.filterwarnings("ignore", category=SAWarning)
             jdbcres = find_tomcat_geoserver_jdbc_resources()
+            if jdbcres is None:
+                self.tables = None
+                return
             # look for name matching connurl java:comp/env/ in tomcat's conf/server.xml
             k = self.connurl.removeprefix("java:comp/env/")
             if k in jdbcres:
