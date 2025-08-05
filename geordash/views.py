@@ -17,6 +17,7 @@ from geordash.tasks.gsdatadir import parse_gsdatadir
 import geordash.checks.ows
 import geordash.checks.csw
 import geordash.checks.mviewer
+import geordash.checks.gsd
 from geordash.decorators import check_role
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -135,6 +136,7 @@ def start_parse_gsd():
     result = parse_gsdatadir.delay()
     return {"taskid": result.id}
 
+
 @tasks_bp.get("/fetchcswrecords/<string:portal>.json")
 def start_fetch_csw(portal: str):
     result = get_records.delay(portal)
@@ -221,6 +223,16 @@ def check_mviewer(url):
         return abort(404)
     result = geordash.checks.mviewer.check_mviewer.delay(url)
     return {"result_id": result.id}
+
+
+@tasks_bp.route("/check/geoserver/datadir.json")
+def check_geoserver_datadir():
+    groupresult = geordash.checks.gsd.gsdatadir()
+    if groupresult.id:
+        app.extensions["rcli"].add_taskid_for_taskname_and_args(
+            "geordash.checks.gsd.gsdatadir", [], groupresult.id
+        )
+    return {"result_id": groupresult.id}
 
 
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
