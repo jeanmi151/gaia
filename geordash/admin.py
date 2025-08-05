@@ -75,7 +75,12 @@ def geoserver():
 @check_role(role="ADMINISTRATOR")
 def geoserver_datadir():
     gsd = app.extensions["owscache"].get_geoserver_datadir_view()
-    return render_template("admin/geoserver/datadir.html", gsd=gsd)
+    all_jobs_for_gsd = app.extensions["rcli"].get_taskids_by_taskname_and_args(
+        "geordash.checks.gsd.gsdatadir", []
+    )
+    return render_template(
+        "admin/geoserver/datadir.html", previous_jobs=all_jobs_for_gsd, gsd=gsd
+    )
 
 
 @admin_bp.route("/geoserver/datadir/<colltype>")
