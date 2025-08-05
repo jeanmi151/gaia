@@ -4,6 +4,7 @@
 
 from flask import current_app as app
 from celery import shared_task
+from datetime import datetime
 from geordash.logwrap import get_logger
 from geordash.owscapcache import OwsCapCache
 
@@ -12,6 +13,7 @@ def parse_gsdatadir(self):
     """
     parse xml in the datadir, and analyze spatial datas
     """
+    start = datetime.now()
     gsd = app.extensions["owscache"].get_geoserver_datadir_view()
     i = 0
     ni = 0
@@ -30,7 +32,8 @@ def parse_gsdatadir(self):
             f"current={t} ({len(gsd.collections[t].coll)} entries), done {i}/{len(gsd.available_keys)}"
         )
     gsd.compute_crossref()
-    get_logger("ParseGsDatadir").debug(f"computed crossrefs")
+    end = datetime.now()
+    get_logger("ParseGsDatadir").debug(f"computed crossrefs, parsing took {end-start}")
     gsd.parsed=True
     app.extensions["owscache"].update_geoserver_datadir_view(gsd)
     return ni
