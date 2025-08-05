@@ -415,6 +415,14 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                               return {'url': `${j.args[0]} ${j.args[1]}`, 'xurl': xurl, 'problem': GetPbStr(i) }
                             } else if (data['task'].includes('mviewer.check_all')) {
                               return {'url': j.args[0], 'xurl': baseurl + '/mviewer/' + j.args[0].replaceAll('/','~'), 'problem': GetPbStr(i) }
+                            } else if (data['task'].includes('gsd.gsdatadir')) {
+                            // gsdd
+                              n = j.args[1].split('~')
+                              if (n.length > 1) {
+                                return {'url': n[n.length-1], 'xurl': baseurl + '/admin/geoserver/datadir/' + j.args[0].slice(0, -1) + '/' + j.args[1], 'problem': GetPbStr(i) }
+                              } else {
+                                return {'url': j.args[1], 'xurl': baseurl + '/admin/geoserver/datadir/' + j.args[0].slice(0, -1) + '/' + j.args[1], 'problem': GetPbStr(i) }
+                              }
                             } else {
                               // csw
                               if (data['task'].includes('csw') && j.args.length == 2) {
@@ -466,6 +474,8 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                           argtitle = 'Configfile'
                         } else if (data['task'].includes('mviewer.check_all')) {
                           argtitle = 'Config url'
+                        } else if (data['task'].includes('gsd.gsdatadir')) {
+                          argtitle = 'Item'
                         }
                         var prevexp = $(targetpbdivid + '-export')
                         if (prevexp.length > 0) {
