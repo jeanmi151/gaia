@@ -239,6 +239,53 @@ const GetPbStr = (p) => {
       return `Sld with url ${p.url} doesnt exist`
     case 'NoSuchResource':
       return `Resource '${p.restype}' with id '${p.resid}' doesnt exist`
+    /* from gsd */
+    case 'EmptyWorkspace':
+      return `Workspace '${p.skey}' is empty`
+    case 'EmptyConnUrl':
+      return `DataStore '${p.skey}' has no connurl`
+    case 'NoSuchFile':
+      return `'${p.skey}' refers to file ${p.path} which doesnt exist`
+    case 'NoSuchDir':
+      return `'${p.skey}' refers to directory ${p.path} which doesnt exist`
+    case 'NoSuchVectorData':
+      return `'${p.skey}' refers to vector data ${p.vdk.replaceAll('~','/')} which wasnt found in gs datadir`
+    case 'NoSuchRasterData':
+      return `'${p.skey}' refers to raster data ${p.rdk.replaceAll('~','/')} which wasnt found in gs datadir`
+    case 'NoSuchSchema':
+      return `'${p.skey}' refers to database schema ${p.schema} which wasnt found in ${p.database}`
+    case 'NoSuchWorkspace':
+      return `${p.stype} '${p.skey}' refers to workspace ${p.wsid} which doesnt exist`
+    case 'NoSuchNamespace':
+      return `${p.stype} '${p.skey}' refers to namespace ${p.nsid} which doesnt exist`
+    case 'NoSuchDatastore':
+      return `FeatureType '${p.skey}' refers to datastore ${p.dsid} which doesnt exist`
+    case 'NoSuchTableInSchema':
+      return `FeatureType '${p.skey}' refers to table ${p.table} in schema ${p.schema} which doesnt exist`
+    case 'NoSuchFeatureType':
+      return `Layer '${p.skey}' refers to featuretype ${p.ftid} which doesnt exist`
+    case 'NoSuchCoverage':
+      return `Layer '${p.skey}' refers to coverage ${p.cid} which doesnt exist`
+    case 'NoSuchCoveragestore':
+      return `Coverage '${p.skey}' refers to coveragestore ${p.dsid} which doesnt exist`
+    case 'NoSuchStyle':
+      return `Layer '${p.skey}' refers to style ${p.sid} which doesnt exist`
+    case 'LayerHasNoDefaultStyle':
+      return `Layer '${p.skey}' has no default style`
+    case 'NotTileindex':
+      return `VectorData '${p.vdk}' doesnt look like a TileIndex`
+    case 'StyleInGlobalWorkspace':
+      return `Style '${p.skey}' isnt in a workspace`
+    case 'NoSuchSLD':
+      return `Style '${p.skey}' refers to an SLD in ${p.path.replaceAll('~','/')} which doesnt exist`
+    case 'EmptySLD':
+      return `SLD '${p.skey.replaceAll('~','/')}' is empty`
+    case 'UnusedSLD':
+      return `SLD '${p.skey.replaceAll('~','/')}' is unused (eg not referenced by any style)`
+    case 'UnusedRasterData':
+      return `RasterData '${p.skey.replaceAll('~','/')}' is unused`
+    case 'UnusedVectorData':
+      return `VectorData '${p.skey.replaceAll('~','/')}' is unused`
     default:
       return `Unhandled error code ${p.type} for problem ${p}`
   }
