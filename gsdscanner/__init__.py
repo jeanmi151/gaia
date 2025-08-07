@@ -232,7 +232,7 @@ class GSDatadirScanner:
                 for sid in l.styleids:
                     st = self.collections["styles"].coll.get(sid)
                     if st is not None:
-                        st.referenced_by.add(("layer", sid))
+                        st.referenced_by.add(("layer", l.id))
 
         for s in self.collections["styles"].coll.values():
             if s.format == "sld":
