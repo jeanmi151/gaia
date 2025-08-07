@@ -71,6 +71,8 @@ $(document).ready(function(){
 <li>type de raster: {{ obj.type }}</li>
 {% elif colltype == 'vectordata' %}
 <li>type de vecteur: {{ obj.type }}</li>
+{% elif colltype == 'sld' %}
+<li>Titre de la première regle: {{ obj.firstrulename }}</li>
 {% elif colltype == 'style' %}
 <li>format du style: {{ obj.format }}</li>
 {% set sk = obj.sldpath.replace('/','~') %}
