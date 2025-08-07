@@ -137,37 +137,37 @@ class GSDatadirScanner:
         for d in self.collections["datastores"].coll.values():
             w = self.collections["workspaces"].coll.get(d.workspaceid)
             if w is not None:
-                w.referenced_by.add(d.id)
+                w.referenced_by.add(('datastore', d.id))
 
         for c in self.collections["coveragestores"].coll.values():
             w = self.collections["workspaces"].coll.get(c.workspaceid)
             if w is not None:
-                w.referenced_by.add(c.id)
+                w.referenced_by.add(('coveragestore', c.id))
 
         for f in self.collections["featuretypes"].coll.values():
             ds = self.collections["datastores"].coll.get(f.datastoreid)
             if ds is not None:
-                ds.referenced_by.add(f.id)
+                ds.referenced_by.add(('featuretype', f.id))
 
         for c in self.collections["coverages"].coll.values():
             cs = self.collections["coveragestores"].coll.get(c.coveragestoreid)
             if cs is not None:
-                cs.referenced_by.add(c.id)
+                cs.referenced_by.add(('coverage', c.id))
 
         for l in self.collections["layers"].coll.values():
             if l.coverageid:
                 c = self.collections["coverages"].coll.get(l.coverageid)
                 if c is not None:
-                    c.referenced_by.add(l.id)
+                    c.referenced_by.add(('layer', l.id))
             if l.featuretypeid:
                 ft = self.collections["featuretypes"].coll.get(l.featuretypeid)
                 if ft is not None:
-                    ft.referenced_by.add(l.id)
+                    ft.referenced_by.add(('layer', l.id))
             st = self.collections["styles"].coll.get(l.defaultstyleid)
             if st is not None:
-                st.referenced_by.add(l.id)
+                st.referenced_by.add(('layer', l.id))
             if l.styleids:
                 for sid in l.styleids:
                     st = self.collections["styles"].coll.get(sid)
                     if st is not None:
-                        st.referenced_by.add(sid)
+                        st.referenced_by.add(('layer', sid))
