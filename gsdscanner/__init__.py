@@ -236,9 +236,8 @@ class GSDatadirScanner:
 
         for s in self.collections["styles"].coll.values():
             if s.format == "sld":
-                sldpath = f"{os.path.dirname(s.file)}/{s.sldfilename}"
-                if os.path.isfile(sldpath):
-                    sk = sldpath.replace("/", "~")
+                if os.path.isfile(s.sldpath):
+                    sk = s.sldpath.replace("/", "~")
                     sld = self.collections["slds"].coll.get(sk)
                     if sld is not None:
                         sld.referenced_by.add(("style", s.id))

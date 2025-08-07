@@ -370,9 +370,8 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
 
     # todo: css styles
     if item.format == "sld":
-        sldpath = f"{os.path.dirname(item.file)}/{item.sldfilename}"
-        if os.path.isfile(sldpath):
-            sk = sldpath.replace("/", "~")
+        if os.path.isfile(item.sldpath):
+            sk = item.sldpath.replace("/", "~")
             s = gsd.collections["slds"].coll.get(sk)
             if s is None:
                 ret["problems"].append({"type": "NoSuchSLD", "path": sk, "skey": key})

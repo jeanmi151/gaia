@@ -4,6 +4,7 @@
 
 from lxml import etree
 from geordash.utils import getelemat
+import os
 
 
 class Style(dict):
@@ -23,6 +24,7 @@ class Style(dict):
         # can be None for styles in the global workspace
         self.workspaceid = getelemat(xml, "/style/workspace/id")
         self.sldfilename = getelemat(xml, "/style/filename")
+        self.sldpath = f"{os.path.dirname(self.file)}/{self.sldfilename}"
         # styles created before the introduction of css dont have a format tag
         if self.format is None:
             if getelemat(xml, "/style/sldVersion") is not None:
