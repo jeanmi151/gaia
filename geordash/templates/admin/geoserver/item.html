@@ -33,8 +33,8 @@ $(document).ready(function(){
 {% if obj.nativename %}
 <li>nom de couche: {{ obj.nativename }}</li>
 {% endif %}
-<!-- todo: link to gs admin/edit page ? -->
 {% if colltype == 'datastore' %}
+<li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.web.data.store.DataAccessEditPage?storeName={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
 <li>type de datastore: {{ obj.type }}</li>
 {% if obj.dbtype %}
 <li>dbtype: {{ obj.dbtype }}</li>
@@ -51,9 +51,11 @@ $(document).ready(function(){
 {% endif %}
 {% endif %}
 {% elif colltype == 'coveragestore' %}
+<li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.web.data.store.CoverageStoreEditPage?storeName={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
 <li>type de coveragestore: {{ obj.type }}</li>
 <li>path: {{ obj.url }}</li>
 {% elif colltype == 'layer' %}
+<li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.web.data.resource.ResourceConfigurationPage?name={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
 <li>type de couche: {{ obj.type }}</li>
 <li>publiée: {{ obj.advertised }}</li>
 <li>active: {{ obj.enabled }}</li>
@@ -74,6 +76,11 @@ $(document).ready(function(){
 {% elif colltype == 'sld' %}
 <li>Titre de la première regle: {{ obj.firstrulename }}</li>
 {% elif colltype == 'style' %}
+{% if wsname %}
+<li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.wms.web.data.StyleEditPage?name={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
+{% else %}
+<li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.wms.web.data.StyleEditPage?name={{ obj.name }}'>éditer dans geoserver</a></li>
+{% endif %}
 <li>format du style: {{ obj.format }}</li>
 {% set sk = obj.sldpath.replace('/','~') %}
 <li>sld: <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='sld',collobj=sk) }}'>{{ sk }}</a></li>
