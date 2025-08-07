@@ -18,7 +18,7 @@ class SLD(dict):
         self.referenced_by = set()
 
     def __repr__(self):
-        return f"SLD: file={self.file}, id={self.id}, name={self.name}"
+        return f"SLD: file={self.file}, id={self.id}, name={self.name}, firstrulename={self.firstrulename}"
 
     def parse(self):
         # check for empty sld, only parse if not empty..
@@ -49,9 +49,9 @@ class SLD(dict):
                 xml,
                 "|".join(
                     [
-                        "(/sld:StyledLayerDescriptor/sld:NamedLayer/sld:UserStyle/sld:FeatureTypeStyle/sld:Rule)[1]/sld:Name",
+                        "(/sld:StyledLayerDescriptor/sld:NamedLayer/sld:UserStyle/sld:FeatureTypeStyle/sld:Rule)[1]/sld:Title",
                         "(/StyledLayerDescriptor/NamedLayer/UserStyle/se:FeatureTypeStyle/se:Rule)[1]/se:Name",
-                        "(/StyledLayerDescriptor/NamedLayer/UserStyle/FeatureTypeStyle/Rule)[1]/Name",
+                        "(/StyledLayerDescriptor/NamedLayer/UserStyle/FeatureTypeStyle/Rule)[1]/Title",
                         "(/sld:UserStyle/sld:FeatureTypeStyle/sld:Rule)[1]/sld:Title",
                     ]
                 ),
