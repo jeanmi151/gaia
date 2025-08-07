@@ -74,7 +74,7 @@ $(document).ready(function(){
 {% elif colltype == 'style' %}
 <li>format du style: {{ obj.format }}</li>
 {% set sk = obj.sldpath.replace('/','~') %}
-<li>sld: <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='sld',collobj=sk) }}'>{{ sk }}<a></li>
+<li>sld: <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='sld',collobj=sk) }}'>{{ sk }}</a></li>
 {% endif %}
 {% if obj.workspaceid %}
 <li>dans le workspace <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='workspace',collobj=obj.workspaceid) }}'>{{ obj.workspaceid }}</a></li>
