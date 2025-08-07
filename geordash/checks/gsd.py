@@ -125,7 +125,12 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
         # check that the given schema exists
         if not item.tables:
             ret["problems"].append(
-                {"type": "NoSuchSchema", "schema": item.schema, "database": item.connurl, "skey": key}
+                {
+                    "type": "NoSuchSchema",
+                    "schema": item.schema,
+                    "database": item.connurl,
+                    "skey": key,
+                }
             )
     return ret
 
@@ -376,7 +381,9 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
             if s is None:
                 ret["problems"].append({"type": "NoSuchSLD", "path": sk, "skey": key})
         else:
-            ret["problems"].append({"type": "NoSuchSLD", "path": item.sldpath, "skey": key})
+            ret["problems"].append(
+                {"type": "NoSuchSLD", "path": item.sldpath, "skey": key}
+            )
     return ret
 
 
