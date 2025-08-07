@@ -62,7 +62,7 @@ $(document).ready(function(){
 référencé par:
 <ul>
 {% for f in obj.referenced_by %}
-<li>{{ f }}</li>
+<li>le {{ f[0] }} <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype=f[0],collobj=f[1]) }}'>{{ f[1] }}</a></li>
 {% endfor %}
 </ul>
 </p>
