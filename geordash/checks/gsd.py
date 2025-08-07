@@ -376,7 +376,7 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
             if s is None:
                 ret["problems"].append({"type": "NoSuchSLD", "path": sk, "skey": key})
         else:
-            ret["problems"].append({"type": "NoSuchSLD", "path": sldpath, "skey": key})
+            ret["problems"].append({"type": "NoSuchSLD", "path": item.sldpath, "skey": key})
     return ret
 
 
