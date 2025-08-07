@@ -117,6 +117,11 @@ def geoserver_datadir_collobj(colltype: str, collobj: str):
     items = gsd.collections[colltype + "s"].coll
     obj = items.get(collobj)
     if obj is not None:
+        wsname = None
+        if hasattr(obj, 'workspaceid'):
+            w = gsd.collections['workspaces'].coll.get(obj.workspaceid)
+            if w is not None:
+                wsname = w.name
         all_jobs_for_gsditem = app.extensions["rcli"].get_taskids_by_taskname_and_args(
             "geordash.checks.gsd.gsdatadir_item",
             [colltype + "s", collobj, None],  # None is for the optional datadir path..
@@ -125,6 +130,7 @@ def geoserver_datadir_collobj(colltype: str, collobj: str):
             "admin/geoserver/item.html",
             previous_jobs=all_jobs_for_gsditem,
             obj=obj,
+            wsname=wsname,
             colltype=colltype,
             key=collobj,
         )
