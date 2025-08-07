@@ -44,7 +44,7 @@ $(document).ready(function(){
 <li>dans le datastore <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='datastore',collobj=obj.datastoreid) }}'>{{ obj.datastoreid }}</a></li>
 {% endif %}
 {% if obj.coveragestoreid %}
-<li>dans le coveragestore <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='featuretype',collobj=obj.coveragestoreid) }}'>{{ obj.coveragestoreid }}</a></li>
+<li>dans le coveragestore <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='coveragestore',collobj=obj.coveragestoreid) }}'>{{ obj.coveragestoreid }}</a></li>
 {% endif %}
 {% if obj.namespaceid %}
 <!-- <li>dans le namespace <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='namespace',collobj=obj.namespaceid) }}'>{{ obj.namespaceid }}</a></li> -->
@@ -53,7 +53,7 @@ $(document).ready(function(){
 <li>dans le featuretype <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='featuretype',collobj=obj.featuretypeid) }}'>{{ obj.featuretypeid }}</a></li>
 {% endif %}
 {% if obj.coverageid %}
-<li>dans le coverage <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='featuretype',collobj=obj.coverageid) }}'>{{ obj.coverageid }}</a></li>
+<li>dans le coverage <a href='{{ url_for('dashboard.admin.geoserver_datadir_collobj',colltype='coverage',collobj=obj.coverageid) }}'>{{ obj.coverageid }}</a></li>
 {% endif %}
 </ul>
 
