@@ -396,6 +396,13 @@ def check_sld(gsd: GSDatadirScanner, item: SLD, key: str, ret: dict):
         and re.match("^tmp[0-9a-f\-]{36}.sld", os.path.basename(item.file)) is None
     ):
         ret["problems"].append({"type": "UnusedSLD", "skey": key})
+    if item.firstrulename in (
+        "Green Line",
+        "Blue Line",
+        "Red Square",
+        "Gray Polygon with Black Outline",
+    ):
+        ret["problems"].append({"type": "DefaultSLD", "skey": key})
     return ret
 
 
