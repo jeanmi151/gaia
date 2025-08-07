@@ -115,9 +115,6 @@ def check_datastore(gsd: GSDatadirScanner, item: Datastore, key: str, ret: dict)
                     ret["problems"].append(
                         {"type": "NoSuchVectorData", "vdk": vdk, "skey": key}
                     )
-                else:
-                    vd = gsd.collections["vectordatas"].coll.get(vdk)
-                    vd.referenced_by.add(('datastore', key))
             # shapefile and directory of shapefile point at a dir
             else:
                 if not os.path.isdir(item.connurl):
@@ -157,8 +154,6 @@ def check_coveragestore(
                 ret["problems"].append(
                     {"type": "NoSuchRasterData", "rdk": rdk, "skey": key}
                 )
-            else:
-                gsd.collections["rasterdatas"].coll.get(rdk).referenced_by.add(('coveragestore', key))
         elif item.type == "ImageMosaic":
             if not os.path.isdir(item.url):
                 ret["problems"].append(
@@ -187,7 +182,6 @@ def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: d
             vdk = fpath.replace("/", "~")
             if gsd.collections["vectordatas"].has(vdk):
                 vd = gsd.collections["vectordatas"].coll.get(vdk)
-                vd.referenced_by.add(('featuretype', key))
                 # check that a layer named from item.nativename exists in the vd matching the gs
                 if item.nativename not in vd.layers:
                     ret["problems"].append(
@@ -273,8 +267,6 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                 ret["problems"].append(
                     {"type": "NoSuchRasterData", "rdk": rdk, "skey": cs.key}
                 )
-            else:
-                gsd.collections["rasterdatas"].coll.get(rdk).referenced_by.add(('coverage', key))
         elif cs.type == "ImageMosaic":
             if os.path.isdir(cs.url):
                 idx = cs.url
@@ -287,7 +279,6 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                     # check that it's in vd
                     if gsd.collections["vectordatas"].has(vdk):
                         vd = gsd.collections["vectordatas"].coll.get(vdk)
-                        vd.referenced_by.add(('coverage', key))
                         if item.nativecoveragename not in vd.layers:
                             ret["problems"].append(
                                 {
@@ -322,9 +313,7 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                                         rd = gsd.collections["rasterdatas"].coll.get(
                                             rdk
                                         )
-                                        if rd is not None:
-                                            rd.referenced_by.add(('coverage', key))
-                                        else:
+                                        if rd is None:
                                             ret["problems"].append(
                                                 {
                                                     "type": "NoSuchRasterData",
@@ -385,9 +374,7 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
         if os.path.isfile(sldpath):
             sk = sldpath.replace("/", "~")
             s = gsd.collections["slds"].coll.get(sk)
-            if s is not None:
-                s.referenced_by.add(('style', key))
-            else:
+            if s is None:
                 ret["problems"].append({"type": "NoSuchSLD", "path": sk, "skey": key})
         else:
             ret["problems"].append({"type": "NoSuchSLD", "path": sldpath, "skey": key})

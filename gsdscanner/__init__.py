@@ -4,6 +4,8 @@
 
 from lxml import etree
 from datetime import datetime
+from osgeo.ogr import Open
+import os
 from geordash.utils import getelemat
 from geordash.logwrap import get_logger
 
@@ -124,50 +126,119 @@ class GSDatadirScanner:
         self.parsed = True
 
     def compute_crossref(self):
-        """compute cross references between xml files
+        """compute cross references between xml files, and data files
 
-        - datastore -> workspace
-        - coveragestore -> workspace
-        - coverage -> coveragestore
-        - featuretype -> datastore
+        - datastore -> workspace & vectordata for geopackage
+        - coveragestore -> workspace & rasterdata for geotiff
+        - coverage -> coveragestore, rasterdata for geotiff, rasterdata & vectordata for ImageMosaic
+        - featuretype -> datastore & vectordata
         - layer -> {featuretype, coverage} + style
-
-        slds, vectordatas & rasterdatas will be done during checks
+        - style -> sld
         """
         for d in self.collections["datastores"].coll.values():
             w = self.collections["workspaces"].coll.get(d.workspaceid)
             if w is not None:
-                w.referenced_by.add(('datastore', d.id))
+                w.referenced_by.add(("datastore", d.id))
+            if d.connurl is not None and d.type == "GeoPackage":
+                vdk = d.connurl.replace("/", "~")
+                vd = self.collections["vectordatas"].coll.get(vdk)
+                if vd is not None:
+                    vd.referenced_by.add(("datastore", d.id))
 
         for c in self.collections["coveragestores"].coll.values():
             w = self.collections["workspaces"].coll.get(c.workspaceid)
             if w is not None:
-                w.referenced_by.add(('coveragestore', c.id))
+                w.referenced_by.add(("coveragestore", c.id))
+            if os.path.isfile(c.url) and c.type == "GeoTiff":
+                rdk = c.url.replace("/", "~")
+                rd = self.collections["rasterdatas"].coll.get(rdk)
+                if rd is not None:
+                    rd.referenced_by.add(("coveragestore", c.id))
 
         for f in self.collections["featuretypes"].coll.values():
             ds = self.collections["datastores"].coll.get(f.datastoreid)
             if ds is not None:
-                ds.referenced_by.add(('featuretype', f.id))
+                ds.referenced_by.add(("featuretype", f.id))
+                if ds.type in [
+                    "Shapefile",
+                    "Directory of spatial files (shapefiles)",
+                    "GeoPackage",
+                ]:
+                    fpath = ds.connurl
+                    if "shapefile" in ds.type.lower():
+                        if fpath.endswith("/"):
+                            fpath = fpath.removesuffix("/")
+                        fpath = f"{fpath}/{f.nativename}.shp"
+                    vdk = fpath.replace("/", "~")
+                    vd = self.collections["vectordatas"].coll.get(vdk)
+                    if vd is not None:
+                        vd.referenced_by.add(("featuretype", f.id))
 
         for c in self.collections["coverages"].coll.values():
             cs = self.collections["coveragestores"].coll.get(c.coveragestoreid)
             if cs is not None:
-                cs.referenced_by.add(('coverage', c.id))
+                cs.referenced_by.add(("coverage", c.id))
+                if cs.type == "GeoTIFF":
+                    rdk = cs.url.replace("/", "~")
+                    rd = self.collections["rasterdatas"].coll.get(rdk)
+                    if rd is not None:
+                        rd.referenced_by.add(("coverage", c.id))
+                elif cs.type == "ImageMosaic" and os.path.isdir(cs.url):
+                    idx = cs.url
+                    if idx.endswith("/"):
+                        idx = idx.removesuffix("/")
+                    idx = f"{idx}/{c.nativecoveragename}.shp"
+                    # check that a shp exists with the same name
+                    if os.path.isfile(idx):
+                        vdk = idx.replace("/", "~")
+                    vd = self.collections["vectordatas"].coll.get(vdk)
+                    if vd is not None:
+                        vd.referenced_by.add(("coverage", c.id))
+                        if c.nativecoveragename in vd.layers and vd.layers[
+                            c.nativecoveragename
+                        ]["fields"] == ["location"]:
+                            # iterate over features, check that each of them is an existing rd
+                            ds = Open(vd.file)
+                            l = ds.GetLayerByName(c.nativecoveragename)
+                            for f in l:
+                                rpath = f.GetField("location")
+                                # if not absolute path, prepend the coveragestore url
+                                if not rpath.startswith("/"):
+                                    csdir = cs.url
+                                    if csdir.endswith("/"):
+                                        csdir = csdir.removesuffix("/")
+                                    rpath = f"{csdir}/{rpath}"
+                                if os.path.isfile(rpath):
+                                    rdk = rpath.replace("/", "~")
+                                    # check that it's an existing rd
+                                    rd = self.collections["rasterdatas"].coll.get(rdk)
+                                    if rd is not None:
+                                        rd.referenced_by.add(("coverage", c.id))
+                                        rd.referenced_by.add(("vectordatas", vd.id))
 
         for l in self.collections["layers"].coll.values():
             if l.coverageid:
                 c = self.collections["coverages"].coll.get(l.coverageid)
                 if c is not None:
-                    c.referenced_by.add(('layer', l.id))
+                    c.referenced_by.add(("layer", l.id))
             if l.featuretypeid:
                 ft = self.collections["featuretypes"].coll.get(l.featuretypeid)
                 if ft is not None:
-                    ft.referenced_by.add(('layer', l.id))
+                    ft.referenced_by.add(("layer", l.id))
             st = self.collections["styles"].coll.get(l.defaultstyleid)
             if st is not None:
-                st.referenced_by.add(('layer', l.id))
+                st.referenced_by.add(("layer", l.id))
             if l.styleids:
                 for sid in l.styleids:
                     st = self.collections["styles"].coll.get(sid)
                     if st is not None:
-                        st.referenced_by.add(('layer', sid))
+                        st.referenced_by.add(("layer", sid))
+
+        for s in self.collections["styles"].coll.values():
+            if s.format == "sld":
+                sldpath = f"{os.path.dirname(s.file)}/{s.sldfilename}"
+                if os.path.isfile(sldpath):
+                    sk = sldpath.replace("/", "~")
+                    sld = self.collections["slds"].coll.get(sk)
+                    if sld is not None:
+                        sld.referenced_by.add(("style", s.id))
