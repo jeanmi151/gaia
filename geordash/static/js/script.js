@@ -280,6 +280,8 @@ const GetPbStr = (p) => {
       return `Style '${p.skey}' refers to an SLD in ${p.path.replaceAll('~','/')} which doesnt exist`
     case 'EmptySLD':
       return `SLD '${p.skey.replaceAll('~','/')}' is empty`
+    case 'DefaultSLD':
+      return `SLD '${p.skey.replaceAll('~','/')}' is likely a default generic style`
     case 'UnusedSLD':
       return `SLD '${p.skey.replaceAll('~','/')}' is unused (eg not referenced by any style)`
     case 'UnusedRasterData':
