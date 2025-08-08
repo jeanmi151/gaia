@@ -51,11 +51,14 @@ def gsdatadir_item(colltype, key, defpath=None, gsd=None):
             defpath=defpath, parse_now=True
         )
     if gsd is None:
+        get_logger("CheckGsd").error("no geoserver datadir view ?")
         return False
     if colltype not in gsd.available_keys:
+        get_logger("CheckGsd").error(f"{colltype} isnt a geoserver item type")
         return False
     item = gsd.collections[colltype].coll.get(key)
     if item is None:
+        get_logger("CheckGsd").error(f"{key} not found in {colltype} collection")
         return False
     ret = dict()
     ret["problems"] = list()
