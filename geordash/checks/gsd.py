@@ -31,6 +31,7 @@ def gsdatadir(defpath=None):
         defpath=defpath, parse_now=True
     )
     if gsd is None:
+        get_logger("CheckGsd").error("no geoserver datadir view ?")
         return False
     taskslist = list()
     for colltype in gsd.available_keys:
