@@ -518,6 +518,8 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       } else {
                         $(targetdivid).text("job failed badly, raw error: " + data["value"]);
                       }
+                    } else if (data["value"] === false) {
+                        $(targetdivid).text("job failed early and didn't return a real value, check celery logs");
                     } else {
                       $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
                     }
