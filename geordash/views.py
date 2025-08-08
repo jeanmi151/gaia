@@ -234,6 +234,18 @@ def check_geoserver_datadir():
         )
     return {"result_id": groupresult.id}
 
+@tasks_bp.route("/check/geoserver/datadir/<string:colltype>/<string:itemid>.json")
+def check_geoserver_datadir_item(colltype, itemid):
+    gsd = app.extensions["owscache"].get_geoserver_datadir_view()
+    ctype = f"{colltype}s"
+    if gsd is None:
+        return abort(404)
+    if ctype not in gsd.available_keys:
+        return abort(404)
+    if gsd.collections[ctype].coll.get(itemid) is None:
+        return abort(404)
+    result = geordash.checks.gsd.gsdatadir_item.delay(ctype, itemid, None)
+    return {"result_id": result.id}
 
 @tasks_bp.route("/check/ows/<string:stype>/<string:url>/<string:lname>.json")
 def check_owslayer(stype, url, lname):
