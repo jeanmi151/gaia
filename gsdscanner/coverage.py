@@ -34,5 +34,5 @@ class Coverage(dict):
                 mdtype = e.find("metadataType").text
                 mdurl = e.find("content").text
                 self.metadatalinks.append(
-                    {"mdformat": mdformat, "type": mdtype, "mdurl": mdurl}
+                    {"format": mdformat, "type": mdtype, "url": mdurl}
                 )
