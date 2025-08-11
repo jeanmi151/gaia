@@ -69,6 +69,9 @@ def find_tomcat_geoserver_jdbc_resources():
         get_logger("Utils").error(f"cant read {path}, not the right group/modes ?")
         return None
     else:
+        get_logger("Utils").info(
+            f"parsing {path} to find JNDI resources"
+        )
         ret = dict()
         with fp:
             xml = etree.parse(fp)
