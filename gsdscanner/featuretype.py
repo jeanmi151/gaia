@@ -30,4 +30,14 @@ class FeatureType(dict):
         self.namespaceid = getelemat(xml, "/featureType/namespace/id")
         self.datastoreid = getelemat(xml, "/featureType/store/id")
         self.nativename = getelemat(xml, "/featureType/nativeName")
-        # XXX metadataLinks
+        self.metadatalinks = None
+        r = xml.xpath("/featureType/metadataLinks/metadataLink")
+        if len(r) > 0:
+            self.metadatalinks = list()
+            for e in r:
+                mdformat = e.find("type").text
+                mdtype = e.find("metadataType").text
+                mdurl = e.find("content").text
+                self.metadatalinks.append(
+                    {"mdformat": mdformat, "type": mdtype, "mdurl": mdurl}
+                )
