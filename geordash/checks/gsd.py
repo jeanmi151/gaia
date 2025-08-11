@@ -380,6 +380,14 @@ def check_coverage(gsd: GSDatadirScanner, item: Coverage, key: str, ret: dict):
                         {"type": "NoSuchFile", "path": idx, "skey": cs.key}
                     )
 
+    if item.metadatalinks is not None:
+        for m in item.metadatalinks:
+            r = check_mdlink_resolves(m)
+            if r != True:
+                ret["problems"].append(r)
+    else:
+        ret["problems"].append({"type": "NoMetadataUrl"})
+
     if not gsd.collections["namespaces"].has(item.namespaceid):
         ret["problems"].append(
             {
