@@ -54,6 +54,9 @@ $(document).ready(function(){
 <li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.web.data.store.CoverageStoreEditPage?storeName={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
 <li>type de coveragestore: {{ obj.type }}</li>
 <li>path: {{ obj.url }}</li>
+{% elif colltype == 'workspace' %}
+<li><a href='{{ url_for('dashboard.ows', stype='wms', url=localgsbaseurl + '~' + obj.name + '~ows') }}'>voir la liste des couches wms dans gaia</a></li>
+<li><a href='{{ url_for('dashboard.ows', stype='wfs', url=localgsbaseurl + '~' + obj.name + '~ows') }}'>voir la liste des couches wfs dans gaia</a></li>
 {% elif colltype == 'layer' %}
 {% if wsname %}
 <li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.web.data.resource.ResourceConfigurationPage?name={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
