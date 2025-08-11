@@ -28,7 +28,7 @@ class Style(dict):
         # styles created before the introduction of css dont have a format tag
         if self.format is None:
             if getelemat(xml, "/style/sldVersion") is not None:
-                self.format = 'sld'
-            elif self.sldfilename.endswith('.sld'):
+                self.format = "sld"
+            elif self.sldfilename.endswith(".sld"):
                 # likely the default styles in the global ws
-                self.format = 'sld'
+                self.format = "sld"
