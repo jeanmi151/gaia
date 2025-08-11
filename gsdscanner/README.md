@@ -59,11 +59,11 @@ right unix user, or give the user the right group membership.
 
 ## checks
 
-the checks are done by a [celery task](geordash/checks/gsd.py) checking each
+the checks are done by a [celery task](../geordash/checks/gsd.py) checking each
 object for each category.
 
 ## running standalone
 
-the [checkgsd.py](checkgsd.py) script at the toplevel of the repository can be
+the [checkgsd.py](../checkgsd.py) script at the toplevel of the repository can be
 run standalone (eg outside of gaia/georchestra), pointing at the path of a
 given datadir.
