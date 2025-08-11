@@ -26,25 +26,33 @@ def getelemsat(xml: etree._ElementTree, path: str, nsmap=None) -> list:
     return None
 
 
-def find_tomcat_geoserver_jdbc_resources():
-    """try hard to find the path of the geoserver's tomcat server.xml
+def find_tomcat_geoserver_catalina_base():
+    """try hard to find the path of the geoserver's tomcat catalina base
     iterate of the list of processes, and try to find one which has:
     - java for the process name
     - catalina.base in its args
     when found, read the l/p for each jdbc resource
     """
-    catalinabase = None
     for proc in psutil.process_iter():
         try:
             pinfo = proc.as_dict(attrs=["name", "cmdline", "environ"])
             if pinfo["name"] == "java":
                 for a in pinfo["cmdline"]:
                     if "-Dcatalina.base=" in a:
-                        catalinabase = a.split("=")[1]
-                if "CATALINA_BASE" in pinfo["environ"]:
-                    catalinabase = pinfo["environ"]["CATALINA_BASE"]
+                        return a.split("=")[1]
+                if (
+                    pinfo["environ"] != None
+                    and type(pinfo["environ"]) == dict
+                    and "CATALINA_BASE" in pinfo["environ"]
+                ):
+                    return pinfo["environ"]["CATALINA_BASE"]
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
+    return None
+
+
+def find_tomcat_geoserver_jdbc_resources():
+    catalinabase = find_catalina_base()
     if catalinabase is None:
         path = "/srv/tomcat/geoserver/conf/server.xml"
     else:
