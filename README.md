@@ -191,7 +191,16 @@ instead, amount of maps/contexts that the current user can access.
 - lists currently configured portals in geonetwork
 
 ### `/admin/geoserver`
-- lists currently configured workspaces in geoserver
+- lists currently configured workspaces in geoserver, querying geoserver's REST API
+
+### `/admin/geoserver/datadir`
+- display geoserver datadir contents, from a high pov - more details [documented here](gsdscanner/README.md)
+
+### `/admin/geoserver/datadir/<itemtype>`
+- display list of geoserver items for the given type (workspaces, datastores, layers, styles...)
+
+### `/admin/geoserver/datadir/<itemtype>/<itemid>`
+- displays details about a given item in the geoserver datadir
 
 ### `/map/<mapid>`
 - displays map details & current problems
