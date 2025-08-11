@@ -25,4 +25,14 @@ class Coverage(dict):
         self.declaredsrs = getelemat(xml, "/coverage/srs")
         self.namespaceid = getelemat(xml, "/coverage/namespace/id")
         self.coveragestoreid = getelemat(xml, "/coverage/store/id")
-        # XXX metadataLinks
+        self.metadatalinks = None
+        r = xml.xpath("/coverage/metadataLinks/metadataLink")
+        if len(r) > 0:
+            self.metadatalinks = list()
+            for e in r:
+                mdformat = e.find("type").text
+                mdtype = e.find("metadataType").text
+                mdurl = e.find("content").text
+                self.metadatalinks.append(
+                    {"mdformat": mdformat, "type": mdtype, "mdurl": mdurl}
+                )
