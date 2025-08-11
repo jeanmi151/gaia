@@ -116,7 +116,11 @@ def find_geoserver_datadir(default):
                 for a in pinfo["cmdline"]:
                     if "-DGEOSERVER_DATA_DIR=" in a:
                         return a.split("=")[1]
-                if "GEOSERVER_DATA_DIR" in pinfo["environ"]:
+                if (
+                    pinfo["environ"] != None
+                    and type(pinfo["environ"]) == dict
+                    and "GEOSERVER_DATA_DIR" in pinfo["environ"]
+                ):
                     return pinfo["environ"]["GEOSERVER_DATA_DIR"]
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
