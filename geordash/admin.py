@@ -118,10 +118,27 @@ def geoserver_datadir_collobj(colltype: str, collobj: str):
     obj = items.get(collobj)
     if obj is not None:
         wsname = None
-        if hasattr(obj, 'workspaceid'):
-            w = gsd.collections['workspaces'].coll.get(obj.workspaceid)
+        if hasattr(obj, "workspaceid"):
+            w = gsd.collections["workspaces"].coll.get(obj.workspaceid)
             if w is not None:
                 wsname = w.name
+        elif colltype == "layer":
+            if obj.coverageid:
+                c = gsd.collections["coverages"].coll.get(obj.coverageid)
+                if c is not None:
+                    cs = gsd.collections["coveragestores"].coll.get(c.coveragestoreid)
+                    if cs is not None:
+                        w = gsd.collections["workspaces"].coll.get(cs.workspaceid)
+                        if w is not None:
+                            wsname = w.name
+            elif obj.featuretypeid:
+                f = gsd.collections["featuretypes"].coll.get(obj.featuretypeid)
+                if f is not None:
+                    ds = gsd.collections["datastores"].coll.get(f.datastoreid)
+                    if ds is not None:
+                        w = gsd.collections["workspaces"].coll.get(ds.workspaceid)
+                        if w is not None:
+                            wsname = w.name
         all_jobs_for_gsditem = app.extensions["rcli"].get_taskids_by_taskname_and_args(
             "geordash.checks.gsd.gsdatadir_item",
             [colltype + "s", collobj, None],  # None is for the optional datadir path..
