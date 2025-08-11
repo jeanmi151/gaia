@@ -6,6 +6,7 @@ from celery import shared_task
 from celery import group
 from flask import current_app as app
 from osgeo.ogr import Open
+import requests
 
 from gsdscanner import GSDatadirScanner
 from gsdscanner.datastore import Datastore
@@ -20,6 +21,7 @@ from gsdscanner.rasterdata import RasterData
 from gsdscanner.workspace import Workspace
 
 from geordash.logwrap import get_logger
+from geordash.utils import objtype
 
 import os
 import re
@@ -169,6 +171,26 @@ def check_coveragestore(
                     {"type": "NoSuchDir", "path": item.url, "skey": key}
                 )
     return ret
+
+
+def check_mdlink_resolves(m: dict):
+    mdurl = m["url"]
+    try:
+        r = requests.head(mdurl)
+        if r.status_code != 200:
+            return {
+                "type": "BrokenMetadataUrl",
+                "url": mdurl,
+                "code": r.status_code,
+            }
+    except Exception as e:
+        return {
+            "type": "ConnectionFailure",
+            "url": mdurl,
+            "exception": objtype(e),
+            "exceptionstr": str(e),
+        }
+    return True
 
 
 def check_featuretype(gsd: GSDatadirScanner, item: FeatureType, key: str, ret: dict):
