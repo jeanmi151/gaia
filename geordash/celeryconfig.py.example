@@ -53,6 +53,11 @@ beat_schedule = {
         "args": ("wfs", "/geoserver/ows"),
         "schedule": crontab(minute=30, hour=0),
     },
+    "check-gs-datadir-every-sunday": {
+        "task": "geordash.checks.gsd.gsdatadir",
+        "args": [],
+        "schedule": crontab(day_of_week='sunday',minute=30, hour=1),
+    },
     "check-gn-metadatas-every-night": {
         "task": "geordash.checks.csw.check_catalog",
         "args": ["/geonetwork/srv/fre/csw"],
