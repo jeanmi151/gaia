@@ -309,8 +309,11 @@ class OwsCapCache:
         """
         # XX put path and hostname in rkey ?
         rkey = "geoserver_datadir"
+        dp = find_geoserver_datadir(defpath)
+        if dp is None:
+            return None
         # will parse global.xml to have the datadir version (should be _latest_)
-        gsdd = gsdscanner.GSDatadirScanner(find_geoserver_datadir(defpath))
+        gsdd = gsdscanner.GSDatadirScanner(dp)
         if rkey not in self.services:
             re = self.rediscli.get(rkey)
             if re:
