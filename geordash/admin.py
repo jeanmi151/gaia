@@ -75,6 +75,10 @@ def geoserver():
 @check_role(role="ADMINISTRATOR")
 def geoserver_datadir():
     gsd = app.extensions["owscache"].get_geoserver_datadir_view()
+    if gsd is None:
+        return make_response(
+            jsonify({"error": f"no geoserver datadir was found, check logs"}, 404)
+        )
     all_jobs_for_gsd = app.extensions["rcli"].get_taskids_by_taskname_and_args(
         "geordash.checks.gsd.gsdatadir", []
     )
@@ -87,6 +91,10 @@ def geoserver_datadir():
 @check_role(role="ADMINISTRATOR")
 def geoserver_datadir_collection(colltype: str):
     gsd = app.extensions["owscache"].get_geoserver_datadir_view()
+    if gsd is None:
+        return make_response(
+            jsonify({"error": f"no geoserver datadir was found, check logs"}, 404)
+        )
     items = gsd.collections[colltype].coll
     out = list()
     for o in items.values():
@@ -114,6 +122,10 @@ def geoserver_datadir_collection(colltype: str):
 @check_role(role="ADMINISTRATOR")
 def geoserver_datadir_collobj(colltype: str, collobj: str):
     gsd = app.extensions["owscache"].get_geoserver_datadir_view()
+    if gsd is None:
+        return make_response(
+            jsonify({"error": f"no geoserver datadir was found, check logs"}), 404
+        )
     items = gsd.collections[colltype + "s"].coll
     obj = items.get(collobj)
     if obj is not None:
