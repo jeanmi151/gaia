@@ -318,7 +318,7 @@ class OwsCapCache:
             re = self.rediscli.get(rkey)
             if re:
                 cached_gsdd = jsonpickle.decode(json.loads(re.decode("utf-8")))
-                if cached_gsdd.version >= gsdd.version:
+                if gsdd.version is None or cached_gsdd.version >= gsdd.version:
                     # update in-memory cache, this one is parsed
                     self.services[rkey] = cached_gsdd
                     return self.services[rkey]
