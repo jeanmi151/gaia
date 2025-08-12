@@ -44,10 +44,19 @@ class GSDatadirScanner:
             "vectordatas",
             "rasterdatas",
         ]
-        # XXX handle access errors re ownership/rights
-        tree = etree.parse(f"{path}/global.xml")
-        self.pburl = getelemat(tree, "/global/settings/proxyBaseUrl")
-        self.version = int(getelemat(tree, "/global/updateSequence"))
+        try:
+            tree = etree.parse(f"{path}/global.xml")
+            self.pburl = getelemat(tree, "/global/settings/proxyBaseUrl")
+            self.version = int(getelemat(tree, "/global/updateSequence"))
+        except OSError as e:
+            if "failed to load external entity" in e.args[0]:
+                get_logger("GsdScanner").error(
+                    f"{path} doesnt contain global.xml, is it a geoserver datadir ?"
+                )
+            else:
+                get_logger("GsdScanner").error(e)
+            self.version = None
+            pass
 
     def parse(self, toparse):
         if type(toparse) == list:
