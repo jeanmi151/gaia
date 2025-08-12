@@ -11,6 +11,9 @@
                 {"prefix": "#ms-map", "taskname": "geordash.checks.mapstore.check_resources","taskargs": ['MAP']},
                 {"prefix": "#ms-ctx", "taskname": "geordash.checks.mapstore.check_resources","taskargs": ['CONTEXT']},
 {% endif %}
+{% if superuser %}
+                {"prefix": "#gs-datadir", "taskname": "geordash.checks.gsd.gsdatadir","taskargs": []},
+{% endif %}
               ]);
 {% if 'sec-roles' not in request.headers or ( 'sec-roles' in request.headers and 'MAPSTORE_ADMIN' not in request.headers['sec-roles'] ) %}
               fetchMapsAndCtxCount('{{ url_for('dashboard.my_maps_and_apps') }}');
@@ -42,6 +45,17 @@ welcome to <a href='https://github.com/georchestra/gaia/'>gaia (geOrchestra Auto
     </div>
   </div>
  </div>
+{% if superuser %}
+ <div class="col">
+  <div class="card h-100" id="gs-datadir-card">
+    <div class="card-body">
+      <h5 class="card-title">Geoserver Datadir</h5>
+      <p class="card-text" id="gs-datadir-abstract">Placeholder</p>
+      <p class="card-text"><small class="text-muted" id="gs-datadir-lastupdated">Job never ran</small></p>
+    </div>
+  </div>
+ </div>
+{% endif %}
  <div class="col">
   <div class="card h-100" id="gn-csw-card">
     <div class="card-body">
