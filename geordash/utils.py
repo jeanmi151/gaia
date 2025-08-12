@@ -52,7 +52,7 @@ def find_tomcat_geoserver_catalina_base():
 
 
 def find_tomcat_geoserver_jdbc_resources():
-    catalinabase = find_catalina_base()
+    catalinabase = find_tomcat_geoserver_catalina_base()
     if catalinabase is None:
         path = "/srv/tomcat/geoserver/conf/server.xml"
     else:
