@@ -124,6 +124,17 @@ def find_geoserver_datadir(default):
             pass
     if default is None:
         default = "/srv/data/geoserver"
+    path = f"{default}/global.xml"
+    if not os.access(path, os.F_OK):
+        get_logger("Utils").error(
+            f"{path} not found, dunno where to find geoserver datadir"
+        )
+        return None
+    try:
+        fp = open(path)
+    except PermissionError:
+        get_logger("Utils").error(f"cant read {path}, not the right group/modes ?")
+        return None
     return default
 
 
