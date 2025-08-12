@@ -15,6 +15,9 @@ def parse_gsdatadir(self):
     """
     start = datetime.now()
     gsd = app.extensions["owscache"].get_geoserver_datadir_view()
+    if gsd is None:
+        get_logger("ParseGsDatadir").error("no geoserver datadir view ?")
+        return False
     i = 0
     ni = 0
     for t in gsd.available_keys:
