@@ -36,7 +36,7 @@ def find_tomcat_geoserver_catalina_base():
     for proc in psutil.process_iter():
         try:
             pinfo = proc.as_dict(attrs=["name", "cmdline", "environ"])
-            if pinfo["name"] == "java" and "/geoserver" in pinfo["cmdline"]:
+            if pinfo["name"] == "java" and "/geoserver" in " ".join(pinfo["cmdline"]):
                 for a in pinfo["cmdline"]:
                     if "-Dcatalina.base=" in a:
                         return a.split("=")[1]
