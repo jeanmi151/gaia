@@ -416,6 +416,9 @@ def check_style(gsd: GSDatadirScanner, item: Style, key: str, ret: dict):
             # style in global ws shouldnt reference a ws ?
             ret["problems"].append({"type": "StyleInGlobalWorkspace", "skey": key})
 
+    if len(item.referenced_by) == 0:
+        ret["problems"].append({"type": "UnusedStyle", "skey": key})
+
     # todo: css styles
     if item.format == "sld":
         if os.path.isfile(item.sldpath):
