@@ -522,6 +522,9 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       }
                     } else if (data["value"] === false) {
                         $(targetdivid).text("job failed early and didn't return a real value, check celery logs");
+                    } else if (Array.isArray(data["value"]) && data["value"].length === 0 && data["finished"] === false && data["completed"] == "0 / 0") {
+                        $(targetdivid).text("nothing to check ?");
+                        return;
                     } else {
                       $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
                     }
