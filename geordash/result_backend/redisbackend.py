@@ -170,6 +170,9 @@ class RedisClient:
             taskname = task["name"]
             args = task["args"]
         else:
+            if len(task["result"][1]) == 0:
+                get_logger("RedisClient").error(f"{taskid} has no child tasks ?")
+                return None
             # taskset, take name & args from the first task of the set
             ftid = task["result"][1][0][0][0]
             tj = self.get(ftid)
