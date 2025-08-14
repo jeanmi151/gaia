@@ -284,6 +284,8 @@ const GetPbStr = (p) => {
       return `SLD '${p.skey.replaceAll('~','/')}' is likely a default generic style`
     case 'UnusedSLD':
       return `SLD '${p.skey.replaceAll('~','/')}' is unused (eg not referenced by any style)`
+    case 'UnusedStyle':
+      return `Style '${p.skey}' is unused (eg not referenced by any layer)`
     case 'UnusedRasterData':
       return `RasterData '${p.skey.replaceAll('~','/')}' is unused`
     case 'UnusedVectorData':
