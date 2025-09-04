@@ -261,7 +261,7 @@ const GetPbStr = (p) => {
     case 'NoSuchDatastore':
       return `FeatureType '${p.skey}' refers to datastore ${p.dsid} which doesnt exist`
     case 'NoSuchTableInSchema':
-      return `FeatureType '${p.skey}' refers to table ${p.table} in schema ${p.schema} which doesnt exist`
+      return `FeatureType '${p.skey}' refers to table/view ${p.table} in schema ${p.schema} which doesnt exist`
     case 'NoSuchFeatureType':
       return `Layer '${p.skey}' refers to featuretype ${p.ftid} which doesnt exist`
     case 'NoSuchCoverage':
