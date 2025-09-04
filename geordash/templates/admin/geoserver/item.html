@@ -31,7 +31,7 @@ $(document).ready(function(){
 <li>titre: {{ obj.title }}</li>
 {% endif %}
 {% if obj.nativename %}
-<li>nom de couche: {{ obj.nativename }}</li>
+<li>nom natif: {{ obj.nativename }}</li>
 {% endif %}
 {% if colltype == 'datastore' %}
 <li><a href='/{{ localgsbaseurl }}/web/wicket/bookmarkable/org.geoserver.web.data.store.DataAccessEditPage?storeName={{ obj.name }}&wsName={{ wsname }}'>éditer dans geoserver</a></li>
