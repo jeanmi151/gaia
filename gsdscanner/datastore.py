@@ -91,5 +91,7 @@ class Datastore(dict):
                     self.tables = [
                         t.removeprefix(f"{self.schema}.") for t in m.tables.keys()
                     ]
+                    # add views
+                    self.tables.extend(inspector.get_view_names(schema=self.schema))
                 else:
                     self.tables = None
