@@ -50,6 +50,12 @@ class GeorchestraConfig:
             except:
                 # safe default value
                 self.sections["urls"]["localgs"] = "geoserver"
+
+        with open(f"{self.datadirpath}/geonetwork/geonetwork.properties") as lines:
+            lines = chain(("[section]",), lines)  # This line does the trick.
+            parser.read_file(lines)
+        self.sections["geonetwork"] = parser["section"]
+
         # read current commit from .git/HEAD which might lead to the branch tip
         prefix = getcwd() + "/.git/"
         self.sections["gaia"] = {"commit": None}
@@ -66,6 +72,24 @@ class GeorchestraConfig:
         except OSError:
             # failed to read .git/HEAD or .git/refs/heads/* ?
             pass
+
+    def tostr(self):
+        str = ""
+        for key in self.sections:
+            str += key + ":\r\n<br>"
+            for key2 in self.sections[key]:
+                str += " \t&emsp;" + key2 + " : "
+                if self.sections[key][key2] == self.get(key2, section=key):
+                    str += " \t&emsp;" + self.sections[key][key2] + "\r\n<br> "
+                else:
+                    str += (
+                        " \t&emsp;"
+                        + self.sections[key][key2]
+                        + " = "
+                        + self.get(key2, section=key)
+                        + "\r\n<br> "
+                    )
+        return str
 
     def get(self, key, section="default"):
         if section not in self.sections:

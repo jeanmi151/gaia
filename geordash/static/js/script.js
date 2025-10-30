@@ -40,6 +40,40 @@ const fetchForHome = (widgets) => {
   })
 }
 
+const fetchForHomeSingleTask = (widgets) => {
+  widgets.forEach(function(o) {
+    fetch(baseurl + '/tasks/lastresultbytask/' + o["taskname"] + "?taskargs=" + o["taskargs"].join(","))
+      .then(response => response.json())
+      .then(mydata => {
+        if (parseInt(mydata["finished"])) {
+          const d = new Date(mydata["finished"] * 1000);
+          $(o["prefix"] + '-lastupdated').html("Information valid as of "+ d.toLocaleString("fr-FR") + '<br/>(taskid: '+ mydata['taskid'] + ')')
+        }
+        if (mydata === "notask") {
+          $(o["prefix"] + '-abstract').html("<span class='text-warning'>no " + o["taskname"] + " job found with args " + o["taskargs"].join(",") + ", something went wrong ?</span>")
+          return;
+        }
+        if (mydata['value'] === null && mydata['ready'] === false) {
+          $(o["prefix"] + '-abstract').html("<span class='text-primary'>job is currently running, " + mydata['completed'] + " objects checked</span>")
+          return;
+        }
+        let str = "<br/>";
+
+        const nerrors = mydata['value']['problems'].length;
+
+        if (nerrors > 0) {
+          str += "<span class='text-danger'>" + nerrors + " errors found !</span>";
+        } else {
+          str += "<span class='text-success'> no errors !</span>";
+        }
+        $(o["prefix"] + '-abstract').html(str);
+    })
+    .catch(function(err) {
+      $(o["prefix"] + '-abstract').html("<span class='bg-danger text-white'>something went wrong</span>")
+    });
+  })
+}
+
 const fetchMyMd = (localgnbaseurl) => {
   fetch(baseurl + '/api/geonetwork/metadatas.json')
     .then(response => response.json())
@@ -290,6 +324,8 @@ const GetPbStr = (p) => {
       return `RasterData '${p.skey.replaceAll('~','/')}' is unused`
     case 'UnusedVectorData':
       return `VectorData '${p.skey.replaceAll('~','/')}' is unused`
+    case 'UnusedFileResTotal':
+      return `In total ${bytesFormatter(p.size)} could be saved on ${bytesFormatter(p.total)}`
     default:
       return `Unhandled error code ${p.type} for problem ${p}`
   }
@@ -446,11 +482,13 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       data["value"].problems = probs.flat(1)
                   } else {
                       // if problems is undef, single task badly failed and returned the python exception as value
-                      if (data["value"].problems !== undefined) {
-                        const probs = data["value"].problems.map(i => {
-                          return GetPbStr(i)
-                        })
-                        data["value"].problems = probs
+                      if (!data['task'].includes('gn_datadir')) {
+                          if (data["value"].problems !== undefined) {
+                            const probs = data["value"].problems.map(i => {
+                              return GetPbStr(i)
+                            })
+                            data["value"].problems = probs
+                          }
                       }
                   }
                   if (data["value"].problems !== undefined && data["value"].problems.length > 0) {
@@ -466,10 +504,20 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       const missing = all.filter(x => !done.includes(x));
                       $(targetdivid).text("jobs on " + missing + " failed, did " + data["completed"] + " - on those, " + data["value"].problems.length + ' problems found');
                     } else {
+                      if (data['task'].includes('gn_datadir')) {
+                          // if gn_datadir will remove last problem as it is a total count
+                          const targetpboverviewdivid = targetdivid.replace('#pbtitle', '#pboverviews')
+                          totalgndatadir = data["value"].problems.pop()
+                          const exporttotalgndatadir = $("<div>");
+                          exporttotalgndatadir.html("<p>"+GetPbStr(totalgndatadir)+" within the path "+data["value"]["searching_path"]+"</p>" )
+                          $(targetpboverviewdivid).html(exporttotalgndatadir)
+                        }
                       $(targetdivid).text(data["value"].problems.length + ' problems found');
                     }
-                    if (Array.isArray(data["value"])) {
+                    if (Array.isArray(data["value"]) || Array.isArray(data["value"]['problems'])) {
                         var argtitle = 'Layer'
+                        var argcolumn2 = 'Problem'
+                        var columns2Formatter = 'None'
                         if (data['task'].includes('csw')) {
                           argtitle = 'Metadata'
                         } else if (data['task'].includes('check_resources')) {
@@ -480,6 +528,10 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                           argtitle = 'Config url'
                         } else if (data['task'].includes('gsd.gsdatadir')) {
                           argtitle = 'Item'
+                        } else if (data['task'].includes('gn_datadir')) {
+                          argtitle = 'Path'
+                          argcolumn2 = 'Size'
+                          columns2Formatter = 'bytesFormatter'
                         }
                         var prevexp = $(targetpbdivid + '-export')
                         if (prevexp.length > 0) {
@@ -506,7 +558,7 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                             columns: [
                               {'title': 'Index', 'formatter': 'runningFormatter'},
                               {'field': 'url', 'title': argtitle, 'sortable': true, 'formatter': 'urlFormatter'},
-                              {'field': 'problem', 'title': 'Problem', 'sortable': true}
+                              {'field': 'problem', 'title': argcolumn2, 'sortable': true, 'formatter': columns2Formatter}
                             ]
                           });
                         }
@@ -529,6 +581,10 @@ const PollTaskRes = (type, resid, taskid, showdelete, targetdivid = '#pbtitle') 
                       $(targetdivid).html('<a href="https://lessalesmajestes.bandcamp.com/album/no-problemo">No problemo!</a>')
                     }
                     $(targetpbdivid).empty();
+                    if (data['task'].includes('gn_datadir')) {
+                       const targetpboverviewdivid = targetdivid.replace('#pbtitle', '#pboverviews');
+                       $(targetpboverviewdivid).empty();
+                    }
                   }
                   const d = new Date(data["finished"] * 1000);
                   $(targetpbdetdivid).text('vérification faite le '+ d.toLocaleString("fr-FR"));
@@ -564,6 +620,13 @@ function urlFormatter(value, row) {
   } else {
     return row.url
   }
+}
+function bytesFormatter(bytes, row="") {
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes == 0) return 'n/a';
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    if (i == 0) return bytes + ' ' + sizes[i];
+    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
 }
 function runningFormatter(value, row, index) {
     return 1 + index;
